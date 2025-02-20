@@ -63,6 +63,20 @@ class ClientService
         }
     }
 
+    public function getClientsByHotel($hotel_id)
+    {
+        try {
+            // Retrieve the logged-in user
+            $loggedUser = Auth::user();
+
+            // Get paginated client data using the client repository
+            return $this->clientRepository->getClientsByHotel($loggedUser, $hotel_id);
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
+            throw new \Exception($e->getMessage());
+        }
+    }
+
     /**
      * Create a new client.
      *
@@ -74,7 +88,12 @@ class ClientService
     {
         DB::beginTransaction();
         try {
-            $loggedUserId = Auth::user()->id;
+            if(!empty(Auth::user()))
+            {
+                $loggedUserId = Auth::user()->id;
+            }else{
+                $loggedUserId = 1;
+            }
             $userData = [];
             $clientData = [];
             // Prepare user data
@@ -88,6 +107,7 @@ class ClientService
             $userData['password'] = Str::random(8);
             $userData['created_by_id'] = $loggedUserId;
             $user = $this->userRepository->addUser($userData);
+    
             // Prepare client data
             $clientData['user_id'] = $user->id;
             $clientData['hotel_id'] = $requestData['hotel_id'];
@@ -96,7 +116,6 @@ class ClientService
             $clientData['entity'] = $requestData['entity'];
             $clientData['created_by_id'] = $loggedUserId;
             $client = $this->clientRepository->addClient($clientData);
-
 
             $this->activityLogService->addActivityLog('create', User::class, json_encode([]), json_encode($userData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);
             $this->activityLogService->addActivityLog('create', Client::class, json_encode([]), json_encode($clientData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);

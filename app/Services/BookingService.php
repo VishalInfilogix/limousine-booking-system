@@ -109,6 +109,49 @@ class BookingService
         }
     }
 
+    
+    public function getBookingArchiveData(array $requestData = [])
+    {
+        try {
+            // Retrieve the logged-in user
+            $loggedUser = Auth::user();
+            // Extract parameters from the request data or use default values
+            $page = $requestData['page'] ?? 1;
+            $search = $requestData['search'] ?? '';
+            $sortField = $requestData['sortField'] ?? 'id';
+            $sortDirection = $requestData['sortDirection'] ?? 'desc';
+            $pickupDateRange = $requestData['pickupDateRange'] ?? null;
+            $driverId = $requestData['driverId'] ?? null;
+            $currentDate = Carbon::now()->toDateString(); // Get current date in MySQL format
+            $loggedUser = Auth::user();
+            $userTypeSlug = $loggedUser->userType->slug ?? null;
+            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
+            {
+                if ($pickupDateRange) {
+                    $dates = explode("-", $pickupDateRange);
+                    $startDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[0]))->format('Y-m-d H:i:s');
+                    $endDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[1]))->format('Y-m-d H:i:s');
+                } else {
+                    $startDate = $currentDate;
+                    $endDate = Carbon::now()->addDays(30)->startOfDay()->toDateTimeString();
+                }
+            }else{
+                if ($pickupDateRange) {
+                    $dates = explode("-", $pickupDateRange);
+                    $startDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[0]))->format('Y-m-d H:i:s');
+                    $endDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[1]))->format('Y-m-d H:i:s');
+                } else {
+                    $startDate = $currentDate;
+                    $endDate = Carbon::now()->addDay()->startOfDay()->addHours(4)->toDateTimeString(); // Set end date to tomorrow at 4 AM
+                }
+            }
+            return $this->bookingRepository->getBookingsArchive($loggedUser, $startDate, $endDate, $search, $page, $sortField, $sortDirection, $driverId);
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
+            throw new \Exception($e->getMessage());
+        }
+    }
+
     /**
      * Create a new booking.
      *
@@ -382,6 +425,12 @@ class BookingService
             $additional_stops = !empty($requestData['additional_stops']) 
                                 ? join('||', array_filter($requestData['additional_stops'])) 
                                 : '';
+
+            $linkedClients = NULL;
+            $linkedClients = join(',', $requestData['access_given_clients']);
+
+            if (isset($requestData['access_given_clients']))
+                $bookingData['linked_clients'] = $requestData['access_given_clients'];
             if (isset($requestData['status']))
                 $bookingData['status'] = $requestData['status'];
             if (isset($requestData['pickup_date']))
@@ -577,6 +626,78 @@ class BookingService
                 $bookingBillingData['is_peak_period_surcharge'] = $isPeakPeriod;
                 $this->bookingBillingRepository->createOrUpdateBookingBillingByBookingId($booking->id, $bookingBillingData, $loggedUserId);
             }
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    
+
+    public function restoreBooking(int $bookingId, Booking $booking, array $log_headers)
+    {
+        DB::beginTransaction();
+        try {
+            $loggedUserId = Auth::user()->id;
+            $loggedUserType = Auth::user()->userType->name ?? null;
+            $userTypeSlug = Auth::user()->userType->slug ?? null;
+
+            
+            $bookingData['deleted_at'] = NULL;
+            $bookingData['completely_deleted'] = 'no';
+            
+            
+            $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user());
+
+            $bookingData['updated_by_id'] = $loggedUserId;
+
+            $oldData = $this->bookingRepository->getBookingByIdToRestore($bookingId);
+
+            $newData = $this->bookingRepository->restoreBooking($booking, $bookingData);
+
+            $message= "Restored";
+            $logData = ["message" => $message, "booking_id" => $bookingId, "user_id" => $loggedUserId];
+            $this->bookingLogRepository->addLogs($logData);
+
+            $this->activityLogService->addActivityLog('restore', Booking::class, json_encode($oldData), json_encode($newData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    
+
+    public function cancelBooking(int $bookingId, Booking $booking, array $log_headers)
+    {
+        DB::beginTransaction();
+        try {
+            $loggedUserId = Auth::user()->id;
+            $loggedUserType = Auth::user()->userType->name ?? null;
+            $userTypeSlug = Auth::user()->userType->slug ?? null;
+            
+            $bookingData['client_asked_to_cancel'] = 'yes';
+            
+            
+            $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user());
+
+            $bookingData['updated_by_id'] = $loggedUserId;
+
+            $oldData = $this->bookingRepository->getBookingByIdToRestore($bookingId);
+
+            $newData = $this->bookingRepository->cancelBooking($booking, $bookingData);
+
+            $message= "Requested For Cancel";
+            $logData = ["message" => $message, "booking_id" => $bookingId, "user_id" => $loggedUserId];
+            $this->bookingLogRepository->addLogs($logData);
+
+            $this->activityLogService->addActivityLog('cancel', Booking::class, json_encode($oldData), json_encode($newData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);
+
             DB::commit();
             return true;
         } catch (\Exception $e) {
@@ -909,6 +1030,44 @@ class BookingService
             $oldData = $this->bookingRepository->getBookingByIds($requestData['booking_ids']);
             // Delete booking(s) from the database
             $this->bookingRepository->deleteBooking($requestData['booking_ids']);
+            $loggedUser=Auth::user();
+            foreach ($requestData['booking_ids'] as $bookingId) {
+                $message= "Deleted";
+                $logData = ["message" => $message, "booking_id" => $bookingId, "user_id" => $loggedUser->id];
+                $this->bookingLogRepository->addLogs($logData);
+            }
+            $this->activityLogService->addActivityLog('delete', Booking::class, json_encode($oldData), json_encode([]), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            // Rollback the transaction if an error occurs
+            DB::rollback();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    
+    public function getBookingByIdToRestore(int $bookingId)
+    {
+        try {
+            $booking = $this->bookingRepository->getBookingByIdToRestore($bookingId);
+
+            return $booking;
+        } catch (\Exception $e) {
+            // Rollback the transaction if an error occurs
+            DB::rollback();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    
+    public function permanentDeleteBookings($requestData, $log_headers)
+    {
+        try {
+            $oldData = $this->bookingRepository->getBookingByIdsToPermanentDelete($requestData['booking_ids']);
+            
+            $this->bookingRepository->permanentDeleteBooking($requestData['booking_ids']);
+
             $loggedUser=Auth::user();
             foreach ($requestData['booking_ids'] as $bookingId) {
                 $message= "Deleted";

@@ -40,7 +40,9 @@ export default class EditBookings extends BaseClass {
         $(document).on("change", "#pickup_time_to_be_advised", this.handlePickupTime);
         $(document).on("change", "#driver-id", this.handleDriver);
         $(document).on("click", "#addStop", this.handleAddStop);
+        $(document).on("click", "#addClient", this.handleAddClient);
         $(document).on("click", ".remove-stop", this.handleRemoveStop);
+        $(document).on("click", ".remove-client", this.handleRemoveClient);
         $(document).on(
             "change",
             "#service-types, #is-peak-period-surcharge, #is-mid-night-surcharge, #is-arr-waiting-time-surcharge, #is-out-of-city-surcharge, #is-last-minute-booking-surcharge, #is-additional-stop-charge, #is-misc-surcharge",
@@ -54,10 +56,16 @@ export default class EditBookings extends BaseClass {
         $(document).on("change", "#status", this.handleStatus);
         $(document).on("change.td", "#trip-ended", this.handleDateTime);
         $(document).on("click", ".delete-booking-btn", this.handleDeleteModal);
+        $(document).on("click", ".cancel-booking-btn", this.handleCancelModal);
         $(document).on(
             "click",
             "#deleteConfirmButton",
             this.handleDeleteBookings
+        );
+        $(document).on(
+            "click",
+            "#cancelConfirmButton",
+            this.handleCancelBookings
         );
         $(document).on(
             "change",
@@ -84,12 +92,36 @@ export default class EditBookings extends BaseClass {
         }
     };
 
+    handleCancelModal = ({ target }) => {
+        try {
+            const bookingId = $(target).data("id");
+            this.openModal("cancelConfirmModal");
+            $("#cancelConfirmationTitle").text(
+                "Are you sure you want to cancel this booking?"
+            );
+            $("#cancelConfirmationTitle").data("id", bookingId);
+        } catch (error) {
+            this.handleException(error);
+        }
+    };
+
     handleDeleteBookings = () => {
         try {
             const bookingId = $("#deleteConfirmationTitle").data("id");
             const formData = new FormData();
             formData.append("booking_ids[]", bookingId);
             this.sendDeleteRequest(formData);
+        } catch (error) {
+            this.handleException(error);
+        }
+    };
+
+    handleCancelBookings = () => {
+        try {
+            const bookingId = $("#cancelConfirmationTitle").data("id");
+            const formData = new FormData();
+            formData.append("booking_id", bookingId);
+            this.sendCancelRequest(formData);
         } catch (error) {
             this.handleException(error);
         }
@@ -217,7 +249,29 @@ export default class EditBookings extends BaseClass {
                         formData.getAll("booking_ids[]")
                     );
                     $("#loader").hide();
-                    window.history.back();
+                    window.location.href = this.props.routes.baseUrl + '/bookings';
+                }
+                throw flash;
+            })
+            .catch((error) => {
+                $("#loader").hide();
+                this.handleException(error);
+            });
+    };
+
+    sendCancelRequest = (formData) => {
+        const url = this.props.routes.cancelBooking;
+        $("#loader").show();
+        axios
+            .post(url, formData)
+            .then((response) => {
+                const statusCode = response.data.status.code;
+                const message = response.data.status.message;
+                const flash = new ErrorHandler(statusCode, message);
+                if (statusCode === 200) {
+                    this.closeModal("cancelConfirmModal");
+                    $("#loader").hide();
+                    window.location.href = this.props.routes.baseUrl + '/bookings';
                 }
                 throw flash;
             })
@@ -305,6 +359,47 @@ export default class EditBookings extends BaseClass {
         }
         this.initializeAdditionalStopLimits();
         this.handleAdditionalStopIds();
+    };
+
+    handleAddClient = () => {
+        const lastClientInputContainer = $(".access_given_clients").last();
+
+        const lastId = parseInt(lastClientInputContainer.attr("id").split("_")[3]);
+
+        const newId = lastId + 1;
+
+        const clients = this.props.clients;
+        const bookingCreatedBy = this.props.bookingCreatedBy;
+
+        const newClientInput = `
+            <select name="access_given_clients[]" id="access_given_clients_${newId}"
+                class="form-control form-select custom-select col-sm-9 access_given_clients"
+                autocomplete="off">
+                <option value="">Select Client</option>
+                    ${clients
+                        .filter(row => bookingCreatedBy !== row.user.id)
+                        .map(
+                            (row) =>
+                                `<option value="${row.user.id}">
+                                    ${(row.user.first_name ? row.user.first_name : '')} 
+                                    ${(row.user.last_name ? row.user.last_name : '')}
+                                </option>`
+                        )
+                        .join("")}
+            </select>
+            <button type="button" class="remove-client col-sm-2" id="remove_client_${newId}">
+                <span class="fas fa-times mt-3 text-danger" id="client_span_${newId}"></span>
+            </button>`;
+            
+        $('.access_given_clients_div').append(newClientInput);
+    };
+    
+
+    handleRemoveClient = ({ target }) => {
+        const id = $(target).attr('id').split('_')[2];
+
+        $('#access_given_clients_' + id).remove();
+        $('#remove_client_' + id).remove();
     };
 
     handleRemoveStop = ({ target }) => {
@@ -1185,8 +1280,16 @@ export default class EditBookings extends BaseClass {
             this.handleDriverOffDay
         );
         this.initializeTimePicker("pick-up-time-picker");
-        this.initializeDateTimePicker("flight-departure-time-picker");
-        this.initializeDateTimePicker("trip-ended-picker");
+        if($('#service-types').val() == 3 || $('#service-types').val() == 7)
+        {
+            this.initializeDateTimePicker("flight-departure-time-picker");
+        }
+        const loggedUser = this.props.loggedUser;
+        const loggedUserSlug = loggedUser.user_type?.slug ?? null;
+        if(loggedUserSlug === null || ["admin", "admin-staff"].includes(loggedUserSlug))
+        {
+            this.initializeDateTimePicker("trip-ended-picker");
+        }
         this.initializeGoogleMapAutoComplete("pick-up-location");
         this.initializeGoogleMapAutoComplete("drop-off-location");
         $(".additional-stops[id^='additionalStops_']").each((_, element) => {

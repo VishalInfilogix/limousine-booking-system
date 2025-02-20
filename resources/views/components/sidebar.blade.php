@@ -26,6 +26,13 @@
                         <p>Bookings</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('bookings-archives') }}" class="nav-link {{ Request::is('bookings-archives*') ? 'active' : '' }}"
+                        title="Bookings Archives">
+                        <span class="icon-nav icon bookings-icon"></span>
+                        <p>Bookings Archives</p>
+                    </a>
+                </li>
                 @if ($loggedUsertypeSlug === null || in_array($loggedUsertypeSlug, ['admin', 'admin-staff']))
                     <li class="nav-item {{ Request::is('driver*') ? 'menu-open' : '' }}">
                         <a href="javascript:void(0);" class="nav-link" title="Drivers">

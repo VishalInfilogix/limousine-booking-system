@@ -59,6 +59,7 @@ class BookingController extends Controller
         private PeakPeriodService $peakPeriodService,
         private DriverOffDayService $driverOffDayService,
         private BookingLogService $bookingLogService,
+        private ClientService $clientService,
         private CorporateFairBillingRepository $corporateFairBillingRepository,
         private CustomHelper $helper
     ) {
@@ -115,6 +116,7 @@ class BookingController extends Controller
                 $events = $this->eventService->getEventDataByHotel($hotel_id);
             }
         }
+
         $hotelClients = $this->hotelService->getClientAdmins();
         $peakPeriods = $this->peakPeriodService->getAllPeakPeriod();
         $locations = $this->locationService->getLocations();
@@ -243,6 +245,8 @@ class BookingController extends Controller
         $peakPeriods = $this->peakPeriodService->getAllPeakPeriod();
         $driverOffDays = $this->driverOffDayService->getSavedDates();
         $events = $this->eventService->getEventDataByHotel($booking->client_id);
+        $clients = $this->clientService->getClientsByHotel($booking->client_id);
+        $clients->load('user');
         $logs =  $this->bookingLogService->getBookingLogs(["searchByBookingId" => $booking->id, 'isNoDateRange' => true]);
 
         if(!empty($booking->service_type_id))
@@ -271,8 +275,9 @@ class BookingController extends Controller
             $corporateFairBillingDetailsService = $this->corporateFairBillingRepository->getCorporateFairBillingByHotelIdVehicleClassTripType($booking->client->hotel_id, $vehicleClassId, $service);
             $corporateFairBillingDetailsPerHour = $this->corporateFairBillingRepository->getCorporateFairBillingByHotelIdVehicleClassTripType($booking->client->hotel_id, $vehicleClassId, 'Hour');
         }
-
-        return view('admin.bookings.edit-booking', compact('serviceTypes', 'driverOffDays', 'logs', 'vehicles', 'drivers', 'booking', 'locations', 'peakPeriods', 'vehicleTypes', 'events', 'corporateFairBillingDetailsService', 'corporateFairBillingDetailsPerHour'));
+        // return $booking->linked_clients;
+        // return explode(',', $booking->linked_clients);
+        return view('admin.bookings.edit-booking', compact('serviceTypes', 'driverOffDays', 'logs', 'vehicles', 'drivers', 'booking', 'locations', 'peakPeriods', 'vehicleTypes', 'events', 'corporateFairBillingDetailsService', 'corporateFairBillingDetailsPerHour', 'clients'));
     }
 
     public function update(EditBookingRequest $request, Booking $booking)
@@ -395,6 +400,97 @@ class BookingController extends Controller
                 'status' => 200,
                 'message' => 'No Fare Found',
             ]);
+        }
+    }
+
+    public function bookingsArchives(Request $request)
+    {
+        try {
+            $serviceTypes = $this->serviceTypeService->getServiceTypes();
+            $locations = $this->locationService->getLocations();
+            $hotels = $this->hotelService->getHotels();
+            $vehicleTypes = $this->vehicleClassService->getVehicleClass();
+            $drivers = $this->driverService->getDrivers();
+            $vehicles = $this->vehicleService->getvehicles();
+            $driverOffDays = $this->driverOffDayService->getSavedDates();
+            $hotelClients = $this->hotelService->getClientAdmins();
+            $bookingData = $this->bookingService->getBookingArchiveData($request->query());
+            return view('admin.bookings-archives.index', compact('serviceTypes', 'locations', 'driverOffDays', 'bookingData', 'hotels', 'vehicleTypes', 'drivers', 'vehicles', 'hotelClients'));
+        } catch (\Exception $e) {
+            $this->helper->alertResponse(__('messages.something_went_wrong'), 'error');
+            // Handle any exceptions that occur
+            $this->helper->handleException($e);
+            return redirect()->back();
+        }
+    }
+
+    public function filterBookingsArchives(Request $request)
+    {
+        try {
+            // Retrieve booking data based on the filter criteria
+            $bookingData = $this->bookingService->getBookingArchiveData($request->query());
+            // Render the booking listing partial view with the filtered data
+            $data = ['html' => view('admin.bookings-archives.partials.bookings-archives-listing', compact('bookingData'))->render()];
+            // Return a JSON response with the updated booking listing HTML
+            return $this->handleResponse($data, __("message.booking_filtered"), Response::HTTP_OK);
+        } catch (\Exception $e) {
+            // Handle the exception and return an error response
+            $this->helper->handleException($e);
+            return $this->handleResponse([], $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, []);
+        }
+    }
+    
+
+    public function restoreBooking(Request $request, int $bookingId)
+    {
+        $logHeaders = $this->getHttpData($request);
+
+        $booking = $this->bookingService->getBookingByIdToRestore($bookingId);
+
+        $restoreBooking = $this->bookingService->restoreBooking($bookingId, $booking, $logHeaders);
+
+        return redirect()->route('bookings')->with('success', 'Booking Restored Successfully');
+        try {
+        } catch (\Exception $e) {
+            // Handle the exception and return an error response
+            $this->helper->handleException($e);
+            return $this->handleResponse([], $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, []);
+        }        
+    }
+
+    
+    public function permanentDeleteBookings(DeleteBookingRequest $request)
+    {
+        try {
+
+            $logHeaders = $this->getHttpData($request);
+
+            $this->bookingService->permanentDeleteBookings($request->all(), $logHeaders);
+
+            return $this->handleResponse([], __("message.booking_deleted"), Response::HTTP_OK);
+        } catch (\Exception $e) {
+            // Handle any exceptions that occur
+            $this->helper->handleException($e);
+            // Generate and return a response indicating the error that occurred
+            return $this->handleResponse([], $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, []);
+        }
+    }
+
+    public function cancelBooking(Request $request)
+    {
+        try {
+            $log_headers = $this->getHttpData($request);
+
+            $booking = $this->bookingService->getBookingByIdToRestore($request->booking_id);
+
+            $cancelBooking = $this->bookingService->cancelBooking($request->booking_id, $booking, $log_headers);
+
+            return $this->handleResponse([], __("message.booking_cancelled_request"), Response::HTTP_OK);
+        } catch (\Exception $e) {
+            // Handle any exceptions that occur
+            $this->helper->handleException($e);
+            // Generate and return a response indicating the error that occurred
+            return $this->handleResponse([], $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, []);
         }
     }
 }

@@ -119,7 +119,7 @@
         @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="clientId">Client <span class="text-danger">*</span></label>
+                    <label for="clientId">Corporate <span class="text-danger">*</span></label>
                     <select name="client_id" id="clientId"
                         class="form-control form-select custom-select @error('client_id') is-invalid @enderror"
                         autocomplete="off">
@@ -147,7 +147,12 @@
         @endif
         <div class="col-md-4">
             <div class="form-group">
-                <label for="eventId">Event <span class="text-danger">*</span></label>
+                <div id="EventCreate" style="display: flex; align-items: center; justify-content: space-between;">
+                    <label for="eventId">Event <span class="text-danger">*</span></label>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                        <span class="fa fa-plus mt-3"></span>
+                    </button>
+                </div>
                 <select name="event_id" id="eventId"
                     class="form-control form-select custom-select @error('event_id') is-invalid @enderror"
                     autocomplete="off">
@@ -600,3 +605,62 @@
         <button type="submit" id="addBookingFormButton" class="btn btn-outline-primary mx-2" title="Save">Save</button>
     </div>
 </form>
+
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="addEventModalLabel">Add Event</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createEventForm" method="post" action="{{ route('create-event-by-ajax') }}" >
+            <div class="row">
+                @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="clientIdForEvent">Corporate <span class="text-danger">*</span></label>
+                            <select name="client_id_for_event" id="clientIdForEvent"
+                                class="form-control form-select custom-select @error('client_id_for_event') is-invalid @enderror"
+                                autocomplete="off">
+                                <option value="">Select One</option>
+                                @foreach ($hotelClients as $hotelClient)
+                                    @php
+                                        $client = $hotelClient->client ?? null;
+                                    @endphp
+                                    @if ($client)
+                                        @if (old('client_id_for_event') == $client->id)
+                                            <option value="{{ $client->id }}" selected>{{ $hotelClient->name }}</option>
+                                        @else
+                                            <option value="{{ $client->id }}">{{$hotelClient->name  }}</option>
+                                        @endif
+                                    @endif
+                                @endforeach
+                            </select>
+                            <span style="display:none" class="invalid-feedback" id="hotel_for_event_error" role="alert"><strong>Please select a hotel</strong>
+                            </span>
+                        </div>
+                    </div>
+                @else
+                    <input type="hidden" name="client_id_for_event" id="clientIdForEvent" value="{{Auth::user()->client->hotel_id}}">
+                @endif
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="eventId">Event <span class="text-danger">*</span></label>
+                        <input type="text" id="event_name" name="event_name"
+                            value="{{ old('event_name') }}"
+                            class="form-control @error('event_name') is-invalid @enderror"
+                            placeholder="Event Name" autocomplete="off" autofocus>
+                        <span style="display:none" class="invalid-feedback" id="event_name_error" role="alert"><strong>Please enter event name</strong>
+                    </div>
+                </div>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="addEventFormButton">Create Event</button>
+      </div>
+    </div>
+  </div>
+</div>

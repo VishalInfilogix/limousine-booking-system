@@ -263,4 +263,19 @@ class ClientRepository implements ClientInterface
     {
         return $this->model->whereIn('user_id', $userIds)->pluck('id')->toArray();
     }
+
+    public function getClientsByHotel(User $loggedUser, int $hotel_id = null)
+    {
+        $clients = $this->filterClientResultByHotel($loggedUser, $hotel_id)->get();
+
+        return $clients;
+    }
+
+    private function filterClientResultByHotel(User $loggedUser, int $hotel_id = null)
+    {
+        $query = $this->model->query();
+        $query->where('hotel_id', $hotel_id);
+
+        return $query;
+    }
 }

@@ -55,6 +55,9 @@ interface BookingInterface
      */
     public function getBookingById(int $bookingId): ?Booking;
 
+    
+    public function getBookingByIdToRestore(int $bookingId): ?Booking;
+
     /**
      * Retrieve paginated and sorted booking data based on provided parameters.
      *

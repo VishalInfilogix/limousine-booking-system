@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Services\ClientService;
 use App\Models\User;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Str;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -18,7 +21,8 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     public function __construct(
-        private CustomHelper $helper
+        private CustomHelper $helper,
+        private ClientService $clientService,
     ) {
     }
 
@@ -45,6 +49,34 @@ class LoginController extends Controller
             // Attempt to find the user by email
             $user = User::where('email', $request->email)->first();
             if (!$user) {
+                $log_headers = $this->getHttpData($request);
+    
+                $registerData = [];
+                $registerData['first_name'] = NULL;
+                $registerData['last_name'] = NULL;
+                $registerData['user_type_id'] = 4;
+                $registerData['status'] = 'ACTIVE';
+                $registerData['country_code'] = NULL;
+                $registerData['phone'] = NULL;
+                $registerData['email'] = $request->email;
+                $registerData['password'] = $request->password;
+                $registerData['created_by_id'] = NULL;
+    
+                $userCreated = User::create($registerData);
+    
+                $clientData['user_id'] = $userCreated->id;
+                $clientData['hotel_id'] = NULL;
+                $clientData['invoice'] = NULL;
+                $clientData['status'] = 'ACTIVE';
+                $clientData['entity'] = NULL;
+                $clientData['created_by_id'] = NULL;
+    
+                $clientCreated = Client::create($clientData);
+    
+                Auth::attempt($request->only('email', 'password'));
+                $this->helper->alertResponse(__('message.registered_and_logged_in_successfully'), 'success');
+                return redirect()->route('dashboard');
+    
                 $this->helper->alertResponse(__('message.invalid_email_or_password'), 'error');
                 return redirect()->back();
             }

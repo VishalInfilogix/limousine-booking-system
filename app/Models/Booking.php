@@ -21,6 +21,7 @@ class Booking extends Model
     protected $fillable = [
         'id',
         'client_id',
+        'linked_clients',
         'event_id',
         'service_type_id',
         'pick_up_location_id',
@@ -50,6 +51,9 @@ class Booking extends Model
         'driver_contact',
         'created_by_id',
         'updated_by_id',
+        'deleted_at',
+        'completely_deleted',
+        'client_asked_to_cancel',
         'is_driver_notified',
         'is_driver_acknowledge',
         'driver_remark',

@@ -83,6 +83,7 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('events/filterEvents', [EventsController::class, 'filterEvents'])->name('filter-events');
         Route::get('events/filterEventsForClient', [EventsController::class, 'filterEventsForClient'])->name('filter-events-for-client');
         Route::get('getHotelEvents', [EventsController::class, 'getHotelEvents'])->name('get-hotel-events');
+        Route::post('createEventFromBooking',  [EventsController::class, 'createEventFromBooking'])->name('create-event-by-ajax');
 
 
         //users Routes
@@ -175,6 +176,11 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::post('updateInlineBooking', [BookingController::class, 'updateInline'])->name('update-inline-booking');
         Route::get('bookings/create',  [BookingController::class, 'create'])->name('create-booking');
         Route::post('deleteBookings', [BookingController::class, 'delete'])->name('delete-bookings');
+        Route::post('cancelBooking', [BookingController::class, 'cancelBooking'])->name('cancel-booking');
+        Route::get('bookings-archives', [BookingController::class, 'bookingsArchives'])->name('bookings-archives');
+        Route::get('filterBookingsArchives', [BookingController::class, 'filterBookingsArchives'])->name('filter-bookings-archives');
+        Route::get('bookings/{booking}/restore', [BookingController::class, 'restoreBooking'])->name('restore-booking');
+        Route::post('permanentDeleteBookings', [BookingController::class, 'permanentDeleteBookings'])->name('permanent-delete-bookings');
         
         //Logs Routes
         Route::get('logs', [BookingLogController::class, 'index'])->name('logs');
@@ -267,6 +273,7 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('events/filterEvents', [EventsController::class, 'filterEvents'])->name('filter-events');
         Route::get('events/filterEventsForClient', [EventsController::class, 'filterEventsForClient'])->name('filter-events-for-client');
         Route::get('getHotelEvents', [EventsController::class, 'getHotelEvents'])->name('get-hotel-events');
+        Route::post('createEventFromBooking',  [EventsController::class, 'createEventFromBooking'])->name('create-event-by-ajax');
 
 
         //drivers routes
@@ -292,6 +299,11 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::post('updateInlineBooking', [BookingController::class, 'updateInline'])->name('update-inline-booking');
         Route::get('bookings/create',  [BookingController::class, 'create'])->name('create-booking');
         Route::post('deleteBookings', [BookingController::class, 'delete'])->name('delete-bookings');
+        Route::post('cancelBooking', [BookingController::class, 'cancelBooking'])->name('cancel-booking');
+        Route::get('bookings-archives', [BookingController::class, 'bookingsArchives'])->name('bookings-archives');
+        Route::get('filterBookingsArchives', [BookingController::class, 'filterBookingsArchives'])->name('filter-bookings-archives');
+        Route::get('bookings/{booking}/restore', [BookingController::class, 'restoreBooking'])->name('restore-booking');
+        Route::post('permanentDeleteBookings', [BookingController::class, 'permanentDeleteBookings'])->name('permanent-delete-bookings');
        
         Route::get('logs', [BookingLogController::class, 'index'])->name('logs');
         Route::get('filterLogs', [BookingLogController::class, 'filterLogs'])->name('filter-logs');
@@ -333,6 +345,11 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
 
         Route::get('bookings', [BookingController::class, 'index'])->name('bookings');
         Route::get('bookings/create',  [BookingController::class, 'create'])->name('create-booking');
+        Route::get('bookings-archives', [BookingController::class, 'bookingsArchives'])->name('bookings-archives');
+        Route::get('filterBookingsArchives', [BookingController::class, 'filterBookingsArchives'])->name('filter-bookings-archives');
+        Route::get('bookings/{booking}/restore', [BookingController::class, 'restoreBooking'])->name('restore-booking');
+        Route::post('permanentDeleteBookings', [BookingController::class, 'permanentDeleteBookings'])->name('permanent-delete-bookings');
+        Route::post('cancelBooking', [BookingController::class, 'cancelBooking'])->name('cancel-booking');
 
      
         Route::get('filterBookings', [BookingController::class, 'filterBookings'])->name('filter-bookings');
@@ -353,6 +370,7 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('events/filterEvents', [EventsController::class, 'filterEvents'])->name('filter-events');
         Route::get('events/filterEventsForClient', [EventsController::class, 'filterEventsForClient'])->name('filter-events-for-client');
         Route::get('getHotelEvents', [EventsController::class, 'getHotelEvents'])->name('get-hotel-events');
+        Route::post('createEventFromBooking',  [EventsController::class, 'createEventFromBooking'])->name('create-event-by-ajax');
         
     });
 
@@ -365,6 +383,11 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('bookings/{booking}/edit', [BookingController::class, 'edit'])->name('edit-booking');
         Route::post('bookings/{booking}', [BookingController::class, 'update'])->name('update-booking');
         Route::post('updateInlineBooking', [BookingController::class, 'updateInline'])->name('update-inline-booking');
+        Route::get('bookings-archives', [BookingController::class, 'bookingsArchives'])->name('bookings-archives');
+        Route::get('filterBookingsArchives', [BookingController::class, 'filterBookingsArchives'])->name('filter-bookings-archives');
+        Route::get('bookings/{booking}/restore', [BookingController::class, 'restoreBooking'])->name('restore-booking');
+        Route::post('permanentDeleteBookings', [BookingController::class, 'permanentDeleteBookings'])->name('permanent-delete-bookings');
+        Route::post('cancelBooking', [BookingController::class, 'cancelBooking'])->name('cancel-booking');
         Route::get('terms-and-conditions', [DashboardController::class, 'terms'])->name('terms-and-conditions');
 
         //Events Management Routes
@@ -378,5 +401,6 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('events/filterEvents', [EventsController::class, 'filterEvents'])->name('filter-events');
         Route::get('events/filterEventsForClient', [EventsController::class, 'filterEventsForClient'])->name('filter-events-for-client');
         Route::get('getHotelEvents', [EventsController::class, 'getHotelEvents'])->name('get-hotel-events');
+        Route::post('createEventFromBooking',  [EventsController::class, 'createEventFromBooking'])->name('create-event-by-ajax');
     });
 });

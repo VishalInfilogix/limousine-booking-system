@@ -429,6 +429,10 @@ label:not(.form-check-label):not(.custom-file-label){
 .completed-status td{
     background-color: #dfdfdf;
 }
+
+.requested-to-cancel td{
+    background-color: #c2394b;
+}
 .sticky-column{
     position: sticky;
     left: 0;

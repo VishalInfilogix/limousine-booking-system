@@ -36,6 +36,8 @@
                             title="Save">Save</button>
                             @if($loggedUserType !== 'client-admin' && $loggedUserType !== 'client-staff' && $loggedUserType !== 'client')
                                 <button type="button" data-id="{{ $booking->id }}" class="btn btn-outline-danger float-right mx-2 delete-booking-btn" title="Delete">Delete</button>
+                            @else
+                                <button type="button" data-id="{{ $booking->id }}" class="btn btn-outline-danger float-right mx-2 cancel-booking-btn" title="Cancel Booking">Cancel Booking</button>
                             @endif
                         </div>
                     </div>
@@ -899,7 +901,7 @@
                                     @if ($loggedUserType === null || $loggedUserType === 'admin')
                                         <li class="list-group-item">
                                             <div class="form-group row row-gap-2 mb-0">
-                                                <label class="col-sm-6 col-form-label">Client</label>
+                                                <label class="col-sm-6 col-form-label">Corporate</label>
                                                 <div class="col-sm-6">
                                                     @php
                                                         $hotelName = $booking->client->hotel->name ?? null;
@@ -932,6 +934,64 @@
                                             </div>
                                         </li>
                                     @endif
+
+                                    <li class="list-group-item">
+                                        <div class="form-group row row-gap-2 mb-0">
+                                            <label class="col-sm-6 col-form-label">Access Given Clients</label>
+                                            <div class="col-sm-6 access_given_clients_div">
+                                                @if(!empty($booking->linked_clients))
+                                                
+                                                    @php
+                                                            $linkedClients = explode(',', $booking->linked_clients);
+                                                    @endphp
+                                                    @foreach($linkedClients as $bookingClientKey => $bookingClient)
+                                                        @php
+                                                            $clientId = str_replace('"', '', $bookingClient);
+
+                                                            $clientId = str_replace('[', '', $clientId);
+
+                                                            $clientId = str_replace(']', '', $clientId);
+
+                                                        @endphp
+                                                        <select name="access_given_clients[]" id="access_given_clients_{{$bookingClientKey}}"
+                                                            class="form-control form-select custom-select col-sm-9 access_given_clients"
+                                                            autocomplete="off">
+                                                            <option value="">Select Client</option>
+                                                            @foreach ($clients as $client)
+                                                                @if($client->user->id !== $booking->created_by_id)
+                                                                    <option value="{{ $client->user->id }}" {{ $clientId == $client->user->id ? 'selected' : '';}}>
+                                                                        <?= (!empty($client->user->first_name) ? ucwords($client->user->first_name) : '') . (!empty($client->user->last_name) ? ' ' . ucwords($client->user->last_name) : ''); ?>
+                                                                    </option>
+                                                                @endif
+                                                            @endforeach
+                                                        </select>
+                                                        @if($bookingClientKey == 0)
+                                                            <button type="button" id="addClient" class="col-sm-2"><span class="fa fa-plus mt-3"></span></button>
+                                                        @else
+                                                            <button type="button" class="remove-client col-sm-2" id="remove_client_{{$bookingClientKey}}"><span class="fas fa-times mt-3 text-danger" id="client_span_{{$bookingClientKey}}"></span></button>
+                                                        @endif
+                                                    @endforeach
+                                                @else
+                                                    <select name="access_given_clients[]" id="access_given_clients_0"
+                                                        class="form-control form-select custom-select @error('access_given_clients') is-invalid @enderror col-sm-9 access_given_clients"
+                                                        autocomplete="off">
+                                                        <option value="">Select Client</option>
+                                                        @foreach ($clients as $client)
+                                                            <option value="{{ $client->user->id }}">
+                                                                <?= (!empty($client->user->first_name) ? ucwords($client->user->first_name) : '') . (!empty($client->user->last_name) ? ' ' . ucwords($client->user->last_name) : ''); ?>
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="button" id="addClient" class="col-sm-2"><span class="fa fa-plus mt-3"></span></button>
+                                                @endif
+                                                @error('access_given_clients')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </li>
                                     <li class="list-group-item">
                                         <div class="form-group row row-gap-2 mb-0">
                                             <label class="col-sm-6 col-form-label">Booking Date</label>
@@ -1984,11 +2044,16 @@
         const props = {
             routes: {
                 deleteBookings: "{{ route('delete-bookings') }}",
-                corporateFareCharges: "{{ route('get-corporate-fare-charges') }}"
+                cancelBooking: "{{ route('cancel-booking') }}",
+                corporateFareCharges: "{{ route('get-corporate-fare-charges') }}",
+                baseUrl: "{{ url('/') }}"
             },
             peakPeriods: @json($peakPeriods),
             driverOffDays: @json($driverOffDays),
-            drivers: @json($drivers)
+            drivers: @json($drivers),
+            clients: @json($clients),
+            bookingCreatedBy: @json($booking->created_by_id),
+            loggedUser:@json(Auth::user()),
         }
     </script>
 @endsection

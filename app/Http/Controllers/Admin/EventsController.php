@@ -228,16 +228,26 @@ class EventsController extends Controller
 
         if(!empty($eventData))
         {
-            return response()->json([
-                'status' => 200,
-                'message' => 'Events fetched.',
-                'data' => $eventData
-            ]);
+            return $this->handleResponse($eventData, __("message.event_status_updated"), Response::HTTP_OK);
         }else{
-            return response()->json([
-                'status' => 200,
-                'message' => 'No Event Found',
-            ]);
+            $this->helper->handleException($e);
+            return $this->handleResponse([], $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, []);
+        }
+    }
+
+    public function createEventFromBooking(Request $request)
+    {
+        try {
+            // Extract HTTP headers for logging
+            $log_headers = $this->getHttpData($request);
+        
+            // Create a new event using eventService
+            $this->eventService->createEvent($request->all(), $log_headers);
+
+            return $this->handleResponse([], __("message.event_created"), Response::HTTP_OK);
+        } catch (\Exception $e) {
+            $this->helper->handleException($e);
+            return $this->handleResponse([], $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, []);
         }
     }
 }

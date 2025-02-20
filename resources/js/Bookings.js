@@ -3,6 +3,7 @@ import ErrorHandler from "./Utility/ErrorHandler.js";
 import $ from "jquery";
 import "./JqueryCheckBox";
 import "daterangepicker";
+import axios from "axios";
 
 /**
  * Represents the Bookings class.
@@ -28,6 +29,9 @@ export default class Bookings extends BaseClass {
         $(document).on("click", ".multiple_service_type_id ", this.handleMultipleAdditionalStopAddButtonOnServiceType);
         $(document).on("click", ".multiple-add-guest", this.handleMultipleAddGuest);
         $(document).on("click", '.multiple-remove-guest', this.handleRemoveMultipleGuest);
+        $(document).on("click", '#addEventFormButton', this.handleSaveEvent);
+        $(document).on("change", '#clientIdForEvent', this.handleClientForEventError);
+        $(document).on("keyup", '#event_name', this.handleEventNameError);
         $(document).on(
             "change",
             "#clientId",
@@ -127,6 +131,23 @@ export default class Bookings extends BaseClass {
         });
     }
     
+    handleClientForEventError = () => { 
+        if($('#clientIdForEvent').val() == '')
+        {
+            $('#hotel_for_event_error').css('display', 'inline-block');
+        }else{
+            $('#hotel_for_event_error').css('display', 'none');
+        }
+    }
+    
+    handleEventNameError = () => { 
+        if($('#event_name').val() == '')
+        {
+            $('#event_name_error').css('display', 'inline-block');
+        }else{
+            $('#event_name_error').css('display', 'none');
+        }
+    }
     handleEventsOfCorporate = ({ target }) => {
         try {
             const hotelId = $(target).val();
@@ -139,11 +160,49 @@ export default class Bookings extends BaseClass {
                     }
                 })
                 .then((response) => {
-                    const statusCode = response.data.status;
-                    const message = response.data.message;
+                    const statusCode = response.data.status.code;
+                    const message = response.data.status.message;
                     const flash = new ErrorHandler(statusCode, message);
                     
                     if (statusCode === 200) {
+                        $('#eventId').empty().append('<option value="">Select An Event</option>');
+
+                        if (response.data.data.length > 0) {
+                            $.each(response.data.data, function(index, item) {
+                                $('#eventId').append(`<option value="${item.id}">${item.name}</option>`);
+                            });
+                        }
+                    } else {
+                        throw flash;
+                    }
+                })
+                .catch((error) => {
+                    this.handleException(error);
+                });
+        } catch (error) {
+            this.handleException(error);
+        }
+    };
+    
+    getEventsAfterCreateEvent = ({ hotelId }) => {
+        try {
+            const url = this.props.routes.getEventsByHotel;
+            
+            axios
+                .get(url, {
+                    params: {
+                        hotel_id: hotelId,
+                    }
+                })
+                .then((response) => {
+                    const statusCode = response.data.status.code;
+                    const message = response.data.status.message;
+                    const flash = new ErrorHandler(statusCode, message);
+                    
+                    if (statusCode === 200) {
+
+                        $('#clientId').val(hotelId).change();
+
                         $('#eventId').empty().append('<option value="">Select An Event</option>');
 
                         if (response.data.data.length > 0) {
@@ -177,8 +236,8 @@ export default class Bookings extends BaseClass {
                     }
                 })
                 .then((response) => {
-                    const statusCode = response.data.status;
-                    const message = response.data.message;
+                    const statusCode = response.data.status.code;
+                    const message = response.data.status.message;
                     const flash = new ErrorHandler(statusCode, message);
                     
                     if (statusCode === 200) {
@@ -2398,6 +2457,55 @@ ${
         });
     };
 
+    handleSaveEvent = () => {
+        try {
+            const hotel_id = $('#clientIdForEvent').val();
+            const name = $('#event_name').val();
+            const url = this.props.routes.createEventByAjax;
+            
+            const formData = new FormData();
+            formData.append("hotel_id", hotel_id);
+            formData.append("name", name);
+            formData.append("status", 'ACTIVE');
+            
+            if(hotel_id == '' || name == '')
+            {
+                if(hotel_id == '')
+                {
+                    $('#hotel_for_event_error').css('display', 'inline-block');
+                }
+                if(name == '')
+                {
+                    $('#event_name_error').css('display', 'inline-block');
+                }
+            }else{
+                $('#hotel_for_event_error').css('display', 'none');
+                $('#event_name_error').css('display', 'none');
+
+                const saveButton = $("#addEventFormButton"); // Select the button by ID or class
+                saveButton.prop("disabled", true); // Disable the button
+                saveButton.html('<span class="spinner-border spinner-border-sm"></span> Saving...');
+                axios.post(url, formData)
+                    .then((response) => {
+                        const statusCode = response.data.status.code;
+                        const message = response.data.status.message;
+                        const flash = new ErrorHandler(statusCode, message);
+                        if (statusCode === 200) {
+                            this.getEventsAfterCreateEvent({hotelId : hotel_id})
+                            this.closeModal("addEventModal");
+                        }
+                        throw flash;
+                    })
+                    .catch((error) => {
+                        $("#loader").hide();
+                        this.handleException(error);
+                    });
+            }
+
+        } catch (error) {
+            this.handleException(error);
+        }
+    }
     initializeChildSeatRequest = () => {
         $(function() {
             $("input[name='child_seat_required']").on("change", function() {

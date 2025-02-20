@@ -68,6 +68,18 @@ class BookingRepository implements BookingInterface
         return $booking->update($data);
     }
 
+    
+    public function restoreBooking(Booking $booking, array $data): bool
+    {
+        return $booking->update($data);
+    }
+
+    
+    public function cancelBooking(Booking $booking, array $data): bool
+    {
+        return $booking->update($data);
+    }
+
     /**
      * Retrieve a booking by its ID.
      *
@@ -80,6 +92,41 @@ class BookingRepository implements BookingInterface
     {
         return $this->model->find($bookingId);
     }
+
+    
+    public function getBookingByIdToRestore(int $bookingId): ?Booking
+    {
+        return $this->model->withTrashed()->find($bookingId);
+    }
+
+    
+    public function getBookingByIdsToPermanentDelete(array $bookingIds, string $status = null): Collection
+    {
+        // Start the query with the base condition
+        $query = $this->model->withTrashed()->whereIn('id', $bookingIds);
+        // Add the status condition if it's provided
+        if (!empty($status)) {
+            $query->where('status', $status);
+        }
+        // Execute the query and return the result
+        return $query->get();
+    }
+    
+    public function permanentDeleteBooking(array $bookingIds): bool
+    {
+        if(!empty($bookingIds))
+        {
+            foreach($bookingIds as $bId)
+            {
+                $data = [];
+                $data['completely_deleted'] = 'yes';
+
+                $this->model->withTrashed()->where('id', $bId)->update($data);
+            }
+        }
+        return $this->model->whereIn('id', $bookingIds)->delete();
+    }
+
 
     /**
      * Retrieve all booking data from the database.
@@ -121,6 +168,24 @@ class BookingRepository implements BookingInterface
         return $this->paginateResults($sortedCollection, $pageSize, $page);
     }
 
+    
+    public function getBookingsArchive(User $loggedUser,  $startDate, $endDate, string $search = '', int $page = 1, string $sortField = 'id', string $sortDirection = 'asc', $driverId = null, $noPagination = false, $isDriverSchedule = false)
+    {
+        // Filter Booking based on the provided parameters
+        $bookings = $this->filterBookingArchiveResult($loggedUser, $startDate, $endDate, $search, $driverId, $isDriverSchedule)->get();
+        if ($noPagination) {
+            return  $bookings;
+        }
+        // Sort the bookings based on the specified field and direction
+        $sortedCollection = $this->sortBookingsArchive($bookings, $sortField, $sortDirection);
+
+        // Set the page size for pagination
+        $pageSize = config('constants.paginationSize');
+
+        // Paginate the sorted collection
+        return $this->paginateResults($sortedCollection, $pageSize, $page);
+    }
+
 
     /**
      * Filter booking results based on the logged-in user and search query.
@@ -140,7 +205,7 @@ class BookingRepository implements BookingInterface
 
         // Start building the query with eager loading relationships
         $query = $this->model
-            ->with(['serviceType', 'pickUpLocation', 'dropOffLocation', 'vehicleType', 'client.user', 'client.hotel', 'vehicle', 'driver', 'createdBy', 'updatedBy']);
+            ->with(['serviceType', 'event', 'pickUpLocation', 'dropOffLocation', 'vehicleType', 'client.user', 'client.hotel', 'vehicle', 'driver', 'createdBy', 'updatedBy']);
 
         if ($loggedUserType === UserType::CLIENT) {
             $query->where(function ($query) use ($loggedUserId, $loggedUserHotel) {
@@ -162,6 +227,21 @@ class BookingRepository implements BookingInterface
             $query->where('driver_id', $driverId);
         }
 
+        if ($loggedUserType === UserType::CLIENT) {
+            $query->where(function ($query) use ($loggedUserId) {
+                $query->whereRaw("
+                    FIND_IN_SET(?, REPLACE(REPLACE(REPLACE(linked_clients, '\"', ''), '[', ''), ']', ''))
+                ", [$loggedUserId])
+                ->orWhere('created_by_id', $loggedUserId);
+            });
+        }
+        
+        
+        
+        // if (!empty($clientId)) {
+        //     $query->where('created_by_id', $clientId);
+        // }
+
         if (!empty($search)) {
             $search = strtolower($search);
             $query->where(function ($query) use ($search, $loggedUserType) {
@@ -179,12 +259,14 @@ class BookingRepository implements BookingInterface
 
                 $query->orWhereHas('serviceType', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
+                })->orWhereHas('event', function ($query) use ($search) {
+                    $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('pickUpLocation', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?", ['%' . $search . '%']);
                 })->orWhereHas('dropOffLocation', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('client', function ($query) use ($search) {
-                    $query->whereRaw("LOWER(`event`) like ?",  ['%' . $search . '%']);
+                    // $query->whereRaw("LOWER(`event`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('driver', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('vehicle', function ($query) use ($search) {
@@ -199,6 +281,90 @@ class BookingRepository implements BookingInterface
                 }
             });
         }
+
+        $query->where('completely_deleted', 'no');
+        // $query->withTrashed();
+
+        return $query;
+    }
+
+    
+    private function filterBookingArchiveResult(User $loggedUser, $startDate, $endDate, string $search = '', $driverId = null, $isDriverSchedule = false)
+    {
+        $loggedUserId = $loggedUser->id;
+        $loggedUserHotel = $loggedUser->client->hotel_id ?? null;
+        $loggedUserType = $loggedUser->userType->type ?? null;
+
+        // Start building the query with eager loading relationships
+        $query = $this->model
+            ->with(['serviceType', 'event', 'pickUpLocation', 'dropOffLocation', 'vehicleType', 'client.user', 'client.hotel', 'vehicle', 'driver', 'createdBy', 'updatedBy']);
+
+        if ($loggedUserType === UserType::CLIENT) {
+            $query->where(function ($query) use ($loggedUserId, $loggedUserHotel) {
+                $query->where('created_by_id', $loggedUserId)
+                    ->orWhereHas('client', function ($query) use ($loggedUserHotel) {
+                        $query->where('hotel_id', $loggedUserHotel);
+                    });
+            });
+        }
+        if ($isDriverSchedule) {
+            $query->whereNotIn('status', [Booking::COMPLETED, Booking::CANCELLED]);
+        }
+
+        if (!empty($startDate) && !empty($endDate)) {
+            $query->whereBetween(DB::raw("CONCAT(pickup_date, ' ', pickup_time)"), [$startDate, $endDate]);
+        }
+
+        if (!empty($driverId)) {
+            $query->where('driver_id', $driverId);
+        }
+
+        // if (!empty($clientId)) {
+        //     $query->where('created_by_id', $clientId);
+        // }
+        
+        if (!empty($search)) {
+            $search = strtolower($search);
+            $query->where(function ($query) use ($search, $loggedUserType) {
+                $query->whereRaw("LOWER(`client_instructions`) like ?",  ['%' . $search . '%'])
+                    ->orWhereRaw("LOWER(`id`) like ?", ['%' . $search . '%'])
+                    ->orWhereRaw("LOWER(`drop_of_location`) like ?", ['%' . $search . '%'])
+                    ->orWhereRaw("CONCAT(`country_code`, `phone`) LIKE ?",  ['%' . $search . '%'])
+                    ->orWhereRaw("LOWER(`guest_name`) like ?",  ['%' . $search . '%'])
+                    ->orWhereRaw("LOWER(`pick_up_location`) like ?",  ['%' . $search . '%'])
+                    ->orWhereRaw("LOWER(`status`) like ?",  ['%' . $search . '%']);
+                if ($loggedUserType === null || $loggedUserType === UserType::ADMIN) {
+                    $query->orWhereRaw("LOWER(`driver_remark`) like ?",  ['%' . $search . '%'])
+                        ->orWhereRaw("LOWER(`internal_remark`) like ?",  ['%' . $search . '%']);
+                }
+
+                $query->orWhereHas('serviceType', function ($query) use ($search) {
+                    $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
+                })->orWhereHas('event', function ($query) use ($search) {
+                    $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
+                })->orWhereHas('pickUpLocation', function ($query) use ($search) {
+                    $query->whereRaw("LOWER(`name`) like ?", ['%' . $search . '%']);
+                })->orWhereHas('dropOffLocation', function ($query) use ($search) {
+                    $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
+                })->orWhereHas('client', function ($query) use ($search) {
+                    // $query->whereRaw("LOWER(`event`) like ?",  ['%' . $search . '%']);
+                })->orWhereHas('driver', function ($query) use ($search) {
+                    $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
+                })->orWhereHas('vehicle', function ($query) use ($search) {
+                    $query->whereRaw("LOWER(`model`) like ?", ['%' . $search . '%']);
+                });
+                if ($loggedUserType === null || $loggedUserType === UserType::ADMIN) {
+                    $query->orWhereHas('client.hotel', function ($query) use ($search) {
+                        $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
+                    })->orWhereHas('updatedBy', function ($query) use ($search) {
+                        $query->whereRaw("CONCAT(LOWER(`first_name`), ' ', LOWER(`last_name`)) like ?", ['%' . $search . '%']);
+                    });
+                }
+            });
+        }
+
+        $query->where('completely_deleted', 'no');
+        $query->onlyTrashed();
 
         return $query;
     }
@@ -216,6 +382,91 @@ class BookingRepository implements BookingInterface
      * @return \Illuminate\Support\Collection The sorted collection of bookings.
      */
     private function sortBookings(Collection $bookings, string $sortField = 'id', string $sortDirection = 'desc')
+    {
+        // Determine the sorting function based on the sort direction
+        $sortFunction = $sortDirection == 'asc' ? 'sortBy' : 'sortByDesc';
+        return $bookings->$sortFunction(function ($innerQuery) use ($sortField) {
+            switch ($sortField) {
+                case 'sortLastEdit':
+                    $value = strtolower($innerQuery->updatedBy->name ?? 'zzzz');
+                    break;
+                case 'sortComment':
+                    $value = strtolower($innerQuery->comment ?? 'zzzz');
+                    break;
+                case 'sortDriverRemark':
+                    $value = strtolower($innerQuery->driver_remarks ?? 'zzzz');
+                    break;
+                case 'sortInstructions':
+                    $value = strtolower($innerQuery->client_instructions ?? 'zzzz');
+                    break;
+                case 'sortStatus':
+                    $value = strtolower($innerQuery->status ?? 'zzzz');
+                    break;
+                case 'sortVehicleType':
+                    $value = strtolower($innerQuery->vehicleType->name ?? 'zzzz');
+                    break;
+                case 'sortDriver':
+                    $value = strtolower($innerQuery->driver->name ?? 'zzzz');
+                    break;
+                case 'sortContact':
+                    $value = strtolower($innerQuery->country_code . $innerQuery->phone ?? 'zzzz');
+                    break;
+                case 'sortClient':
+                    $value = strtolower($innerQuery->client->hotel->name ?? 'zzzz');
+                    break;
+                case 'sortDropOf':
+                    $dropOffLocationId = $innerQuery->drop_off_location_id ?? null;
+                    $dropOffLocation = null;
+                    if ($innerQuery->service_type_id === 3) {
+                        $dropOffLocation = $innerQuery->flight_detail;
+                    } else {
+                        if ($dropOffLocationId && $dropOffLocationId !== 8) {
+                            $dropOffLocation = $innerQuery->dropOffLocation->name ?? null;
+                        } else {
+                            $dropOffLocation = $innerQuery->drop_of_location;
+                        }
+                    }
+                    $value = strtolower($dropOffLocation ?? 'zzzz');
+                    break;
+                case 'sortPikUp':
+                    $pickUpLocationId = $innerQuery->pick_up_location_id ?? null;
+                    $pickUpLocation = null;
+                    if ($innerQuery->service_type_id === 1) {
+                        $pickUpLocation = $innerQuery->flight_detail;
+                    } else {
+                        if ($pickUpLocationId && $pickUpLocationId !== 8) {
+                            $pickUpLocation = $innerQuery->pickUpLocation->name ?? null;
+                        } else {
+                            $pickUpLocation = $innerQuery->pick_up_location;
+                        }
+                    }
+                    $value = strtolower($pickUpLocation ?? 'zzzz');
+                    break;
+                case 'sortType':
+                    $value = strtolower($innerQuery->serviceType->name ?? 'zzzz');
+                    break;
+                case 'sortTime':
+                    $value = $innerQuery->pickup_time;
+                    break;
+                case 'sortBooking':
+                    $value = strtolower($innerQuery->id ?? 'zzzz');
+                    break;
+                case 'sortPickUpDate':
+                    $value = $innerQuery->pickup_date ?? 'zzzz';
+                    break;
+                case 'sortBookingDate':
+                    $value = $innerQuery->created_at ?? 'zzzz';
+                    break;
+                default:
+                    $value = strtolower($innerQuery->id ?? 'zzzz');
+                    break;
+            }
+            return $value;
+        });
+    }
+
+    
+    private function sortBookingsArchive(Collection $bookings, string $sortField = 'id', string $sortDirection = 'desc')
     {
         // Determine the sorting function based on the sort direction
         $sortFunction = $sortDirection == 'asc' ? 'sortBy' : 'sortByDesc';

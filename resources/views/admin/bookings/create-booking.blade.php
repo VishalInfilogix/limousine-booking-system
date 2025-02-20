@@ -63,6 +63,7 @@
     const props = {
         routes: {
             getEventsByHotel: "{{ route('get-hotel-events') }}",
+            createEventByAjax: "{{ route('create-event-by-ajax') }}",
         },
         isCreatePage:true,
         serviceTypes: @json($serviceTypes),

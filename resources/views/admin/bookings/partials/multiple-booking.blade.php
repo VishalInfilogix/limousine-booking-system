@@ -15,7 +15,7 @@
                         <tr>
                             <th>Type Of Service</th>
                             @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
-                                <th class="cell-min-width-200">Client </th>
+                                <th class="cell-min-width-200">Corporate </th>
                             @endif
                             <th class="cell-min-width-200">Event </th>
                             <th>Date </th>

@@ -1,4 +1,4 @@
-    @php
+@php
         use App\CustomHelper;
         $user = Auth::user();
         $userTypeSlug = $user->userType->slug ?? null;
@@ -111,8 +111,6 @@
                 $rowClass = 'cancelled-status';
             } elseif ($booking->status === 'COMPLETED') {
                 $rowClass = 'completed-status';
-            }elseif($booking->status !== 'CANCELLED' && $booking->client_asked_to_cancel === 'yes'){
-                $rowClass = 'requested-to-cancel';
             } elseif (($booking->status === 'PENDING' || is_null($booking->driver_id) || is_null($booking->vehicle_id)) && $booking->status !== 'ACCEPTED') {
                 $rowClass = 'pending-status';
             }
@@ -137,22 +135,17 @@
               </div>
           </td>
       @endif
-      <td class="sticky-column">
-          @if (
-            $userTypeSlug === null ||
-                in_array($userTypeSlug, ['admin', 'admin-staff']) ||
-                (in_array($userTypeSlug, ['client-admin', 'client-staff']) && 
-                    ($booking->status === 'PENDING' || ($booking->status === 'ACCEPTED' && $hoursDifference > 24))
-                ))
-              <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
-                  <i class="fas fa-pencil-alt mr-1"></i>
-              </a>
-          @endif
-          {{-- @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
-              <button title="Delete"><i data-id="{{ $booking->id }}"
-                      class="fas fa-solid fa-trash text-danger mr-2 mx-1"></i></button>
-          @endif --}}
-      </td>
+      @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
+        <td class="sticky-column">
+            <a class="text-dark mx-1" href="{{ route('restore-booking', ['booking' => $booking->id]) }}" title="Restore">
+                <i class="fas fa-recycle mr-1"></i>
+            </a>
+            @if($user->department == 'Management')
+            <button title="Permanent Delete"><i data-id="{{ $booking->id }}"
+                    class="fas fa-solid fa-trash text-danger mr-2 mx-1"></i></button>
+            @endif
+        </td>
+        @endif
       <td class="sticky-column">
           @if ($attachment && Storage::disk('public')->exists($attachment))
               <a target="blank" href="{{ Storage::url($attachment) }}" class="attachment-link">
@@ -192,16 +185,7 @@
       <td @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff'])) data-name="status" data-old="{{ ucfirst(strtolower($booking->status)) }}"
           data-old-id="{{ $booking->status }}" @endif
           class="text-truncate">
-          @if($booking->status == 'CANCELLED')
-            {{ ucfirst(strtolower($booking->status)) }}
-          @else
-            @if($booking->client_asked_to_cancel == 'yes')
-                Requested Cancel
-            @else
-                {{ ucfirst(strtolower($booking->status)) }}
-            @endif
-          @endif
-        </td>
+          {{ ucfirst(strtolower($booking->status)) ?? 'N/A' }}</td>
       <td @if ($isEditable) data-name="client_instructions" data-old="{{ $booking->client_instructions }}" @endif
           class="text-truncate" style="max-width: 200px" title="{{ $booking->client_instructions ?? 'N/A' }}">
           {{ $booking->client_instructions ?? 'N/A' }}</td>

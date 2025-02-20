@@ -20,6 +20,7 @@
         @include('components.nav')
         @include('components.sidebar')
         @include('modals.delete-confirm-modal')
+        @include('modals.cancel-booking-modal')
         @yield('content')
         @include('components.footer')
     </div>
