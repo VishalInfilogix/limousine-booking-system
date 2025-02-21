@@ -246,16 +246,37 @@ class BookingController extends Controller
 
         $hoursDifference = ($pickupDateTimeStamp - $currentTimeStamp) / 3600;
         
-        if ($loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId) {
-            $this->helper->alertResponse(__('message.permission_denied'), 'error');
-            return redirect()->route('dashboard');
+        $hotelIdsFromLinkedCorporates = NULL;
+
+        if (in_array($userTypeSlug, ['client-admin', 'client-staff']) && $loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId) {
+
+            $client = $user->load('client');
+
+            $multiCorporatesData = $user->client->load('multiCorporates');
+            $hotelIdsFromLinkedCorporates = $multiCorporatesData->multiCorporates->pluck('hotel_id');
+            
+
+            if(!empty($hotelIdsFromLinkedCorporates))
+            {
+                if (!in_array($bookedByHotelId, $hotelIdsFromLinkedCorporates->toArray())) {
+                    $this->helper->alertResponse(__('message.permission_denied'), 'error');
+                    return redirect()->route('dashboard');
+                }
+            }else{
+                if($loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId){
+                    $this->helper->alertResponse(__('message.permission_denied'), 'error');
+                    return redirect()->route('dashboard');
+                }
+            }
+            
         } else if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']) || (in_array($userTypeSlug, ['client-admin', 'client-staff']) && ($booking->status === 'PENDING' || ($booking->status === 'ACCEPTED' && $hoursDifference > 24)))) {
         
-        }else if($userTypeSlug && in_array($userTypeSlug, ['client-admin', 'client-staff']) && ($booking->status !== 'PENDING'))
+        }else if($userTypeSlug && in_array($userTypeSlug, ['client-admin', 'client-staff']) && $booking->status !== 'PENDING')
         {
             $this->helper->alertResponse(__('message.permission_denied'), 'error');
             return redirect()->route('dashboard');
         }
+
         $locations = $this->locationService->getLocations();
         $serviceTypes = $this->serviceTypeService->getServiceTypes();
         $vehicleTypes = $this->vehicleClassService->getVehicleClass();
@@ -296,7 +317,7 @@ class BookingController extends Controller
         }
         // return $booking->linked_clients;
         // return explode(',', $booking->linked_clients);
-        return view('admin.bookings.edit-booking', compact('serviceTypes', 'driverOffDays', 'logs', 'vehicles', 'drivers', 'booking', 'locations', 'peakPeriods', 'vehicleTypes', 'events', 'corporateFairBillingDetailsService', 'corporateFairBillingDetailsPerHour', 'clients'));
+        return view('admin.bookings.edit-booking', compact('serviceTypes', 'driverOffDays', 'logs', 'vehicles', 'drivers', 'booking', 'locations', 'peakPeriods', 'vehicleTypes', 'events', 'corporateFairBillingDetailsService', 'corporateFairBillingDetailsPerHour', 'clients', 'hotelIdsFromLinkedCorporates'));
     }
 
     public function update(EditBookingRequest $request, Booking $booking)
@@ -326,15 +347,36 @@ class BookingController extends Controller
             $pickupDateTimeStamp = strtotime($pickupDateTime);
             $currentTimeStamp = strtotime(date('Y-m-d H:i'));
             $hoursDifference = ($pickupDateTimeStamp - $currentTimeStamp) / 3600;
-            if ($loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId) {
-                $this->helper->alertResponse(__('message.permission_denied'), 'error');
-                return redirect()->route('dashboard');
+
+            if (in_array($userTypeSlug, ['client-admin', 'client-staff']) && $loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId) {
+
+                $client = $user->load('client');
+    
+                $multiCorporatesData = $user->client->load('multiCorporates');
+                $hotelIdsFromLinkedCorporates = $multiCorporatesData->multiCorporates->pluck('hotel_id');
+                
+    
+                if(!empty($hotelIdsFromLinkedCorporates))
+                {
+                    if (!in_array($bookedByHotelId, $hotelIdsFromLinkedCorporates->toArray())) {
+                        $this->helper->alertResponse(__('message.permission_denied'), 'error');
+                        return redirect()->route('dashboard');
+                    }
+                }else{
+                    if($loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId){
+                        $this->helper->alertResponse(__('message.permission_denied'), 'error');
+                        return redirect()->route('dashboard');
+                    }
+                }
+                
             } else if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']) || (in_array($userTypeSlug, ['client-admin', 'client-staff']) && ($booking->status === 'PENDING' || ($booking->status === 'ACCEPTED' && $hoursDifference > 24)))) {
-        
-            } else if ($userTypeSlug && in_array($userTypeSlug, ['client-admin', 'client-staff']) && $booking->status !== 'PENDING') {
+            
+            }else if($userTypeSlug && in_array($userTypeSlug, ['client-admin', 'client-staff']) && $booking->status !== 'PENDING')
+            {
                 $this->helper->alertResponse(__('message.permission_denied'), 'error');
                 return redirect()->route('dashboard');
             }
+            
             $logHeaders = $this->getHttpData($request);
             $file = $request->file('attachment');
 

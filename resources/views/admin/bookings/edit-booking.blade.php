@@ -933,6 +933,21 @@
                                                 </div>
                                             </div>
                                         </li>
+                                    @else
+                                        @if(!empty($hotelIdsFromLinkedCorporates) && count($hotelIdsFromLinkedCorporates) > 0)
+                                            <li class="list-group-item">
+                                                <div class="form-group row row-gap-2 mb-0">
+                                                    <label class="col-sm-6 col-form-label">Corporate</label>
+                                                    <div class="col-sm-6">
+                                                        @php
+                                                            $hotelName = $booking->client->hotel->name ?? null;
+                                                        @endphp
+                                                        <span>{{ $hotelName ?? null }}</span>
+                                                        <input type="hidden" name="client_hotel_id" id="client_hotel_id" value="{{!empty($booking->client->hotel_id) ? $booking->client->hotel_id : '';}}">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        @endif
                                     @endif
 
                                     <li class="list-group-item">

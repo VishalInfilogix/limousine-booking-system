@@ -1126,4 +1126,71 @@ class BookingService
             throw new \Exception($e->getMessage());
         }
     }
+
+    public function getBookingDataForDashboardPieChart(array $requestData = [])
+    {
+        try {
+            $startDate = $requestData['startDate'] ?? null;
+            $endDate = $requestData['endDate'] ?? Carbon::now()->toDateString();
+            
+            $loggedUser = Auth::user();
+            $userTypeSlug = $loggedUser->userType->slug ?? null;
+
+            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
+            {
+            }else{
+                if (!$startDate) {
+                    $startDate = Booking::min('created_at');
+                }
+            }
+            return $this->bookingRepository->getBookingsForDashboardForPieChart($startDate, $endDate, $loggedUser);
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function getBookingDataForDashboardForLineChart(array $requestData = [])
+    {
+        try {
+            $startDate = $requestData['startDate'] ?? null;
+            $endDate = $requestData['endDate'] ?? Carbon::now()->toDateString();
+            
+            $loggedUser = Auth::user();
+            $userTypeSlug = $loggedUser->userType->slug ?? null;
+            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
+            {                
+            }else{
+                if (!$startDate) {
+                    $startDate = Booking::min('created_at');
+                }
+            }
+            return $this->bookingRepository->getBookingsForDashboardForLineChart($startDate, $endDate, $loggedUser);
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function getBookingDataForDashboardForLineChartCancellation(array $requestData = [])
+    {
+        try {
+            $startDate = $requestData['startDate'] ?? null;
+            $endDate = $requestData['endDate'] ?? Carbon::now()->toDateString();
+            
+            $loggedUser = Auth::user();
+            $userTypeSlug = $loggedUser->userType->slug ?? null;
+            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
+            {                
+            }else{
+                if (!$startDate) {
+                    $startDate = Booking::min('created_at');
+                }
+            }
+            return $this->bookingRepository->getBookingsForDashboardForLineChartCancellation($startDate, $endDate, $loggedUser);
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
+            throw new \Exception($e->getMessage());
+        }
+    }
 }

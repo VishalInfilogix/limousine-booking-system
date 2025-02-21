@@ -829,4 +829,76 @@ class BookingRepository implements BookingInterface
             return $value;
         });
     }
+
+    public function getBookingsForDashboardForPieChart($startDate, $endDate, $loggedUser)
+    {
+        // Filter Booking based on the provided parameters
+        $bookings = $this->filterBookingResultForDashboardForPieChart($startDate, $endDate, $loggedUser)->get();
+
+        return  $bookings;
+    }
+    
+    private function filterBookingResultForDashboardForPieChart($startDate, $endDate, $loggedUser)
+    {
+        // Start building the query with eager loading relationships
+        $query = $this->model->withTrashed()->whereBetween('pickup_date', [$startDate, $endDate]);
+
+        $userTypeSlug = $loggedUser->userType->slug ?? null;
+        if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
+        {
+            $query->where('created_by_id', $loggedUser->id);
+        }
+        return $query;
+    }
+
+    public function getBookingsForDashboardForLineChart($startDate, $endDate, $loggedUser)
+    {
+        // Filter Booking based on the provided parameters
+        $bookings = $this->filterBookingResultForDashboardForLineChart($startDate, $endDate, $loggedUser)->get();
+
+        return  $bookings;
+    }
+    
+    private function filterBookingResultForDashboardForLineChart($startDate, $endDate, $loggedUser)
+    {
+        // Start building the query with eager loading relationships
+        $query = $this->model->withTrashed()->selectRaw('DATE(pickup_date) as date, COUNT(*) as count')
+        ->whereBetween('pickup_date', [$startDate, $endDate])
+        ->groupBy('date')
+        ->orderBy('date', 'ASC');
+
+        $userTypeSlug = $loggedUser->userType->slug ?? null;
+        if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
+        {
+            $query->where('created_by_id', $loggedUser->id);
+        }
+
+        return $query;
+    }
+
+    public function getBookingsForDashboardForLineChartCancellation($startDate, $endDate, $loggedUser)
+    {
+        // Filter Booking based on the provided parameters
+        $bookings = $this->filterBookingResultForDashboardForLineChartForCancellation($startDate, $endDate, $loggedUser)->get();
+
+        return  $bookings;
+    }
+    
+    private function filterBookingResultForDashboardForLineChartForCancellation($startDate, $endDate, $loggedUser)
+    {
+        // Start building the query with eager loading relationships
+        $query = $this->model->withTrashed()->selectRaw('DATE(pickup_date) as date, COUNT(*) as count')
+        ->where('status', 'CANCELLED')
+        ->whereBetween('pickup_date', [$startDate, $endDate])
+        ->groupBy('date')
+        ->orderBy('date', 'ASC');
+
+        $userTypeSlug = $loggedUser->userType->slug ?? null;
+        if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
+        {
+            $query->where('created_by_id', $loggedUser->id);
+        }
+
+        return $query;
+    }
 }
