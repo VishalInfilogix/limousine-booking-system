@@ -235,4 +235,9 @@ class EventRepository implements EventInterface
 
         return $query;
     }
+
+    public function getActiveEventsData(): Collection
+    {
+        return $this->model->where('status', 'ACTIVE')->get();
+    }
 }

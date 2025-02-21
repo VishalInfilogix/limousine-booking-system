@@ -116,6 +116,20 @@ class ClientService
             $clientData['entity'] = $requestData['entity'];
             $clientData['created_by_id'] = $loggedUserId;
             $client = $this->clientRepository->addClient($clientData);
+    
+            $clientId = $client->id;
+            // Prepare Client Multi Hotels Data
+            if(!empty($requestData['multi_hotel_id']))
+            {
+                foreach($requestData['multi_hotel_id'] as $client_hotel_data)
+                {
+                    $clientHotelData['client_id'] = $clientId;
+                    $clientHotelData['hotel_id'] = $client_hotel_data;
+                    $clientHotelData['status'] = $requestData['status'];
+                    $clientHotelData['created_by_id'] = $loggedUserId;
+                    $clientHotel = $this->clientRepository->addClientHotel($clientHotelData);
+                }
+            }
 
             $this->activityLogService->addActivityLog('create', User::class, json_encode([]), json_encode($userData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);
             $this->activityLogService->addActivityLog('create', Client::class, json_encode([]), json_encode($clientData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);
@@ -226,6 +240,21 @@ class ClientService
             $oldClientData = json_encode($client);
             $this->clientRepository->updateClient($client, $clientData);
 
+
+            $clientId = $client->id;
+            // Prepare Client Multi Hotels Data
+            $this->clientRepository->deleteOldClientHotel($clientId);
+            if(!empty($requestData['multi_hotel_id']))
+            {
+                foreach($requestData['multi_hotel_id'] as $client_hotel_data)
+                {
+                    $clientHotelData['client_id'] = $clientId;
+                    $clientHotelData['hotel_id'] = $client_hotel_data;
+                    $clientHotelData['status'] = $requestData['status'];
+                    $clientHotelData['created_by_id'] = $loggedUserId;
+                    $clientHotel = $this->clientRepository->addClientHotel($clientHotelData);
+                }
+            }
 
             $this->activityLogService->addActivityLog('create', User::class, $oldUserData, json_encode($userData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);
             $this->activityLogService->addActivityLog('create', Client::class, $oldClientData, json_encode($clientData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);

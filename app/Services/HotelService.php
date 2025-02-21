@@ -370,4 +370,15 @@ class HotelService
             throw new \Exception($e->getMessage());
         }
     }
+
+    public function getActiveHotels()
+    {
+        try {
+            // Retrieve all hotels from the repository
+            return $this->hotelRepository->getActiveHotelsData();
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
+            throw new \Exception($e->getMessage());
+        }
+    }
 }

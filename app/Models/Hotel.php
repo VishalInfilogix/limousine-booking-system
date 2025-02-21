@@ -46,4 +46,9 @@ class Hotel extends Model
     {
         return $this->hasMany(CorporateFairBilling::class);
     }   
+
+    public function multiClients(): HasMany
+    {
+        return $this->hasMany(ClientMultiCorporates::class);
+    }
 }

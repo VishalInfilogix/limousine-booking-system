@@ -105,15 +105,32 @@ class BookingController extends Controller
         $loggedUser = Auth::user();
 
         $events = NULL;
+        $multipleCorporatesHotelData = NULL;
+
         if(!empty($loggedUser->userType))
         {
             if($loggedUser->userType->slug === 'client-staff' || $loggedUser->userType->slug === 'client-admin')
             {
                 $loggedUser->load('client');
-                
+                $loggedUser->client->load(['hotel', 'multiCorporates.hotel']);
+
+                $loggedInUserHotelDetails = $loggedUser->client->hotel;
                 $hotel_id = $loggedUser->client->hotel_id;
 
-                $events = $this->eventService->getEventDataByHotel($hotel_id);
+                $multiCorporates = $loggedUser->client->multiCorporates;
+
+                $multipleCorporatesHotelData = $multiCorporates->pluck('hotel');
+
+                if (!$multipleCorporatesHotelData->isEmpty() && !$multipleCorporatesHotelData->contains('id', $loggedInUserHotelDetails->id)) {
+                    $multipleCorporatesHotelData->push($loggedInUserHotelDetails);
+                }
+
+                if(!empty($multipleCorporatesHotelData) && count($multipleCorporatesHotelData) > 1)
+                {
+                    $events = NULL;
+                }else{
+                    $events = $this->eventService->getEventDataByHotel($hotel_id);
+                }
             }
         }
 
@@ -122,7 +139,7 @@ class BookingController extends Controller
         $locations = $this->locationService->getLocations();
         $serviceTypes = $this->serviceTypeService->getServiceTypes(true);
         $vehicleTypes = $this->vehicleClassService->getVehicleClass();
-        return view('admin.bookings.create-booking', compact('serviceTypes', 'peakPeriods', 'hotelClients', 'locations', 'vehicleTypes', 'events'));
+        return view('admin.bookings.create-booking', compact('serviceTypes', 'peakPeriods', 'hotelClients', 'locations', 'vehicleTypes', 'events', 'multipleCorporatesHotelData'));
     }
     /**
      * Save a newly created booking.
@@ -221,12 +238,14 @@ class BookingController extends Controller
         } else {
             $pickUpTime = $pickup ? $pickup : 'N/A';
         }
+
         $pickupDate = $booking->pickup_date;
         $pickupDateTime = $pickupDate . ' ' . $pickUpTime;
         $pickupDateTimeStamp = strtotime($pickupDateTime);
         $currentTimeStamp = strtotime(date('Y-m-d H:i'));
-        $hoursDifference = ($pickupDateTimeStamp - $currentTimeStamp) / 3600;
 
+        $hoursDifference = ($pickupDateTimeStamp - $currentTimeStamp) / 3600;
+        
         if ($loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId) {
             $this->helper->alertResponse(__('message.permission_denied'), 'error');
             return redirect()->route('dashboard');

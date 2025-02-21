@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PeakPeriodController;
 use App\Http\Controllers\Admin\UserTypeController;
+use App\Http\Controllers\Admin\ReportsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\VehicleClassController;
 use App\Http\Controllers\Admin\VehicleController;
@@ -182,6 +183,12 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('bookings/{booking}/restore', [BookingController::class, 'restoreBooking'])->name('restore-booking');
         Route::post('permanentDeleteBookings', [BookingController::class, 'permanentDeleteBookings'])->name('permanent-delete-bookings');
         
+
+        // Reports Routes
+        Route::get('reports', [ReportsController::class, 'index'])->name('reports');
+        Route::get('/filter-reports', [ReportsController::class, 'filterReports'])->name('filter-reports');
+        Route::post('/export-reports', [ReportsController::class, 'export'])->name('export-reports');
+
         //Logs Routes
         Route::get('logs', [BookingLogController::class, 'index'])->name('logs');
         Route::get('filterLogs', [BookingLogController::class, 'filterLogs'])->name('filter-logs');
@@ -305,6 +312,13 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('bookings/{booking}/restore', [BookingController::class, 'restoreBooking'])->name('restore-booking');
         Route::post('permanentDeleteBookings', [BookingController::class, 'permanentDeleteBookings'])->name('permanent-delete-bookings');
        
+        
+
+        // Reports Routes
+        Route::get('reports', [ReportsController::class, 'index'])->name('reports');
+        Route::get('/filter-reports', [ReportsController::class, 'filterReports'])->name('filter-reports');
+        Route::post('/export-reports', [ReportsController::class, 'export'])->name('export-reports');
+
         Route::get('logs', [BookingLogController::class, 'index'])->name('logs');
         Route::get('filterLogs', [BookingLogController::class, 'filterLogs'])->name('filter-logs');
 
@@ -352,10 +366,18 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::post('cancelBooking', [BookingController::class, 'cancelBooking'])->name('cancel-booking');
 
      
+        
+
+        
         Route::get('filterBookings', [BookingController::class, 'filterBookings'])->name('filter-bookings');
         Route::get('bookings/{booking}/edit', [BookingController::class, 'edit'])->name('edit-booking');
         Route::post('bookings/{booking}', [BookingController::class, 'update'])->name('update-booking');
         Route::post('updateInlineBooking', [BookingController::class, 'updateInline'])->name('update-inline-booking');
+        
+        // Reports Routes
+        Route::get('reports', [ReportsController::class, 'index'])->name('reports');
+        Route::get('/filter-reports', [ReportsController::class, 'filterReports'])->name('filter-reports');
+        Route::post('/export-reports', [ReportsController::class, 'export'])->name('export-reports');
         
         Route::get('terms-and-conditions', [DashboardController::class, 'terms'])->name('dashboard.terms');
 
@@ -389,6 +411,12 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::post('permanentDeleteBookings', [BookingController::class, 'permanentDeleteBookings'])->name('permanent-delete-bookings');
         Route::post('cancelBooking', [BookingController::class, 'cancelBooking'])->name('cancel-booking');
         Route::get('terms-and-conditions', [DashboardController::class, 'terms'])->name('terms-and-conditions');
+        
+
+        // Reports Routes
+        Route::get('reports', [ReportsController::class, 'index'])->name('reports');
+        Route::get('/filter-reports', [ReportsController::class, 'filterReports'])->name('filter-reports');
+        Route::post('/export-reports', [ReportsController::class, 'export'])->name('export-reports');
 
         //Events Management Routes
         Route::get('events', [EventsController::class, 'index'])->name('events');

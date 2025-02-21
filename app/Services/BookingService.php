@@ -418,6 +418,7 @@ class BookingService
     {
         DB::beginTransaction();
         try {
+            $loggedUserForNotification = Auth::user();
             $loggedUserId = Auth::user()->id;
             $loggedUserType = Auth::user()->userType->name ?? null;
             $userTypeSlug = Auth::user()->userType->slug ?? null;
@@ -544,7 +545,11 @@ class BookingService
             }
             $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user());
             $bookingData['updated_by_id'] = $loggedUserId;
+            
             $this->bookingRepository->updateBooking($booking, $bookingData);
+            
+            $this->updateBookingNotification($loggedUserForNotification, $booking, $requestData['access_given_clients']);
+
             if ($loggedUserType === null || $loggedUserType === UserType::ADMIN) {
                 $bookingBillingData['booking_id'] = $booking->id;
 
@@ -1007,6 +1012,44 @@ class BookingService
         } else {
             $notifyUsers =  $this->userRepository->getAdmins();
         }
+    }
+
+    private function updateBookingNotification($loggedUser, $booking, $deLinkClients)
+    {
+        $userType =  $loggedUser->userType->type ?? null;
+        $message = "updated the booking details.";
+        $subject = "Booking Update";
+        $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
+        if(!empty($deLinkClients))
+        {
+            foreach($deLinkClients as $deLinkClient)
+            {
+                $userDetail = $this->userRepository->getUserById((int) $deLinkClient);
+                
+                $mailData   = [
+                    'subject' =>  $subject,
+                    'template' =>  'booking-updated-email',
+                    'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
+                    'logs' => $message,
+                    'changedBy' => $loggedUserFullName,
+                    'bookingId' => $booking->id,
+                ];
+                $this->helper->sendEmail($userDetail->email, $mailData);
+            }
+        }
+
+        $userDetail = $this->userRepository->getUserById($booking->created_by_id);
+
+        $mailData   = [
+            'subject' =>  $subject,
+            'template' =>  'booking-updated-email',
+            'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
+            'logs' => $message,
+            'changedBy' => $loggedUserFullName,
+            'bookingId' => $booking->id,
+        ];
+
+        $this->helper->sendEmail($userDetail->email, $mailData);
     }
 
     /**

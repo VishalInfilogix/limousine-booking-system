@@ -5,6 +5,7 @@
 @endphp
 @forelse($driversBooking as $key => $drivers)
     @php
+        $eventName = !empty($drivers->event) && !empty($drivers->event->name) ? $drivers->event->name : NULL;
         $pickUpLocation = null;
         $pickupLocationId = $drivers->pick_up_location_id ?? null;
         if ($pickupLocationId && $pickupLocationId !== 8) {
@@ -91,12 +92,13 @@
         </td>
         <td>{!! $pickUpTime ?? 'N/A' !!}</td>
         <td class="text-truncate">{{ $drivers->serviceType->name ?? 'N/A' }}</td>
-        <td class="text-truncate">{{ $pickUpLocation ?? 'N/A' }}</td>
-        <td class="text-truncate">{{ $dropOffLocation ?? 'N/A' }}</td>
-        <td class="text-truncate">{!! $resultGuestName ?? 'N/A' !!}</td>
+        <td class="text-truncate toggalPickup">{{ $pickUpLocation ?? 'N/A' }}</td>
+        <td class="text-truncate toggalDropOff">{{ $dropOffLocation ?? 'N/A' }}</td>
+        <td class="text-truncate toggalGuest">{!! $resultGuestName ?? 'N/A' !!}</td>
         @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
             <td class="text-truncate">{!! $hotelValue !!}</td>
         @endif
+        <td class="text-truncate toggalEvent">{!! $eventName !!}</td>
         <td class="text-truncate toggalContact">
             {{ $drivers->country_code ? '+(' . $drivers->country_code . ')' : '' }}{{ $drivers->phone ?? 'N/A' }}</td>
         <td class="text-truncate" style="max-width: 200px" title="{{ $drivers->driver_remark ?? 'N/A' }}">

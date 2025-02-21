@@ -16,6 +16,10 @@
                             <th>Type Of Service</th>
                             @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
                                 <th class="cell-min-width-200">Corporate </th>
+                            @else
+                                @if(!empty($multipleCorporatesHotelData) && count($multipleCorporatesHotelData) > 1)
+                                    <th class="cell-min-width-200">Corporate </th>
+                                @endif
                             @endif
                             <th class="cell-min-width-200">Event </th>
                             <th>Date </th>
@@ -195,6 +199,39 @@
                                             @enderror
                                         </div>
                                     </td>
+                                @else                                    
+                                    @if(!empty($multipleCorporatesHotelData) && count($multipleCorporatesHotelData) > 1)
+                                        <td>
+                                            <div class="form-group">
+                                                <select name="multiple_client_id[{{ $index }}]"
+                                                    id="clientId_{{ $index }}"
+                                                    class="form-control form-select multiple_client_id custom-select @error('multiple_client_id.' . $index) is-invalid @enderror"
+                                                    autocomplete="off">
+                                                    <option value="">Select One</option>
+                                                    @foreach ($multipleCorporatesHotelData as $hotelClient)
+                                                        @php
+                                                            $client = $hotelClient->client ?? null;
+                                                        @endphp
+                                                        @if ($client)
+                                                            @if (old('multiple_client_id.' . $index) == $client->id)
+                                                                <option value="{{ $client->id }}" selected>
+                                                                    {{ !empty($hotelClient->user->first_name) ? $hotelClient->user->first_name : '' }}</option>
+                                                            @else
+                                                                <option value="{{ $client->id }}">
+                                                                    {{ !empty($hotelClient->name) ? $hotelClient->name : '' }}
+                                                                </option>
+                                                            @endif
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                                @error('multiple_client_id.' . $index)
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </td>
+                                    @endif
                                 @endif
                                 <td>
                                     <div class="form-group">

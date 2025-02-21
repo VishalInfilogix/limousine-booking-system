@@ -144,6 +144,36 @@
                     @enderror
                 </div>
             </div>
+        @else
+            @if(!empty($multipleCorporatesHotelData) && count($multipleCorporatesHotelData) > 1)
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="clientId">Corporate <span class="text-danger">*</span></label>
+                        <select name="client_id" id="clientId"
+                            class="form-control form-select custom-select @error('client_id') is-invalid @enderror"
+                            autocomplete="off">
+                            <option value="">Select One</option>
+                            @foreach ($multipleCorporatesHotelData as $hotelClient)
+                                @php
+                                    $client = $hotelClient->client ?? null;
+                                @endphp
+                                @if ($client)
+                                    @if (old('client_id') == $client->id)
+                                        <option value="{{ $client->id }}" selected>{{ $hotelClient->name }}</option>
+                                    @else
+                                        <option value="{{ $client->id }}">{{$hotelClient->name  }}</option>
+                                    @endif
+                                @endif
+                            @endforeach
+                        </select>
+                        @error('client_id')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+            @endif
         @endif
         <div class="col-md-4">
             <div class="form-group">

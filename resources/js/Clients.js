@@ -46,6 +46,8 @@ export default class Clients extends BaseClass {
         $(document).on("click", ".fa-trash", this.handleDeleteModal);
         $(document).on("click", "#editClientFormButton", this.handleEditClient);
         $(document).on("click", "#resetPassword", this.handleResetPassword);
+        $(document).on("click", '#addHotel', this.handleMultiHotels);
+        $(document).on("click", '.remove-hotel', this.handleRemoveHotel);
         $(document).on(
             "change",
             "#filterByUserType, #filterByClient",
@@ -57,6 +59,45 @@ export default class Clients extends BaseClass {
             this.handlePagnation
         );
     }
+
+    handleMultiHotels = () => {
+        const lastHotelInputContainer = $(".multiple-hotels").last().parent().parent().parent();
+
+        const lastId = parseInt(
+            lastHotelInputContainer.find(".multiple-hotels").attr("id").split("_")[1]
+        );
+
+        const newId = lastId + 1;
+
+        const hotels = this.props.hotels;
+
+        const newHotelInput = `
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="multiHotelId_${newId}" class="form-label">Corporate</label>
+                            <div class="d-flex">
+                                <select name="multi_hotel_id[]" id="multiHotelId_${newId}" class="form-control form-select custom-select multiple-hotels">
+                                    <option value="">Select one</option>
+                                    ${hotels
+                                        .map(
+                                            (row) =>
+                                                `<option value="${row.id}">${row.name}</option>`
+                                        )
+                                        .join("")}
+                                </select>
+                                <button type="button" class="remove-hotel btn ms-2"><span class="fas fa-times text-danger"></span></button>
+                            </div>
+                        </div>
+                    </div>`;
+
+        $(newHotelInput).insertAfter(lastHotelInputContainer);
+    };
+    
+
+    handleRemoveHotel = ({ target }) => {
+        $(target).parent().parent().parent().remove();
+    };
+
     handlePagnation = (event) => {
         event.preventDefault();
         try {

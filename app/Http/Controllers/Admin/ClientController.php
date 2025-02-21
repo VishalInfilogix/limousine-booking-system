@@ -195,7 +195,8 @@ class ClientController extends Controller
     public function edit(Client $client)
     {
         // Load client data including associated user
-        $clientData = $client->load(['user.userType']);
+        $clientData = $client->load(['user.userType', 'multiCorporates']);
+        
         $hotels = $this->hotelService->getHotels();
 
         // Retrieve entities  data from constatnts

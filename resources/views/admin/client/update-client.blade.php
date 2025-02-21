@@ -139,6 +139,67 @@
             </div>
             <div class="card no-box-shadow">
                 <div class="card-header px-0">
+                    <h3 class="head-sm medium">Link Multi Corporates</h3>
+                </div>
+                <div class="card-body px-0">
+                    <div class="row">
+                        @if(!empty($clientData->multiCorporates) && count($clientData->multiCorporates) > 0)
+                            @foreach($clientData->multiCorporates as $corporateKey => $corporate)
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="multiHotelId_{{$corporateKey}}" class="form-label">Corporate</label>
+                                        <div class="d-flex">
+                                            <select name="multi_hotel_id[]" id="multiHotelId_{{$corporateKey}}" class="form-control form-select custom-select @error('multi_hotel_id') is-invalid @enderror multiple-hotels">
+                                                <option value="">Select one</option>
+                                                @foreach($hotels as $hotel)
+                                                <option value="{{ $hotel->id }}" {{ $corporate->hotel_id == $hotel->id ? 'selected' : '' }}>
+                                                    {{ $hotel->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                            @if($corporateKey == 0)
+                                                <button type="button" id="addHotel" class="btn ms-2">
+                                                    <span class="fa fa-plus"></span>
+                                                </button>
+                                            @else
+                                                <button type="button" class="remove-hotel btn ms-2">
+                                                    <span class="fas fa-times text-danger"></span>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="multiHotelId_0" class="form-label">Corporate</label>
+                                    <div class="d-flex">
+                                        <select name="multi_hotel_id[]" id="multiHotelId_0" class="form-control form-select custom-select @error('multi_hotel_id') is-invalid @enderror multiple-hotels">
+                                            <option value="">Select one</option>
+                                            @foreach($hotels as $hotel)
+                                            <option value="{{ $hotel->id }}" {{ old('hotel_id') == $hotel->id ? 'selected' : '' }}>
+                                                {{ $hotel->name }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button" id="addHotel" class="btn ms-2">
+                                            <span class="fa fa-plus"></span>
+                                        </button>
+                                    </div>
+                                    @error('multi_hotel_id')
+                                    <span class="invalid-feedback d-block">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="card no-box-shadow">
+                <div class="card-header px-0">
                     <h3 class="head-sm medium">Admin Information</h3>
                 </div>
                 <div class="card-body px-0">
@@ -200,7 +261,8 @@
         routes: {
             checkUniqueEmail: "{{route('check-unique-email')}}",
             resetPassword: "{{route('password-change')}}",
-        }
+        },
+        hotels: @json($hotels)
     };
 </script>
 @endsection

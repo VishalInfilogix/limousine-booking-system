@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Client;
 use App\Models\User;
+use App\Models\ClientMultiCorporates;
 use App\Models\UserType;
 use App\Repositories\Interfaces\ClientInterface;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,7 +23,8 @@ class ClientRepository implements ClientInterface
      * @param Client $model The model instance for clients.
      */
     public function __construct(
-        protected Client $model
+        protected Client $model,
+        protected ClientMultiCorporates $clientMultiCorporateModel
     ) {
     }
 
@@ -277,5 +279,13 @@ class ClientRepository implements ClientInterface
         $query->where('hotel_id', $hotel_id);
 
         return $query;
+    }
+    public function addClientHotel(array $data): ClientMultiCorporates
+    {
+        return $this->clientMultiCorporateModel->create($data);
+    }
+    public function deleteOldClientHotel(int $clientId): bool
+    {
+        return $this->clientMultiCorporateModel->where('client_id', $clientId)->delete();
     }
 }

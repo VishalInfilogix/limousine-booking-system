@@ -230,4 +230,15 @@ class EventService
             throw new \Exception($e->getMessage());
         }
     }
+
+    public function getActiveEvents()
+    {
+        try {
+            // Retrieve all hotels from the repository
+            return $this->eventRepository->getActiveEventsData();
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
+            throw new \Exception($e->getMessage());
+        }
+    }
 }

@@ -83,6 +83,7 @@ return [
     'city_surcharge_fetched_successfully' => 'Data fetched successfully.',
     'city_deleted' => "Marked delete successfully.",
     'driver_schedule_filtered' => 'Driver filtered successfully.',
+    'reports_filtered' => 'Reports filtered successfully.',
     'logs_filtered' => "Logs filtered successfully.",
     'file_exported' => "File exported successfully.",
     'driver_schedule_sent' => "Schedule has been sent successfully.",

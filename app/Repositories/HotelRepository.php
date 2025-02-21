@@ -218,5 +218,10 @@ class HotelRepository implements HotelInterface
     {
         return $this->model->with(['client.user'])->get();
     }
+
+    public function getActiveHotelsData(): Collection
+    {
+        return $this->model->where('status', 'ACTIVE')->get();
+    }
     
 }

@@ -71,6 +71,7 @@
         locations: @json($locations),
         peakPeriods: @json($peakPeriods),
         hotelClients:@json($hotelClients),
+        multipleCorporatesHotelData: @json($multipleCorporatesHotelData),
         events:@json($events),
         loggedUser:@json(Auth::user()),
     }
