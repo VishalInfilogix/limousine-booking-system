@@ -123,11 +123,13 @@ class ClientService
             {
                 foreach($requestData['multi_hotel_id'] as $client_hotel_data)
                 {
-                    $clientHotelData['client_id'] = $clientId;
-                    $clientHotelData['hotel_id'] = $client_hotel_data;
-                    $clientHotelData['status'] = $requestData['status'];
-                    $clientHotelData['created_by_id'] = $loggedUserId;
-                    $clientHotel = $this->clientRepository->addClientHotel($clientHotelData);
+                    if(!empty($client_hotel_data) && !empty($clientId)){
+                        $clientHotelData['client_id'] = $clientId;
+                        $clientHotelData['hotel_id'] = $client_hotel_data;
+                        $clientHotelData['status'] = $requestData['status'];
+                        $clientHotelData['created_by_id'] = $loggedUserId;
+                        $clientHotel = $this->clientRepository->addClientHotel($clientHotelData);
+                    }
                 }
             }
 
@@ -244,15 +246,20 @@ class ClientService
             $clientId = $client->id;
             // Prepare Client Multi Hotels Data
             $this->clientRepository->deleteOldClientHotel($clientId);
-            if(!empty($requestData['multi_hotel_id']))
+            if(!empty($requestData['multi_hotel_id']) && count($requestData['multi_hotel_id']))
             {
                 foreach($requestData['multi_hotel_id'] as $client_hotel_data)
                 {
-                    $clientHotelData['client_id'] = $clientId;
-                    $clientHotelData['hotel_id'] = $client_hotel_data;
-                    $clientHotelData['status'] = $requestData['status'];
-                    $clientHotelData['created_by_id'] = $loggedUserId;
-                    $clientHotel = $this->clientRepository->addClientHotel($clientHotelData);
+                    foreach($requestData['multi_hotel_id'] as $client_hotel_data)
+                {
+                    if(!empty($client_hotel_data) && !empty($clientId)){
+                        $clientHotelData['client_id'] = $clientId;
+                        $clientHotelData['hotel_id'] = $client_hotel_data;
+                        $clientHotelData['status'] = $requestData['status'];
+                        $clientHotelData['created_by_id'] = $loggedUserId;
+                        $clientHotel = $this->clientRepository->addClientHotel($clientHotelData);
+                    }
+                }
                 }
             }
 
