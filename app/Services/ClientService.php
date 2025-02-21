@@ -119,7 +119,7 @@ class ClientService
     
             $clientId = $client->id;
             // Prepare Client Multi Hotels Data
-            if(!empty($requestData['multi_hotel_id']))
+            if(!empty($requestData['multi_hotel_id']) && count($requestData['multi_hotel_id']) > 0)
             {
                 foreach($requestData['multi_hotel_id'] as $client_hotel_data)
                 {
