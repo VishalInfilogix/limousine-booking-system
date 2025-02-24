@@ -471,40 +471,40 @@ export default class Hotels extends BaseClass {
         $(".hotel-vehicle-fair-arrival").each((i, e) => {
             $(e).rules("add", {
                 required: true,
-                digits: true,
+                // digits: true,
                 messages: {
                     required: this.languageMessage.hotel_vehicle_fair_arrival.required,
-                    digits: this.languageMessage.hotel_vehicle_fair_arrival.digits,
+                    // digits: this.languageMessage.hotel_vehicle_fair_arrival.digits,
                 },
             });
         });
         $(".hotel-vehicle-fair-departure").each((i, e) => {
             $(e).rules("add", {
                 required: true,
-                digits: true,
+                // digits: true,
                 messages: {
                     required: this.languageMessage.hotel_vehicle_fair_departure.required,
-                    digits: this.languageMessage.hotel_vehicle_fair_departure.digits,
+                    // digits: this.languageMessage.hotel_vehicle_fair_departure.digits,
                 },
             });
         });
         $(".hotel-vehicle-fair-transfer").each((i, e) => {
             $(e).rules("add", {
                 required: true,
-                digits: true,
+                // digits: true,
                 messages: {
                     required: this.languageMessage.hotel_vehicle_fair_transfer.required,
-                    digits: this.languageMessage.hotel_vehicle_fair_transfer.digits,
+                    // digits: this.languageMessage.hotel_vehicle_fair_transfer.digits,
                 },
             });
         });
         $(".hotel-vehicle-fair-per-hour").each((i, e) => {
             $(e).rules("add", {
                 required: true,
-                digits: true,
+                // digits: true,
                 messages: {
                     required: this.languageMessage.hotel_vehicle_fair_per_hour.required,
-                    digits: this.languageMessage.hotel_vehicle_fair_per_hour.digits,
+                    // digits: this.languageMessage.hotel_vehicle_fair_per_hour.digits,
                 },
             });
         });

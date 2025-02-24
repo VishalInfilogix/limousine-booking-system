@@ -416,8 +416,8 @@ class BookingService
 
     public function updateBooking(array $requestData, Booking $booking, ?UploadedFile $file, array $logHeaders)
     {
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
             $loggedUserForNotification = Auth::user();
             $loggedUserId = Auth::user()->id;
             $loggedUserType = Auth::user()->userType->name ?? null;
@@ -426,10 +426,10 @@ class BookingService
             $additional_stops = !empty($requestData['additional_stops']) 
                                 ? join('||', array_filter($requestData['additional_stops'])) 
                                 : '';
-
+    
             $linkedClients = NULL;
             $linkedClients = join(',', $requestData['access_given_clients']);
-
+    
             if (isset($requestData['access_given_clients']))
                 $bookingData['linked_clients'] = $requestData['access_given_clients'];
             if (isset($requestData['status']))
@@ -510,12 +510,12 @@ class BookingService
                 $bookingData['vehicle_id'] = $requestData['vehicle_id'];
             if (isset($requestData['client_instructions']))
                 $bookingData['client_instructions'] = $requestData['client_instructions'];
-
+    
             $bookingData['child_seat_required'] = (isset($requestData['child_seat_required']) && !empty($requestData['child_seat_required'])) ? $requestData['child_seat_required'] : 'no';
             if($bookingData['child_seat_required'] == 'yes')
             {
                 $bookingData['no_of_seats_required'] = $requestData['no_of_seats_required'];
-
+    
                 if($bookingData['no_of_seats_required'] == 1)
                 {
                     $bookingData['child_1_age'] = $requestData['child_1_age'];
@@ -529,9 +529,9 @@ class BookingService
                 $bookingData['child_1_age'] = NULL;
                 $bookingData['child_2_age'] = NULL;
             }
-
+    
             $bookingData['additional_stops'] = $additional_stops;
-
+    
             if ($file && $file->isValid()) {
                 $folderName = 'bookings';
                 $this->uploadService->setPath($folderName);
@@ -549,10 +549,10 @@ class BookingService
             $this->bookingRepository->updateBooking($booking, $bookingData);
             
             $this->updateBookingNotification($loggedUserForNotification, $booking, $requestData['access_given_clients']);
-
+    
             if ($loggedUserType === null || $loggedUserType === UserType::ADMIN) {
                 $bookingBillingData['booking_id'] = $booking->id;
-
+    
                 $isPeakPeriod =  (isset($requestData['is_peak_period_surcharge']) && !empty($requestData['is_peak_period_surcharge'])) ? 1 : 0;
                 $isMidNight =  (isset($requestData['is_mid_night_surcharge']) && !empty($requestData['is_mid_night_surcharge'])) ? 1 : 0;
                 $isWaitingTime =  (isset($requestData['is_arr_waiting_time_surcharge']) && !empty($requestData['is_arr_waiting_time_surcharge'])) ? 1 : 0;
@@ -1025,16 +1025,18 @@ class BookingService
             foreach($deLinkClients as $deLinkClient)
             {
                 $userDetail = $this->userRepository->getUserById((int) $deLinkClient);
-                
-                $mailData   = [
-                    'subject' =>  $subject,
-                    'template' =>  'booking-updated-email',
-                    'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
-                    'logs' => $message,
-                    'changedBy' => $loggedUserFullName,
-                    'bookingId' => $booking->id,
-                ];
-                $this->helper->sendEmail($userDetail->email, $mailData);
+                if(!empty($userDetail) && !empty($userDetail->email) && !empty($userDetail->first_name))
+                {
+                    $mailData   = [
+                        'subject' =>  $subject,
+                        'template' =>  'booking-updated-email',
+                        'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
+                        'logs' => $message,
+                        'changedBy' => $loggedUserFullName,
+                        'bookingId' => $booking->id,
+                    ];
+                    $this->helper->sendEmail($userDetail->email, $mailData);
+                }
             }
         }
 

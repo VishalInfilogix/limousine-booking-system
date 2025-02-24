@@ -327,7 +327,7 @@ class BookingController extends Controller
             $loggedUserHotelId = Auth::user()->client->hotel_id ?? null;
             $user = Auth::user();
             $userTypeSlug = $user->userType->slug ?? null;
-
+    
             $pickUpTime = 'N/A';
             $pickup = $booking->pickup_time ? CustomHelper::formatTime($booking->pickup_time) : null;
             if ($booking->service_type_id === 4) {
@@ -347,9 +347,9 @@ class BookingController extends Controller
             $pickupDateTimeStamp = strtotime($pickupDateTime);
             $currentTimeStamp = strtotime(date('Y-m-d H:i'));
             $hoursDifference = ($pickupDateTimeStamp - $currentTimeStamp) / 3600;
-
+    
             if (in_array($userTypeSlug, ['client-admin', 'client-staff']) && $loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId) {
-
+    
                 $client = $user->load('client');
     
                 $multiCorporatesData = $user->client->load('multiCorporates');
@@ -379,7 +379,7 @@ class BookingController extends Controller
             
             $logHeaders = $this->getHttpData($request);
             $file = $request->file('attachment');
-
+    
             $this->bookingService->updateBooking($request->all(), $booking,  $file, $logHeaders);
             $this->helper->alertResponse(__('message.booking_updated'), 'success');
             return redirect('bookings');
