@@ -1136,12 +1136,8 @@ class BookingService
             $loggedUser = Auth::user();
             $userTypeSlug = $loggedUser->userType->slug ?? null;
 
-            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
-            {
-            }else{
-                if (!$startDate) {
-                    $startDate = Booking::min('created_at');
-                }
+            if (!$startDate) {
+                $startDate = Booking::min('created_at');
             }
             return $this->bookingRepository->getBookingsForDashboardForPieChart($startDate, $endDate, $loggedUser);
         } catch (\Exception $e) {
@@ -1158,13 +1154,11 @@ class BookingService
             
             $loggedUser = Auth::user();
             $userTypeSlug = $loggedUser->userType->slug ?? null;
-            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
-            {                
-            }else{
-                if (!$startDate) {
-                    $startDate = Booking::min('created_at');
-                }
+
+            if (!$startDate) {
+                $startDate = Booking::min('created_at');
             }
+
             return $this->bookingRepository->getBookingsForDashboardForLineChart($startDate, $endDate, $loggedUser);
         } catch (\Exception $e) {
             // Throw an exception with the error message if an error occurs
@@ -1180,13 +1174,11 @@ class BookingService
             
             $loggedUser = Auth::user();
             $userTypeSlug = $loggedUser->userType->slug ?? null;
-            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
-            {                
-            }else{
-                if (!$startDate) {
-                    $startDate = Booking::min('created_at');
-                }
+            
+            if (!$startDate) {
+                $startDate = Booking::min('created_at');
             }
+
             return $this->bookingRepository->getBookingsForDashboardForLineChartCancellation($startDate, $endDate, $loggedUser);
         } catch (\Exception $e) {
             // Throw an exception with the error message if an error occurs

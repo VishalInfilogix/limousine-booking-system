@@ -87,5 +87,6 @@ return [
     'logs_filtered' => "Logs filtered successfully.",
     'file_exported' => "File exported successfully.",
     'driver_schedule_sent' => "Schedule has been sent successfully.",
-    'booking_deleted' => "Booking deleted successfully."
+    'booking_deleted' => "Booking deleted successfully.",
+    'dashboard_data_fetched' => 'Dashboard data fetched successfully.'
 ];

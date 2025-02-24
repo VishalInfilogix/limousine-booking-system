@@ -42,6 +42,7 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
 
     //Dashboard Routes
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('filterDashboardData', [DashboardController::class, 'filterDashboardData'])->name('filter-dashboard-data');
     Route::get('getUserType',  [UserTypeController::class, 'index'])->name('get-user-types');
 
     Route::post('checkUniqueEmail', [UserController::class, 'checkUniqueEmail'])->name('check-unique-email');
