@@ -1007,7 +1007,7 @@ class BookingService
                     'changedBy' => $loggedUserFullName,
                     'bookingId' => $booking->id,
                 ];
-                $this->helper->sendEmail('vishalranablogger@gmail.com', $mailData);
+                $this->helper->sendEmail('limousine@e1asia.com.sg', $mailData);
             }
         } else {
             $notifyUsers =  $this->userRepository->getAdmins();
