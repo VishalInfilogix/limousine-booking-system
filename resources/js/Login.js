@@ -23,6 +23,11 @@ export default class Login extends BaseClass {
             "#forgotPasswordFormButton",
             this.validateforgotPasswordForm
         );
+        $(document).on(
+            "click",
+            "#registerButton",
+            this.validateRegisterForm
+        );
         $(document).on("click", ".passwordIcon", this.handlePasswordInput);
         $(document).on("keyup", "input[name='email']", this.trimEmailField);
     }
@@ -56,6 +61,66 @@ export default class Login extends BaseClass {
                 },
             },
             messages: {
+                email: {
+                    required: this.languageMessage.email.required,
+                    email: this.languageMessage.email.email,
+                },
+            },
+            errorElement: "span",
+            errorPlacement: function (error, element) {
+                error.addClass("invalid-feedback");
+                element.closest(".input-group").append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass("is-invalid").removeClass("is-valid");
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass("is-invalid").addClass("is-valid");
+            },
+        });
+    };
+
+    validateRegisterForm = () => {
+        $("#registerForm").validate({
+            rules: {
+                first_name: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 50,
+                },
+                country_code: {
+                    minlength: 1,
+                    maxlength: 3,
+                    integer: true,
+                    required: true,
+                },
+                phone: {
+                    required: true,
+                    digits: true,
+                    minlength: 6,
+                    maxlength: 10,
+                },
+                email: {
+                    required: true,
+                    email: true,
+                },
+            },
+            messages: {
+                first_name: {
+                    required: this.languageMessage.first_name.required,
+                    minlength: this.languageMessage.first_name.min,
+                    maxlength: this.languageMessage.first_name.max,
+                },
+                country_code: {
+                    minlength: this.languageMessage.country_code.min,
+                    maxlength: this.languageMessage.country_code.max,
+                    integer: this.languageMessage.country_code.integer,
+                },
+                phone: {
+                    digits: this.languageMessage.phone.regex,
+                    minlength: this.languageMessage.phone.min,
+                    maxlength: this.languageMessage.phone.max,
+                },
                 email: {
                     required: this.languageMessage.email.required,
                     email: this.languageMessage.email.email,

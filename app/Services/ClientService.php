@@ -77,6 +77,17 @@ class ClientService
         }
     }
 
+    public function getClientsByLinkedHotel($hotel_id)
+    {
+        try {
+            // Get paginated client data using the client repository
+            return $this->clientRepository->getClientsByLinkedHotel($hotel_id);
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
+            throw new \Exception($e->getMessage());
+        }
+    }
+
     /**
      * Create a new client.
      *
@@ -271,6 +282,17 @@ class ClientService
         } catch (\Exception $e) {
             // Rollback the transaction if an error occurs
             DB::rollback();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function getActiveClients()
+    {
+        try {
+            // Retrieve all clients from the repository
+            return $this->clientRepository->getActiveClientsData();
+        } catch (\Exception $e) {
+            // Throw an exception with the error message if an error occurs
             throw new \Exception($e->getMessage());
         }
     }

@@ -31,6 +31,7 @@ Route::get('/test', function () {
 Route::group(['middleware' => ['guest', 'web']], function () {
     Route::get('/', [LoginController::class, 'index'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('submit-login');
+    Route::post('/register', [LoginController::class, 'register'])->name('register');
     // Password Reset Routes
     Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('forgotPassword', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('forget_password.email');
@@ -189,6 +190,7 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('reports', [ReportsController::class, 'index'])->name('reports');
         Route::get('/filter-reports', [ReportsController::class, 'filterReports'])->name('filter-reports');
         Route::post('/export-reports', [ReportsController::class, 'export'])->name('export-reports');
+        Route::get('/get-clients-by-corporate-id', [ClientController::class, 'getClientsByCorporateId'])->name('get-clients-by-corporate-id');
 
         //Logs Routes
         Route::get('logs', [BookingLogController::class, 'index'])->name('logs');
@@ -319,6 +321,7 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('reports', [ReportsController::class, 'index'])->name('reports');
         Route::get('/filter-reports', [ReportsController::class, 'filterReports'])->name('filter-reports');
         Route::post('/export-reports', [ReportsController::class, 'export'])->name('export-reports');
+        Route::get('/get-clients-by-corporate-id', [ClientController::class, 'getClientsByCorporateId'])->name('get-clients-by-corporate-id');
 
         Route::get('logs', [BookingLogController::class, 'index'])->name('logs');
         Route::get('filterLogs', [BookingLogController::class, 'filterLogs'])->name('filter-logs');
@@ -379,6 +382,7 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('reports', [ReportsController::class, 'index'])->name('reports');
         Route::get('/filter-reports', [ReportsController::class, 'filterReports'])->name('filter-reports');
         Route::post('/export-reports', [ReportsController::class, 'export'])->name('export-reports');
+        Route::get('/get-clients-by-corporate-id', [ClientController::class, 'getClientsByCorporateId'])->name('get-clients-by-corporate-id');
         
         Route::get('terms-and-conditions', [DashboardController::class, 'terms'])->name('dashboard.terms');
 
@@ -418,6 +422,7 @@ Route::middleware(['Auth','SanitizeInput', AuthenticateSession::class])->group(f
         Route::get('reports', [ReportsController::class, 'index'])->name('reports');
         Route::get('/filter-reports', [ReportsController::class, 'filterReports'])->name('filter-reports');
         Route::post('/export-reports', [ReportsController::class, 'export'])->name('export-reports');
+        Route::get('/get-clients-by-corporate-id', [ClientController::class, 'getClientsByCorporateId'])->name('get-clients-by-corporate-id');
 
         //Events Management Routes
         Route::get('events', [EventsController::class, 'index'])->name('events');

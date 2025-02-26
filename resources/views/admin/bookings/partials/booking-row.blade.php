@@ -73,11 +73,17 @@
                 $dropOffLocationEditVal = $booking->drop_of_location ?? null;
             }
         }
+        $additionalStops = $booking->additional_stops;
+        $additionalStopsVal = '';
+        if(!empty($additionalStops))
+        {
+            $additionalStopsVal = explode('||', $booking->additional_stops);
+        }
         $firstName = $booking->updatedBy->first_name ?? null;
         $lastName = $booking->updatedBy->last_name ?? null;
         $fullName = CustomHelper::getFullName($firstName, $lastName);
         $hotel = $booking->client->hotel->name ?? null;
-        $event = $booking->client->event ?? null;
+        $event = $booking->event->name ?? null;
         if ($hotel) {
             $hotelValue = $hotel . '<br> (' . $event . ')';
         } else {
@@ -142,7 +148,7 @@
             $userTypeSlug === null ||
                 in_array($userTypeSlug, ['admin', 'admin-staff']) ||
                 (in_array($userTypeSlug, ['client-admin', 'client-staff']) && 
-                    ($booking->status === 'PENDING' || ($booking->status === 'ACCEPTED' && $hoursDifference > 24))
+                    (($booking->status === 'PENDING' && $hoursDifference > 24) || ($booking->status === 'ACCEPTED' && $hoursDifference > 24))
                 ))
               <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
                   <i class="fas fa-pencil-alt mr-1"></i>
@@ -166,14 +172,22 @@
           {{ CustomHelper::parseDateTime($booking->pickup_date, 'd M, Y') }}</td>
       <td
           @if ($isEditable) data-name="pickup_time" data-old="{{ CustomHelper::formatTime($booking->pickup_time) }}" @endif>
-          {!! $pickUpTime ?? 'N/A' !!}</td>
+          {!! $booking->to_be_advised_status === 'yes' && $pickUpTime === '00:00' ? 'To Be Advised' : $pickUpTime ?? 'N/A' !!}</td>
       <td class="text-truncate">{{ $booking->serviceType->name ?? 'N/A' }}</td>
       <td @if ($isEditable) data-name="pickup_location" data-old="{{ $pickUpLocation }}"
           data-service-id="{{ $booking->service_type_id }}" data-old-id="{{ $booking->pick_up_location_id }}" @endif
           class="text-truncate" style="max-width: 200px" title="{{ $pickUpLocation ?? 'N/A' }}">{{ $pickUpLocation ?? 'N/A' }}</td>
       <td @if ($isEditable) data-name="drop_of_location" data-old="{{ $dropOffLocationEditVal }}"
           data-service-id="{{ $booking->service_type_id }}" data-old-id="{{ $booking->drop_off_location_id }}" @endif
-          class="text-truncate" style="max-width: 200px" title="{{ $dropOffLocation ?? 'N/A' }}">{{ $dropOffLocation ?? 'N/A' }}
+          class="text-truncate" style="max-width: 200px" title="{{ $dropOffLocation ?? 'N/A' }}">
+          {{ $dropOffLocation ?? 'N/A' }}
+          @if(!empty($additionalStopsVal))
+          <br>
+            @foreach($additionalStopsVal as $key => $additionalStop)
+                {{ $key+1 . '. ' . $additionalStop }}
+                <br>
+            @endforeach
+          @endif
       </td>
       <td @if ($isEditable) data-name="guest_name" data-old="{{ $guestNames }}" @endif
           class="text-truncate" style="max-width: 200px" title="{{ $resultGuestName ?? 'N/A' }}">{!! $resultGuestName ?? 'N/A' !!}</td>

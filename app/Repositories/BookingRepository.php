@@ -23,7 +23,8 @@ class BookingRepository implements BookingInterface
      * @param Booking $model The model instance for bookings.
      */
     public function __construct(
-        protected Booking $model
+        protected Booking $model,
+        protected User $userModel
     ) {
     }
 
@@ -265,8 +266,6 @@ class BookingRepository implements BookingInterface
                     $query->whereRaw("LOWER(`name`) like ?", ['%' . $search . '%']);
                 })->orWhereHas('dropOffLocation', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
-                })->orWhereHas('client', function ($query) use ($search) {
-                    // $query->whereRaw("LOWER(`event`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('driver', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('vehicle', function ($query) use ($search) {
@@ -346,8 +345,6 @@ class BookingRepository implements BookingInterface
                     $query->whereRaw("LOWER(`name`) like ?", ['%' . $search . '%']);
                 })->orWhereHas('dropOffLocation', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
-                })->orWhereHas('client', function ($query) use ($search) {
-                    // $query->whereRaw("LOWER(`event`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('driver', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('vehicle', function ($query) use ($search) {
@@ -626,13 +623,19 @@ class BookingRepository implements BookingInterface
         return $query->get();
     }
 
-    public function getBookingsForReports(User $loggedUser,  $startDate, $endDate, string $search = '', int $page = 1, string $sortField = 'id', string $sortDirection = 'asc', $driverId = null, $hotelId = null, $eventId = null, $noPagination = false, $isDriverSchedule = false)
+    public function getBookingsForReports(User $loggedUser,  $startDate, $endDate, string $search = '', int $page = 1, string $sortField = 'id', string $sortDirection = 'asc', $driverId = null, $hotelId = null, $eventId = null, $clientId = null, $noPagination = false, $isDriverSchedule = false)
     {
         // Filter Booking based on the provided parameters
-        $bookings = $this->filterBookingResultForReports($loggedUser, $startDate, $endDate, $search, $driverId, $hotelId, $eventId, $isDriverSchedule)->get();
+        $bookings = $this->filterBookingResultForReports($loggedUser, $startDate, $endDate, $search, $driverId, $hotelId, $eventId, $clientId, $isDriverSchedule)->get();
         if ($noPagination) {
             return  $bookings;
         }
+
+        foreach($bookings as $booking)
+        {
+            $booking->linkedClients = $this->model->linkedClients($booking->linked_clients);
+        }
+        
         // Sort the bookings based on the specified field and direction
         $sortedCollection = $this->sortBookingsForReports($bookings, $sortField, $sortDirection);
 
@@ -643,7 +646,7 @@ class BookingRepository implements BookingInterface
         return $this->paginateResults($sortedCollection, $pageSize, $page);
     }
     
-    private function filterBookingResultForReports(User $loggedUser, $startDate, $endDate, string $search = '', $driverId = null, $hotelId = null, $eventId = null, $isDriverSchedule = false)
+    private function filterBookingResultForReports(User $loggedUser, $startDate, $endDate, string $search = '', $driverId = null, $hotelId = null, $eventId = null, $clientId = null, $isDriverSchedule = false)
     {
         $loggedUserId = $loggedUser->id;
         $loggedUserHotel = $loggedUser->client->hotel_id ?? null;
@@ -661,9 +664,7 @@ class BookingRepository implements BookingInterface
                     });
             });
         }
-        if ($isDriverSchedule) {
-            $query->whereNotIn('status', [Booking::COMPLETED, Booking::CANCELLED]);
-        }
+
 
         if (!empty($startDate) && !empty($endDate)) {
             $query->whereBetween(DB::raw("CONCAT(pickup_date, ' ', pickup_time)"), [$startDate, $endDate]);
@@ -678,7 +679,13 @@ class BookingRepository implements BookingInterface
                 $query->where('hotel_id', $hotelId);
             });
         }
-        
+
+        if (!empty($clientId)) {
+            $query->where(function ($query) use ($clientId) {
+                $query->where('created_by_id', $clientId)
+                      ->orWhereJsonContains('linked_clients', $clientId);
+            });
+        }
 
         if (!empty($eventId)) {
             $query->where('event_id', $eventId);
@@ -722,8 +729,6 @@ class BookingRepository implements BookingInterface
                     $query->whereRaw("LOWER(`name`) like ?", ['%' . $search . '%']);
                 })->orWhereHas('dropOffLocation', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
-                })->orWhereHas('client', function ($query) use ($search) {
-                    // $query->whereRaw("LOWER(`event`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('driver', function ($query) use ($search) {
                     $query->whereRaw("LOWER(`name`) like ?",  ['%' . $search . '%']);
                 })->orWhereHas('vehicle', function ($query) use ($search) {
@@ -773,8 +778,11 @@ class BookingRepository implements BookingInterface
                 case 'sortContact':
                     $value = strtolower($innerQuery->country_code . $innerQuery->phone ?? 'zzzz');
                     break;
-                case 'sortClient':
+                case 'sortCorporate':
                     $value = strtolower($innerQuery->client->hotel->name ?? 'zzzz');
+                    break;
+                case 'sortBookedBy':
+                    $value = strtolower($innerQuery->createdBy->first_name . ' ' . $innerQuery->createdBy->last_name ?? 'zzzz');
                     break;
                 case 'sortEvent':
                     $value = strtolower($innerQuery->event->name ?? 'zzzz');
@@ -792,6 +800,13 @@ class BookingRepository implements BookingInterface
                         }
                     }
                     $value = strtolower($dropOffLocation ?? 'zzzz');
+                    break;
+                case 'sortAdditionalStops':
+                    $additionalStops = $innerQuery->additional_stops ?? '';
+
+                    $stopsArray = explode('||', $additionalStops);
+                
+                    $value = strtolower(trim($stopsArray[0] ?? 'zzzz'));
                     break;
                 case 'sortPikUp':
                     $pickUpLocationId = $innerQuery->pick_up_location_id ?? null;
@@ -821,6 +836,14 @@ class BookingRepository implements BookingInterface
                     break;
                 case 'sortBookingDate':
                     $value = $innerQuery->created_at ?? 'zzzz';
+                    break;
+                case 'sortAccessGivenClients':
+                    $firstLinkedClient = $innerQuery->linkedClients->first();
+
+                    $value = $firstLinkedClient 
+                        ? ($firstLinkedClient->first_name . ' ' . $firstLinkedClient->last_name) 
+                        : 'zzzz';
+
                     break;
                 default:
                     $value = strtolower($innerQuery->id ?? 'zzzz');

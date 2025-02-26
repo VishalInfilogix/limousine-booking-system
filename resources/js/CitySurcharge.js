@@ -38,8 +38,8 @@ export default class CitySurcharge extends BaseClass {
                     return;
                 }
                 const singaporeBounds = new google.maps.LatLngBounds(
-                    new google.maps.LatLng(1.130475, 103.692035), // Southwest corner
-                    new google.maps.LatLng(1.450475, 104.092035) // Northeast corner
+                    new google.maps.LatLng(1.17807, 103.57781), // Southwest corner
+                    new google.maps.LatLng(1.48492, 104.08868) // Northeast corner
                 );
                 // Initialize the map centered on Singapore with bounds and disable zoom controls
                 this.map = new google.maps.Map(mapElement, {

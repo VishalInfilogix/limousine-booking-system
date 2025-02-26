@@ -32,6 +32,12 @@
                 $dropOffLocation = $drivers->drop_of_location;
             }
         }
+        $additionalStops = $drivers->additional_stops;
+        $additionalStopsVal = '';
+        if(!empty($additionalStops))
+        {
+            $additionalStopsVal = explode('||', $drivers->additional_stops);
+        }
         $pickUpTime = 'N/A';
         $pickup = $drivers->pickup_time ? CustomHelper::formatTime($drivers->pickup_time) : null;
         if ($drivers->service_type_id === 4) {
@@ -94,6 +100,14 @@
         <td class="text-truncate">{{ $drivers->serviceType->name ?? 'N/A' }}</td>
         <td class="text-truncate toggalPickup">{{ $pickUpLocation ?? 'N/A' }}</td>
         <td class="text-truncate toggalDropOff">{{ $dropOffLocation ?? 'N/A' }}</td>
+        <td class="text-truncate toggalAdditionalStops">
+            @if(!empty($additionalStopsVal))
+                @foreach($additionalStopsVal as $stopKey => $additionalStop)
+                    {{ $stopKey+1 . '. ' . $additionalStop }}
+                    @if($stopKey != count($additionalStopsVal))<br>@endif
+                @endforeach
+            @endif
+        </td>
         <td class="text-truncate toggalGuest">{!! $resultGuestName ?? 'N/A' !!}</td>
         @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
             <td class="text-truncate">{!! $hotelValue !!}</td>
@@ -101,10 +115,19 @@
         <td class="text-truncate toggalEvent">{!! $eventName !!}</td>
         <td class="text-truncate toggalContact">
             {{ $drivers->country_code ? '+(' . $drivers->country_code . ')' : '' }}{{ $drivers->phone ?? 'N/A' }}</td>
-        <td class="text-truncate" style="max-width: 200px" title="{{ $drivers->driver_remark ?? 'N/A' }}">
-            {{ $drivers->driver_remark ?? 'N/A' }}</td>
         <td class="text-truncate">{{ $drivers->driver->name ?? 'N/A' }}</td>
         <td class="text-truncate">{!! $Vehicle ?? 'N/A' !!}</td>
+        <td class="text-truncate">{!! $drivers->status ?? 'N/A' !!}</td>
+        <td class="text-truncate">{!! $drivers->createdBy->first_name . ' ' . $drivers->createdBy->last_name ?? 'N/A' !!}</td>
+        <td class="text-truncate">
+            @if(!empty($drivers->linkedClients))
+                @foreach($drivers->linkedClients as $clientKey => $client)
+                    {{ $clientKey+1 . '. ' . $client->first_name . ' ' . $client->last_name }}
+                    @if($clientKey != count($drivers->linkedClients))<br>@endif
+                @endforeach
+            @endif
+        </td>
+        <td class="text-truncate">{!! date('d-m-Y H:i', strtotime($drivers->created_at)) ?? 'N/A' !!}</td>
     </tr>
 @empty
     <tr>

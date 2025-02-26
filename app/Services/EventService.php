@@ -89,13 +89,33 @@ class EventService
             $loggedUserId = $loggedUser->id;
             $loggedUserTypeSlug = $loggedUser->userType->slug ?? null;
 
-            $loggedUser->load('client');
+            $loggedUser->load('client');            
 
             if ($loggedUserTypeSlug === null || in_array($loggedUserTypeSlug, ['admin', 'admin-staff']))
             {
                 $hotel_id = $requestData['hotel_id'];
             }else{
+                $multipleCorporatesHotelData = NULL;
+            
+                $loggedUser->client->load(['hotel', 'multiCorporates.hotel']);
+
+                $loggedInUserHotelDetails = $loggedUser->client->hotel;
                 $hotel_id = $loggedUser->client->hotel_id;
+
+                $multiCorporates = $loggedUser->client->multiCorporates;
+
+                $multipleCorporatesHotelData = $multiCorporates->pluck('hotel');
+
+                if (!$multipleCorporatesHotelData->isEmpty() && !$multipleCorporatesHotelData->contains('id', $loggedInUserHotelDetails->id)) {
+                    $multipleCorporatesHotelData->push($loggedInUserHotelDetails);
+                }
+
+                if(!empty($multipleCorporatesHotelData) && count($multipleCorporatesHotelData) > 1)
+                {
+                    $hotel_id = $requestData['hotel_id'];
+                }else{
+                    $hotel_id = $loggedUser->client->hotel_id;
+                }
             }
 
             // Prepare the event data

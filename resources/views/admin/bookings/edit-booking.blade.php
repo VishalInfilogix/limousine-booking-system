@@ -992,8 +992,15 @@
                                                         autocomplete="off">
                                                         <option value="">Select Client</option>
                                                         @foreach ($clients as $client)
-                                                            <option value="{{ $client->user->id }}">
-                                                                <?= (!empty($client->user->first_name) ? ucwords($client->user->first_name) : '') . (!empty($client->user->last_name) ? ' ' . ucwords($client->user->last_name) : ''); ?>
+                                                            @php
+                                                                if(gettype($client) !== 'array')
+                                                                {
+                                                                    $client->toArray();
+                                                                    $client['user']->toArray();
+                                                                }
+                                                            @endphp
+                                                            <option value="{{ $client['user']['id'] }}">
+                                                                <?= (!empty($client['user']['first_name']) ? ucwords($client['user']['first_name']) : '') . (!empty($client->user->last_name) ? ' ' . ucwords($client->user->last_name) : ''); ?>
                                                             </option>
                                                         @endforeach
                                                     </select>

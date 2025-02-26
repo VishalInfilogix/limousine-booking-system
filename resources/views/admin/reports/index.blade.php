@@ -3,6 +3,7 @@
     <div class="content-wrapper">
         @php
             $user = Auth::user();
+            $userTypeSlug = $user->userType->slug ?? null;
         @endphp
         <!-- Content Header (Page header) -->
         <section class="content-header border-bottom">
@@ -12,6 +13,10 @@
                         <h1 class="semibold head-sm">Reports</h1>
                         <!-- <p class="normal text-xs">Driver's Schedule</p> -->
                     </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row align-items-center g-3">
                     <div class="col-sm-2">
                         <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success"
                             title="Hide Contact">
@@ -35,6 +40,13 @@
                     </div>
                     <div class="col-sm-2">
                         <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success"
+                            title="Hide Additional Stops">
+                            <input type="checkbox" class="custom-control-input" id="hideAdditionalStops" checked="">
+                            <label class="custom-control-label pb-0" for="hideAdditionalStops">Hide/Show Additional Stops</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success"
                             title="Hide Guest">
                             <input type="checkbox" class="custom-control-input" id="hideGuest" checked="">
                             <label class="custom-control-label pb-0" for="hideGuest">Hide/Show Guest</label>
@@ -51,10 +63,10 @@
             </div>
             <div class="container-fluid mt-2">
                 <div class="row align-items-center g-3">                    
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <input type="text" id="search" name="search" class="form-control" placeholder="Search">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="far fa-clock"></i></span>
@@ -63,31 +75,7 @@
                                 autocomplete="off" autofocus />
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <select id="driversList" class="form-control form-select custom-select">
-                            <option value="">Select Driver</option>
-                            @foreach ($driverData as $drivers)
-                                <option value="{{ $drivers->id }}">{{ $drivers->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select id="hotelsList" class="form-control form-select custom-select">
-                            <option value="">Select Corporate</option>
-                            @foreach ($hotelsData as $hotel)
-                                <option value="{{ $hotel->id }}">{{ $hotel->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select id="eventsList" class="form-control form-select custom-select">
-                            <option value="">Select Event</option>
-                            @foreach ($eventsData as $event)
-                                <option value="{{ $event->id }}">{{ $event->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-2" id="exportOptions">
+                    <div class="col-md-4" id="exportOptions">
                         @if (!$driversBooking->isEmpty())
                             <select id="exportFormat" class="form-control form-select custom-select">
                                 <option value="">Export</option>
@@ -95,6 +83,42 @@
                                 <option value="excel">Excel</option>
                             </select>
                         @endIf
+                    </div>  
+                </div>
+                <div class="container-fluid mt-2">
+                    <div class="row align-items-center g-3">  
+                        <div class="col-md-3">
+                            <select id="driversList" class="form-control form-select custom-select">
+                                <option value="">Select Driver</option>
+                                @foreach ($driverData as $drivers)
+                                    <option value="{{ $drivers->id }}">{{ $drivers->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="hotelsList" class="form-control form-select custom-select">
+                                <option value="">Select Corporate</option>
+                                @foreach ($hotelsData as $hotel)
+                                    <option value="{{ $hotel->id }}">{{ $hotel->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="clientsList" class="form-control form-select custom-select">
+                                <option value="">Select Client</option>
+                                @foreach ($clientsData as $client)
+                                    <option value="{{ $client->user->id }}">{{ $client->user->first_name . ' ' . $client->user->last_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="eventsList" class="form-control form-select custom-select">
+                                <option value="">Select Event</option>
+                                @foreach ($eventsData as $event)
+                                    <option value="{{ $event->id }}">{{ $event->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>     
                     </div>
                 </div>
             </div>
@@ -119,19 +143,29 @@
                                             aria-hidden="true"></i></th>
                                     <th class="toggalDropOff">Drop-off<i class="fa fa-sort ml-1 theme-color" id="sortDropOff"
                                             aria-hidden="true"></i></th>
+                                    <th class="toggalAdditionalStops">Additional Stops<i class="fa fa-sort ml-1 theme-color" id="sortAdditionalStops"
+                                            aria-hidden="true"></i></th>
                                     <th class="toggalGuest">Guest Name<i class="fa fa-sort ml-1 theme-color" id="sortGuestName"
                                             aria-hidden="true"></i></th>
-                                    <th>Client<i class="fa fa-sort ml-1 theme-color" id="sortClient" aria-hidden="true"></i>
+                                    @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
+                                    <th>Corporate<i class="fa fa-sort ml-1 theme-color" id="sortCorporate" aria-hidden="true"></i>
+                                    @endif
                                     </th>
                                     <th class="toggalEvent">Event<i class="fa fa-sort ml-1 theme-color" id="sortEvent" aria-hidden="true"></i>
                                     </th>
                                     <th class="toggalContact">Contact<i class="fa fa-sort ml-1 theme-color" id="sortContact"
                                             aria-hidden="true"></i></th>
-                                    <th>Driver Remarks<i class="fa fa-sort ml-1 theme-color" id="sortRemarks"
-                                            aria-hidden="true"></i></th>
                                     <th>Driver<i class="fa fa-sort ml-1 theme-color" id="sortDriver" aria-hidden="true"></i>
                                     </th>
                                     <th>Vehicle<i class="fa fa-sort ml-1 theme-color" id="sortVehicle"
+                                            aria-hidden="true"></i></th>
+                                    <th>Status<i class="fa fa-sort ml-1 theme-color" id="sortStatus"
+                                            aria-hidden="true"></i></th>
+                                    <th>Booked By<i class="fa fa-sort ml-1 theme-color" id="sortBookedBy"
+                                            aria-hidden="true"></i></th>
+                                    <th>Access Given Clients<i class="fa fa-sort ml-1 theme-color" id="sortAccessGivenClients"
+                                            aria-hidden="true"></i></th>
+                                    <th>Booking Date<i class="fa fa-sort ml-1 theme-color" id="sortBookingDate"
                                             aria-hidden="true"></i></th>
                                 </tr>
                             </thead>
@@ -156,6 +190,7 @@
             routes: {
                 filterReports: "{{ route('filter-reports') }}",
                 exportData: "{{ route('export-reports') }}",
+                clientsOfCorporates: "{{ route('get-clients-by-corporate-id') }}"
             },
             userTypeId: @json($user->user_type_id)
         }

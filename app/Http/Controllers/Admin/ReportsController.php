@@ -10,6 +10,7 @@ use App\Services\ReportsService;
 use App\Services\DriverService;
 use App\Services\ExportService;
 use App\Services\HotelService;
+use App\Services\ClientService;
 use App\Services\EventService;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -21,6 +22,7 @@ class ReportsController extends Controller
         private DriverService $driverService,
         private ExportService $exportService,
         private HotelService $hotelService,
+        private ClientService $clientService,
         private EventService $eventService,
         private CustomHelper $helper
     ) {
@@ -31,9 +33,10 @@ class ReportsController extends Controller
         try {
             $driverData = $this->driverService->getActiveDrivers($request->query());
             $hotelsData = $this->hotelService->getActiveHotels($request->query());
+            $clientsData = $this->clientService->getActiveClients($request->query());
             $eventsData = $this->eventService->getActiveEvents($request->query());
             $driversBooking = $this->reportsService->getReportsBookingData($request->query());
-            return view('admin.reports.index', compact('driverData', 'driversBooking', 'hotelsData', 'eventsData'));
+            return view('admin.reports.index', compact('driverData', 'driversBooking', 'hotelsData', 'eventsData', 'clientsData'));
         } catch (\Exception $e) {
             $this->helper->alertResponse(__('messages.something_went_wrong'), 'error');
             // Handle any exceptions that occur

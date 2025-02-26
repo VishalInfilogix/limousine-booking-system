@@ -44,6 +44,7 @@ return [
     'client_deleted' => 'Client deleted successfully.',
     'client_filtered' => 'Client filtered successfully.',
     'client_status_updated' => 'Client status updated successfully.',
+    'clients_fetched_successfully' => 'Clients Fetched successfully.',
     'can_not_delete' => 'Cannot delete or update a parent row. This record is being referenced by other records.',
     'driver_created' => "Driver created successfully.",
     'driver_updated' => "Driver updated successfully.",

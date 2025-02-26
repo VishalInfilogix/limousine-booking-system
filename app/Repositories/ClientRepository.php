@@ -276,7 +276,22 @@ class ClientRepository implements ClientInterface
     private function filterClientResultByHotel(User $loggedUser, int $hotel_id = null)
     {
         $query = $this->model->query();
-        $query->where('hotel_id', $hotel_id);
+        $query->where('hotel_id', $hotel_id)->with('user');
+
+        return $query;
+    }
+
+    public function getClientsByLinkedHotel(int $hotel_id = null)
+    {
+        $clients = $this->filterClientResultByLinkedHotel($hotel_id)->get();
+
+        return $clients;
+    }
+
+    private function filterClientResultByLinkedHotel(int $hotel_id = null)
+    {
+        $query = $this->clientMultiCorporateModel->query();
+        $query->where('hotel_id', $hotel_id)->with('client.user');
 
         return $query;
     }
@@ -287,5 +302,10 @@ class ClientRepository implements ClientInterface
     public function deleteOldClientHotel(int $clientId): bool
     {
         return $this->clientMultiCorporateModel->where('client_id', $clientId)->delete();
+    }
+
+    public function getActiveClientsData(): Collection
+    {
+        return $this->model->where('status', 'ACTIVE')->with('user')->get();
     }
 }

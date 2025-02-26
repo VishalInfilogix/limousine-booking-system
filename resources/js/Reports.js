@@ -20,16 +20,19 @@ export default class DriverSchedule extends BaseClass {
         $(document).on("change", "#driversList", this.handleDriverFilter);
         $(document).on("change", "#hotelsList", this.handleHotelsFilter);
         $(document).on("change", "#eventsList", this.handleEventsFilter);
+        $(document).on("change", "#clientsList", this.handleClientsFilter);
         $(document).on("keyup", "#search", this.handleSearchFilter);
         $(document).on("change", "#exportFormat", this.handleExport);
         $(document).on("change", "#hideContact", this.toggalContact);
         $(document).on("change", "#hidePickup", this.toggalPickup);
         $(document).on("change", "#hideDropOff", this.toggalDropOff);
+        $(document).on("change", "#hideAdditionalStops", this.toggalAdditionalStops);
         $(document).on("change", "#hideGuest", this.toggalGuest);
         $(document).on("change", "#hideEvent", this.toggalEvent);
+        $(document).on("change", "#hotelsList", this.getClientsOfCorporate);
         $(document).on(
             "click",
-            "#sortBooking, #sortTime, #sortType,#sortPickUp,#sortDropOff, #sortGuestName, #sortClient, #sortEvent, #sortContact, #sortRemarks, #sortDriver, #sortVehicle",
+            "#sortBooking, #sortTime, #sortType,#sortPickUp,#sortDropOff, #sortAdditionalStops, #sortGuestName, #sortCorporate, #sortEvent, #sortContact, #sortRemarks, #sortDriver, #sortVehicle, #sortStatus, #sortBookedBy, #sortAccessGivenClients, #sortBookingDate",
             this.handleSorting
         );
     }
@@ -57,6 +60,14 @@ export default class DriverSchedule extends BaseClass {
             $(".toggalDropOff").hide();
         }
     };
+    toggalAdditionalStops = ({ target }) => {
+        const isChecked = target.checked;
+        if (isChecked) {
+            $(".toggalAdditionalStops").show();
+        } else {
+            $(".toggalAdditionalStops").hide();
+        }
+    };
     toggalGuest = ({ target }) => {
         const isChecked = target.checked;
         if (isChecked) {
@@ -80,6 +91,7 @@ export default class DriverSchedule extends BaseClass {
             let pickupDateRange = $("#pickupDate").val();
             const driverId = $("#driversList").val();
             const hotelId = $("#hotelsList").val();
+            const clientId = $("#clientsList").val();
             const eventId = $("#eventsList").val();
             const params = {
                 pickupDateRange: pickupDateRange,
@@ -88,6 +100,7 @@ export default class DriverSchedule extends BaseClass {
                 search: $("#search").val(),
                 driverId: driverId,
                 hotelId: hotelId,
+                clientId: clientId,
                 eventId: eventId,
             };
             const queryParams = $.param(params);
@@ -244,6 +257,7 @@ export default class DriverSchedule extends BaseClass {
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
+            const clientId = $("#clientsList").val();
             const search = $("#search").val();
 
             if (startDate && endDate) {
@@ -255,6 +269,7 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
+                clientId: clientId,
                 search: search,
             };
 
@@ -273,6 +288,7 @@ export default class DriverSchedule extends BaseClass {
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
+            const clientId = $("#clientsList").val();
             const search = $("#search").val();
 
             if (startDate && endDate) {
@@ -284,6 +300,7 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
+                clientId: clientId,
                 search: search,
             };
 
@@ -302,6 +319,7 @@ export default class DriverSchedule extends BaseClass {
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
+            const clientId = $("#clientsList").val();
             const search = $("#search").val();
 
             if (startDate && endDate) {
@@ -313,6 +331,38 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
+                clientId: clientId,
+                search: search,
+            };
+
+            const queryParams = $.param(params);
+            const url =
+                this.props.routes.filterReports + "?" + queryParams;
+            this.handleFilterRequest(url);
+        } catch (error) {
+            this.handleException(error);
+        }
+    };
+
+    handleClientsFilter = (startDate, endDate) => {
+        try {
+            let pickupDateRange = $("#pickupDate").val();
+            const hotelId = $("#hotelsList").val();
+            const eventId = $("#eventsList").val();
+            const driverId = $("#driversList").val();
+            const clientId = $("#clientsList").val();
+            const search = $("#search").val();
+
+            if (startDate && endDate) {
+                pickupDateRange = startDate + " - " + endDate;
+            }
+
+            const params = {
+                pickupDateRange: pickupDateRange,
+                hotelId: hotelId,
+                eventId: eventId,
+                driverId: driverId,
+                clientId: clientId,
                 search: search,
             };
 
@@ -331,6 +381,7 @@ export default class DriverSchedule extends BaseClass {
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
+            const clientId = $("#clientsList").val();
             const search = $("#search").val();
 
             if (startDate && endDate) {
@@ -342,6 +393,7 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
+                clientId: clientId,
                 search: search,
             };
 
@@ -467,6 +519,42 @@ export default class DriverSchedule extends BaseClass {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
     };
+
+    getClientsOfCorporate = () => {
+        try {
+            const hotel_id = $('#hotelsList').val();
+            const url = this.props.routes.clientsOfCorporates;
+            
+            axios
+                .get(url, {
+                    params: {
+                        hotel_id: hotel_id,
+                    }
+                })
+                .then((response) => {
+                    const statusCode = response.data.status.code;
+                    const message = response.data.status.message;
+                    const flash = new ErrorHandler(statusCode, message);
+                    
+                    if (statusCode === 200) {
+                        $('#clientsList').empty().append('<option value="">Select Client</option>');
+
+                        if (response.data.data.length > 0) {
+                            $.each(response.data.data, function(index, item) {
+                                $('#clientsList').append(`<option value="${item.user.id}">${item.user.first_name} ${item.user.last_name}</option>`);
+                            });
+                        }
+                    } else {
+                        throw flash;
+                    }
+                })
+                .catch((error) => {
+                    this.handleException(error);
+                });
+        } catch (error) {
+            this.handleException(error);
+        }
+    }
 }
 
 window.service = new DriverSchedule(props);

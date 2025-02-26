@@ -672,7 +672,34 @@
                         </div>
                     </div>
                 @else
-                    <input type="hidden" name="client_id_for_event" id="clientIdForEvent" value="{{Auth::user()->client->hotel_id}}">
+                    @if(!empty($multipleCorporatesHotelData) && count($multipleCorporatesHotelData) > 1)
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="clientIdForEvent">Corporate <span class="text-danger">*</span></label>
+                                <select name="client_id_for_event" id="clientIdForEvent"
+                                    class="form-control form-select custom-select @error('client_id_for_event') is-invalid @enderror"
+                                    autocomplete="off">
+                                    <option value="">Select One</option>
+                                    @foreach ($multipleCorporatesHotelData as $hotelClient)
+                                        @php
+                                            $client = $hotelClient->client ?? null;
+                                        @endphp
+                                        @if ($client)
+                                            @if (old('client_id') == $client->id)
+                                                <option value="{{ $client->id }}" selected>{{ $hotelClient->name }}</option>
+                                            @else
+                                                <option value="{{ $client->id }}">{{$hotelClient->name  }}</option>
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                </select>
+                                <span style="display:none" class="invalid-feedback" id="hotel_for_event_error" role="alert"><strong>Please select a hotel</strong>
+                                </span>
+                            </div>
+                        </div>
+                    @else
+                        <input type="hidden" name="client_id_for_event" id="clientIdForEvent" value="{{Auth::user()->client->hotel_id}}">
+                    @endif
                 @endif
                 <div class="col-md-6">
                     <div class="form-group">

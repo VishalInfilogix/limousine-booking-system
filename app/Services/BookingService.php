@@ -789,6 +789,10 @@ class BookingService
                     $bookingData['vehicle_type_id'] = $requestData['vehicle_type_id'];
                 if (isset($requestData['status']) && !empty($requestData['status']))
                     $bookingData['status'] = $requestData['status'];
+                    if($requestData['status'] == 'CANCELLED')
+                    {
+                        $bookingData['client_asked_to_cancel'] = 'no';
+                    }
                 if (isset($requestData['client_instructions']) && !empty($requestData['client_instructions']))
                     $bookingData['client_instructions'] = $requestData['client_instructions'];
                 if (isset($requestData['driver_remark']) && !empty($requestData['driver_remark']))

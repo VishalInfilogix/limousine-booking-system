@@ -31,36 +31,37 @@ class ReportsService
 
     public function getReportsBookingData(array $requestData = [])
     {
+        // Retrieve the logged-in user
+        $loggedUser = Auth::user();
+        // Extract parameters from the request data or use default values
+        $page = $requestData['page'] ?? 1;
+        $search = $requestData['search'] ?? '';
+        $sortField = $requestData['sortField'] ?? 'id';
+        $pickupDateRange = $requestData['pickupDateRange'] ?? null;
+        $driverId = $requestData['driverId'] ?? null;
+        $hotelId = $requestData['hotelId'] ?? null;
+        $eventId = $requestData['eventId'] ?? null;
+        $clientId = $requestData['clientId'] ?? null;
+        $export = $requestData['format'] ?? null;
+        $noPagination = $requestData['noPagination'] ?? false;
+        if ($export) {
+            $sortDirection = $requestData['sortDirection'] ?? 'asc';
+        } else {
+            $sortDirection = $requestData['sortDirection'] ?? 'desc';
+        }
+        $currentDate = Carbon::now()->toDateString(); // Get current date in MySQL format
+        if ($pickupDateRange && $pickupDateRange !== 'Select A Range') {
+            $dates = explode("-", $pickupDateRange);
+            $startDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[0]))->format('Y-m-d H:i:s');
+            $endDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[1]))->format('Y-m-d H:i:s');
+        } else {
+            // $startDate = $currentDate;
+            // $endDate = Carbon::now()->addDay()->startOfDay()->addHours(4)->toDateTimeString(); // Set end date to tomorrow at 4 AM
+            $startDate = null;
+            $endDate = null;
+        }
+        return $this->bookingRepository->getBookingsForReports($loggedUser, $startDate, $endDate, $search, $page, $sortField, $sortDirection, $driverId, $hotelId, $eventId, $clientId, $noPagination, true);
         try {
-            // Retrieve the logged-in user
-            $loggedUser = Auth::user();
-            // Extract parameters from the request data or use default values
-            $page = $requestData['page'] ?? 1;
-            $search = $requestData['search'] ?? '';
-            $sortField = $requestData['sortField'] ?? 'id';
-            $pickupDateRange = $requestData['pickupDateRange'] ?? null;
-            $driverId = $requestData['driverId'] ?? null;
-            $hotelId = $requestData['hotelId'] ?? null;
-            $eventId = $requestData['eventId'] ?? null;
-            $export = $requestData['format'] ?? null;
-            $noPagination = $requestData['noPagination'] ?? false;
-            if ($export) {
-                $sortDirection = $requestData['sortDirection'] ?? 'asc';
-            } else {
-                $sortDirection = $requestData['sortDirection'] ?? 'desc';
-            }
-            $currentDate = Carbon::now()->toDateString(); // Get current date in MySQL format
-            if ($pickupDateRange && $pickupDateRange !== 'Select A Range') {
-                $dates = explode("-", $pickupDateRange);
-                $startDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[0]))->format('Y-m-d H:i:s');
-                $endDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[1]))->format('Y-m-d H:i:s');
-            } else {
-                // $startDate = $currentDate;
-                // $endDate = Carbon::now()->addDay()->startOfDay()->addHours(4)->toDateTimeString(); // Set end date to tomorrow at 4 AM
-                $startDate = null;
-                $endDate = null;
-            }
-            return $this->bookingRepository->getBookingsForReports($loggedUser, $startDate, $endDate, $search, $page, $sortField, $sortDirection, $driverId, $hotelId, $eventId, $noPagination, true);
         } catch (\Exception $e) {
             // Throw an exception with the error message if an error occurs
             throw new \Exception($e->getMessage());

@@ -120,4 +120,12 @@ class Booking extends Model
     {
         return $this->belongsTo(Events::class, 'event_id');
     }
+
+    public function linkedClients($linkedClients)
+    {
+        $clientIds = json_decode($linkedClients, true) ?? [];
+        return User::whereIn('id', $clientIds)->get();
+    }
+
+
 }

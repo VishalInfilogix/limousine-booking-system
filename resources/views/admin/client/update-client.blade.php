@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="lastname">Last namespace</label>
+                                <label for="lastname">Last Name</label>
                                 <input type="text" id="lastname" name="last_name" value="{{  $clientData->user->last_name }}" class="form-control @error('last_name') is-invalid @enderror" placeholder="Last name" autocomplete="off">
                                 @error('last_name')
                                 <span class="invalid-feedback" role="alert">

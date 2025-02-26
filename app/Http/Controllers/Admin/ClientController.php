@@ -236,4 +236,17 @@ class ClientController extends Controller
             return redirect()->back();
         }
     }
+
+    public function getClientsByCorporateId(Request $request)
+    {
+        $clientsData = $this->clientService->getClientsByHotel($request->hotel_id);
+
+        if(!empty($clientsData))
+        {
+            return $this->handleResponse($clientsData, __("message.clients_fetched_successfully"), Response::HTTP_OK);
+        }else{
+            $this->helper->handleException($e);
+            return $this->handleResponse([], $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, []);
+        }
+    }
 }
