@@ -89,12 +89,12 @@ class ReportsService
                 $filePath = null;
                 if ($requestData['format'] === 'pdf') {
                     $data = [
-                        "title" => " schedule " . $requestData["pickupDateRange"],
+                        "title" => " reports " . $requestData["pickupDateRange"],
                         "driversBooking" => $data,
                         "isDisplayContact" => $isDisplayContact
 
                     ];
-                    $fileName = time() . "_schedule.pdf";
+                    $fileName = time() . "_reports.pdf";
                     $filePath = 'exports/pdf/' . $fileName;
                     $this->exportService->setPath($filePath);
                     $this->exportService->exportToPDF('admin.driver-schedule.export', $data);
@@ -104,10 +104,10 @@ class ReportsService
                     return $relativePath;
                 }
                 if ($requestData['format'] === 'excel') {
-                    $fileName = time() . "_schedule.xlsx";
+                    $fileName = time() . "_reports.xlsx";
                     $filePath = 'exports/excel/';
                     $this->exportService->setPath($filePath);
-                    $columns = ['Booking', 'Time', 'Type', 'Pick-up', 'Drop-off', 'Guest Name', 'Client', 'Driver Remarks', 'Driver', 'Client Instructions', 'Vehicle'];
+                    $columns = ['Booking', 'Time', 'Type', 'Pick-up', 'Drop-off', 'Additional Stops', 'Guest Name', 'Corporate', 'Event', 'Driver', 'Vehicle', 'Status', 'Booked By', 'Access Given Clients', 'Booking Date'];
                     if ($isDisplayContact === "true") {
                         array_splice($columns, 7, 0, 'Contact'); // Add 'Contact' before 'Driver Remarks'
                     }
@@ -141,6 +141,7 @@ class ReportsService
             } else {
                 $dropOffLocation = $schedule->drop_of_location;
             }
+            $additionalStops = $schedule->additional_stops;
             $hotel = $schedule->client->hotel->name ?? null;
             $event = $schedule->client->event ?? null;
             if ($hotel) {
@@ -163,6 +164,7 @@ class ReportsService
                 $pickUpTime = $pickup ? $pickup : 'N/A';
             }
             $guestNames = $schedule->guest_name ?? null;
+            $eventName = !empty($schedule->event) && !empty($schedule->event->name) ? $schedule->event->name : null;
             $vehicleClassName = $schedule->vehicle->vehicleClass->name ?? null;
             $vehicleNumber = $schedule->vehicle->vehicle_number ?? null;
             $vehicle = null;
@@ -171,18 +173,43 @@ class ReportsService
             }
             $contact = $schedule->country_code ? "+(" .  $schedule->country_code . ")" . $schedule->phone : $schedule->phone;
 
+            $clientDetails = '';
+            if(!empty($schedule->linked_clients)){
+                $linkedClients = $schedule->linkedClients($schedule->linked_clients);
+                if(!empty($linkedClients))
+                {
+                    foreach($linkedClients as $clientKey => $client){
+
+                        if(!empty($client))
+                        {
+                            if($clientDetails !== '')
+                            {
+                                $clientDetails .= ',';
+                            }
+                            $clientDetails .= $client->first_name . ' ' . $client->last_name;
+                        }
+
+                    }
+                }
+            }
+
+            $driverName = !empty($schedule->driver) && !empty($schedule->driver->name) ? $schedule->driver->name : '';
             $booking = [
                 $schedule->id,
                 $pickUpTime ?? null,
                 $schedule->serviceType->name ?? null,
                 $pickUpLocation,
                 $dropOffLocation,
+                $additionalStops,
                 $guestNames,
                 $hotelValue,
-                $schedule->driver_remarks ?? null,
-                $schedule->driver->name ?? null,
-                $schedule->client_instructions ?? null,
-                $vehicle
+                $eventName,
+                $driverName,
+                $vehicle,
+                $schedule->status,
+                $schedule->createdBy->first_name . ' ' . $schedule->createdBy->last_name ?? null,
+                $clientDetails,
+                date('d-m-Y H:i', strtotime($schedule->created_at)) ?? null,
             ];
 
             if ($isDisplayContact === "true") {
