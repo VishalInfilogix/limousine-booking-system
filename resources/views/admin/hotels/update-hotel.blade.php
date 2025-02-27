@@ -198,7 +198,7 @@
                                             Delivery</label>
                                         <div class="col-sm-8">
                                             <input type="text" id="perTripDelivery" name="per_trip_delivery"
-                                                value="{{ $hotel->billingAgreement->per_trip_delivery }}"
+                                                value="{{ !empty($hotel->billingAgreement->per_trip_delivery) ? $hotel->billingAgreement->per_trip_delivery : '' }}"
                                                 class="form-control @error('per_trip_delivery') is-invalid @enderror"
                                                 placeholder="Per trip delivery" autocomplete="off">
                                             @error('per_trip_delivery')
@@ -243,7 +243,7 @@
                                             Surcharge</label>
                                         <div class="col-sm-8">
                                             <input type="text" id="peakPeriodSurcharge" name="peak_period_surcharge"
-                                                value="{{ $hotel->billingAgreement->peak_period_surcharge }}"
+                                                value="{{ !empty($hotel->billingAgreement->peak_period_surcharge) ? $hotel->billingAgreement->peak_period_surcharge : '' }}"
                                                 class="form-control @error('peak_period_surcharge') is-invalid @enderror"
                                                 placeholder="Peak Period Surcharge" autocomplete="off">
                                             @error('peak_period_surcharge')
@@ -263,10 +263,10 @@
                                                 autocomplete="off">
                                                 <option value="">Select one</option>
                                                 <option value="FIXED"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_midnight_surcharge_23_seats === 'FIXED' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_midnight_surcharge_23_seats) && $hotel->billingAgreement->fixed_multiplier_midnight_surcharge_23_seats === 'FIXED' ? 'selected' : '' }}>
                                                     Fixed</option>
                                                 <option value="MULTIPLIER"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_midnight_surcharge_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_midnight_surcharge_23_seats) && $hotel->billingAgreement->fixed_multiplier_midnight_surcharge_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
                                                     Multiplier</option>
                                             </select>
                                             @error('fixed_multiplier_midnight_surcharge_23_seats')
@@ -278,7 +278,7 @@
                                         <div class="col-sm-5">
                                             <input type="text" id="midNightSurcharge23Seats"
                                                 name="mid_night_surcharge_23_seats"
-                                                value="{{ $hotel->billingAgreement->mid_night_surcharge_23_seats }}"
+                                                value="{{ !empty($hotel->billingAgreement->mid_night_surcharge_23_seats) ? $hotel->billingAgreement->mid_night_surcharge_23_seats : '' }}"
                                                 class="form-control @error('mid_night_surcharge_23_seats') is-invalid @enderror"
                                                 placeholder="Midnight Surcharge (23s)" autocomplete="off">
                                             @error('mid_night_surcharge_23_seats')
@@ -298,10 +298,10 @@
                                                         autocomplete="off">
                                                         <option value="">Select one</option>
                                                         <option value="FIXED"
-                                                            {{ $hotel->billingAgreement->fixed_multiplier_midnight_surcharge_greater_then_23_seats === 'FIXED' ? 'selected' : '' }}>
+                                                            {{ !empty($hotel->billingAgreement->fixed_multiplier_midnight_surcharge_greater_then_23_seats) && $hotel->billingAgreement->fixed_multiplier_midnight_surcharge_greater_then_23_seats === 'FIXED' ? 'selected' : '' }}>
                                                             Fixed</option>
                                                         <option value="MULTIPLIER"
-                                                            {{ $hotel->billingAgreement->fixed_multiplier_midnight_surcharge_greater_then_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                            {{ !empty($hotel->billingAgreement->fixed_multiplier_midnight_surcharge_greater_then_23_seats) && $hotel->billingAgreement->fixed_multiplier_midnight_surcharge_greater_then_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
                                                             Multiplier</option>
                                                     </select>
                                                     @error('fixed_multiplier_midnight_surcharge_greater_then_23_seats')
@@ -313,7 +313,7 @@
                                                 <div class="col-sm-5">
                                                     <input type="text" id="midNightSurchargeLessThen23Seats"
                                                         name="midnight_surcharge_greater_then_23_seats"
-                                                        value="{{ $hotel->billingAgreement->midnight_surcharge_greater_then_23_seats }}"
+                                                        value="{{ !empty($hotel->billingAgreement->midnight_surcharge_greater_then_23_seats) ? $hotel->billingAgreement->midnight_surcharge_greater_then_23_seats : '' }}"
                                                         class="form-control @error('midnight_surcharge_greater_then_23_seats') is-invalid @enderror"
                                                         placeholder="Midnight Surcharge (< 23s)" autocomplete="off">
                                                     @error('midnight_surcharge_greater_then_23_seats')
@@ -334,10 +334,10 @@
                                                 autocomplete="off">
                                                 <option value="">Select one</option>
                                                 <option value="FIXED"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_arrivel_waiting_time === 'FIXED' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_arrivel_waiting_time) && $hotel->billingAgreement->fixed_multiplier_arrivel_waiting_time === 'FIXED' ? 'selected' : '' }}>
                                                     Fixed</option>
                                                 <option value="MULTIPLIER"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_arrivel_waiting_time === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_arrivel_waiting_time) && $hotel->billingAgreement->fixed_multiplier_arrivel_waiting_time === 'MULTIPLIER' ? 'selected' : '' }}>
                                                     Multiplier</option>
                                             </select>
                                             @error('fixed_multiplier_arrivel_waiting_time')
@@ -348,7 +348,7 @@
                                         </div>
                                         <div class="col-sm-5">
                                             <input type="text" id="arrivelWaitingTime" name="arrivel_waiting_time"
-                                                value="{{ $hotel->billingAgreement->arrivel_waiting_time }}"
+                                                value="{{ !empty($hotel->billingAgreement->arrivel_waiting_time) ? $hotel->billingAgreement->arrivel_waiting_time : '' }}"
                                                 class="form-control @error('') is-invalid @enderror"
                                                 placeholder="Arrival waiting Time" autocomplete="off">
                                             @error('arrivel_waiting_time')
@@ -369,10 +369,10 @@
                                                 autocomplete="off">
                                                 <option value="">Select one</option>
                                                 <option value="FIXED"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_departure_and_transfer_waiting === 'FIXED' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_departure_and_transfer_waiting) && $hotel->billingAgreement->fixed_multiplier_departure_and_transfer_waiting === 'FIXED' ? 'selected' : '' }}>
                                                     Fixed</option>
                                                 <option value="MULTIPLIER"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_departure_and_transfer_waiting === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_departure_and_transfer_waiting) && $hotel->billingAgreement->fixed_multiplier_departure_and_transfer_waiting === 'MULTIPLIER' ? 'selected' : '' }}>
                                                     Multiplier</option>
                                             </select>
                                             @error('fixed_multiplier_departure_and_transfer_waiting')
@@ -384,7 +384,7 @@
                                         <div class="col-sm-5">
                                             <input type="text" id="depatureAndTransferWaiting"
                                                 name="departure_and_transfer_waiting"
-                                                value="{{ $hotel->billingAgreement->departure_and_transfer_waiting }}"
+                                                value="{{ !empty($hotel->billingAgreement->departure_and_transfer_waiting) ? $hotel->billingAgreement->departure_and_transfer_waiting : '' }}"
                                                 class="form-control @error('departure_and_transfer_waiting') is-invalid @enderror"
                                                 placeholder="Departure and transfer waiting" autocomplete="off">
                                             @error('departure_and_transfer_waiting')
@@ -406,10 +406,10 @@
                                                 autocomplete="off">
                                                 <option value="">Select one</option>
                                                 <option value="FIXED"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_last_min_request_23_seats === 'FIXED' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_last_min_request_23_seats) && $hotel->billingAgreement->fixed_multiplier_last_min_request_23_seats === 'FIXED' ? 'selected' : '' }}>
                                                     Fixed</option>
                                                 <option value="MULTIPLIER"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_last_min_request_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_last_min_request_23_seats) && $hotel->billingAgreement->fixed_multiplier_last_min_request_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
                                                     Multiplier</option>
                                             </select>
                                             @error('fixed_multiplier_last_min_request_23_seats')
@@ -421,7 +421,7 @@
                                         <div class="col-sm-5">
                                             <input type="text" id="lastMinRequest23Seats"
                                                 name="last_min_request_23_seats"
-                                                value="{{ $hotel->billingAgreement->last_min_request_23_seats }}"
+                                                value="{{ !empty($hotel->billingAgreement->last_min_request_23_seats) ? $hotel->billingAgreement->last_min_request_23_seats : '' }}"
                                                 class="form-control @error('last_min_request_23_seats') is-invalid @enderror"
                                                 placeholder="Last Min Request (23s)" autocomplete="off">
                                             @error('last_min_request_23_seats')
@@ -441,10 +441,10 @@
                                                         autocomplete="off">
                                                         <option value="">Select one</option>
                                                         <option value="FIXED"
-                                                            {{ $hotel->billingAgreement->fixed_multiplier_last_min_request_greater_then_23_seats === 'FIXED' ? 'selected' : '' }}>
+                                                            {{ !empty($hotel->billingAgreement->fixed_multiplier_last_min_request_greater_then_23_seats) && $hotel->billingAgreement->fixed_multiplier_last_min_request_greater_then_23_seats === 'FIXED' ? 'selected' : '' }}>
                                                             Fixed</option>
                                                         <option value="MULTIPLIER"
-                                                            {{ $hotel->billingAgreement->fixed_multiplier_last_min_request_greater_then_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                            {{ !empty($hotel->billingAgreement->fixed_multiplier_last_min_request_greater_then_23_seats) && $hotel->billingAgreement->fixed_multiplier_last_min_request_greater_then_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
                                                             Multiplier</option>
                                                     </select>
                                                     @error('fixed_multiplier_last_min_request_greater_then_23_seats')
@@ -456,7 +456,7 @@
                                                 <div class="col-sm-5">
                                                     <input type="text" id="lastMinRequestLessThen23Seats"
                                                         name="last_min_request_greater_then_23_seats"
-                                                        value="{{ $hotel->billingAgreement->last_min_request_greater_then_23_seats }}"
+                                                        value="{{ !empty($hotel->billingAgreement->last_min_request_greater_then_23_seats) ? $hotel->billingAgreement->last_min_request_greater_then_23_seats : '' }}"
                                                         class="form-control @error('last_min_request_greater_then_23_seats') is-invalid @enderror"
                                                         placeholder="Last Min Request (<23s)" autocomplete="off">
                                                     @error('last_min_request_greater_then_23_seats')
@@ -476,10 +476,10 @@
                                                 autocomplete="off">
                                                 <option value="">Select one</option>
                                                 <option value="FIXED"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_23_seats === 'FIXED' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_23_seats) && $hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_23_seats === 'FIXED' ? 'selected' : '' }}>
                                                     Fixed</option>
                                                 <option value="MULTIPLIER"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_23_seats) && $hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
                                                     Multiplier</option>
                                             </select>
                                             @error('fixed_multiplier_outside_city_surcharge_23_seats')
@@ -491,7 +491,7 @@
                                         <div class="col-sm-5">
                                             <input type="text" id="outsideCitySurcharge23Seats"
                                                 name="outside_city_surcharge_23_seats"
-                                                value="{{ $hotel->billingAgreement->outside_city_surcharge_23_seats }}"
+                                                value="{{ !empty($hotel->billingAgreement->outside_city_surcharge_23_seats) ? $hotel->billingAgreement->outside_city_surcharge_23_seats : '' }}"
                                                 class="form-control @error('outside_city_surcharge_23_seats') is-invalid @enderror"
                                                 placeholder="Outside city surcharge(23s)" autocomplete="off">
                                             @error('outside_city_surcharge_23_seats')
@@ -512,10 +512,10 @@
                                                         autocomplete="off">
                                                         <option value="">Select one</option>
                                                         <option value="FIXED"
-                                                            {{ $hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_greater_then_23_seats === 'FIXED' ? 'selected' : '' }}>
+                                                            {{ !empty($hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_greater_then_23_seats) && $hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_greater_then_23_seats === 'FIXED' ? 'selected' : '' }}>
                                                             Fixed</option>
                                                         <option value="MULTIPLIER"
-                                                            {{ $hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_greater_then_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                            {{ !empty($hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_greater_then_23_seats) && $hotel->billingAgreement->fixed_multiplier_outside_city_surcharge_greater_then_23_seats === 'MULTIPLIER' ? 'selected' : '' }}>
                                                             Multiplier</option>
                                                     </select>
                                                     @error('fixed_multiplier_outside_city_surcharge_greater_then_23_seats')
@@ -527,7 +527,7 @@
                                                 <div class="col-sm-5">
                                                     <input type="text" id="outsideCitySurchargeLessThen23Seats"
                                                         name="outside_city_surcharge_greater_then_23_seats"
-                                                        value="{{ $hotel->billingAgreement->outside_city_surcharge_greater_then_23_seats }}"
+                                                        value="{{ !empty($hotel->billingAgreement->outside_city_surcharge_greater_then_23_seats) ? $hotel->billingAgreement->outside_city_surcharge_greater_then_23_seats : '' }}"
                                                         class="form-control @error('outside_city_surcharge_greater_then_23_seats') is-invalid @enderror"
                                                         placeholder="Outside city surcharge(<23s)" autocomplete="off">
                                                     @error('outside_city_surcharge_greater_then_23_seats')
@@ -547,10 +547,10 @@
                                                 autocomplete="off">
                                                 <option value="">Select one</option>
                                                 <option value="FIXED"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_additional_stop === 'FIXED' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_additional_stop) && $hotel->billingAgreement->fixed_multiplier_additional_stop === 'FIXED' ? 'selected' : '' }}>
                                                     Fixed</option>
                                                 <option value="MULTIPLIER"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_additional_stop === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_additional_stop) && $hotel->billingAgreement->fixed_multiplier_additional_stop === 'MULTIPLIER' ? 'selected' : '' }}>
                                                     Multiplier</option>
                                             </select>
                                             @error('fixed_multiplier_additional_stop')
@@ -561,7 +561,7 @@
                                         </div>
                                         <div class="col-sm-5">
                                             <input type="text" id="additionalStop" name="additional_stop"
-                                                value="{{ $hotel->billingAgreement->additional_stop }}"
+                                                value="{{ !empty($hotel->billingAgreement->additional_stop) ? $hotel->billingAgreement->additional_stop : '' }}"
                                                 class="form-control @error('additional_stop') is-invalid @enderror"
                                                 placeholder="Additional Stop" autocomplete="off">
                                             @error('additional_stop')
@@ -580,10 +580,10 @@
                                                 autocomplete="off">
                                                 <option value="">Select one</option>
                                                 <option value="FIXED"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_misc_charges === 'FIXED' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_misc_charges) && $hotel->billingAgreement->fixed_multiplier_misc_charges === 'FIXED' ? 'selected' : '' }}>
                                                     Fixed</option>
                                                 <option value="MULTIPLIER"
-                                                    {{ $hotel->billingAgreement->fixed_multiplier_misc_charges === 'MULTIPLIER' ? 'selected' : '' }}>
+                                                    {{ !empty($hotel->billingAgreement->fixed_multiplier_misc_charges) && $hotel->billingAgreement->fixed_multiplier_misc_charges === 'MULTIPLIER' ? 'selected' : '' }}>
                                                     Multiplier</option>
                                             </select>
                                             @error('fixed_multiplier_misc_charges')
@@ -594,7 +594,7 @@
                                         </div>
                                         <div class="col-sm-5">
                                             <input type="text" id="miscCharges" name="misc_charges"
-                                                value="{{ $hotel->billingAgreement->misc_charges }}"
+                                                value="{{ !empty($hotel->billingAgreement->misc_charges) ? $hotel->billingAgreement->misc_charges : '' }}"
                                                 class="form-control @error('misc_charges') is-invalid @enderror"
                                                 placeholder="Misc charges" autocomplete="off">
                                             @error('misc_charges')

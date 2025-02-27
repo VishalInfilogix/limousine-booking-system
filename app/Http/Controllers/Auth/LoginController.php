@@ -120,7 +120,7 @@ class LoginController extends Controller
                     $hotelId = $indivisualsHotel->id;
                 }else{
                     $corporateData = [];
-                    $corporateData['name'] = 'Indivisuals';
+                    $corporateData['name'] = 'Individuals';
                     $corporateData['term_conditions'] = 'Terms And Conditions';
                     $corporateData['created_by_id'] = NULL;
 

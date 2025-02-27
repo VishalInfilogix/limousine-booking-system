@@ -50,6 +50,7 @@ export default class Bookings extends BaseClass {
         $(document).on(
             "change",
             "#serviceTypeId, #pickupLocationId,#dropoffLocationId",
+            console.log('serviceId'),
             this.handlePickupLocationField,
             this.initializeAdditionalStopLimits
         );
@@ -226,7 +227,7 @@ export default class Bookings extends BaseClass {
     handleMultipleEventsOfCorporate = ({ target }) => {
         try {
             const event_box_id = $(target).attr('id').split("_")[1];
-            console.log(event_box_id)
+            // console.log(event_box_id)
             const hotelId = $(target).val();
             const url = this.props.routes.getEventsByHotel;
             
@@ -424,7 +425,7 @@ export default class Bookings extends BaseClass {
             case "additional_stops":
                 html = this.createAdditionalStopField(old, oldId, serviceId);
                 $(target).html(html);
-                console.log(html)
+                // console.log(html)
                 const idValAS = $(html).find("input").attr("id");
                 if (idValAS === "additional_stops") {
                     this.initializeGoogleMapAutoComplete(idValAS);
@@ -1982,7 +1983,7 @@ export default class Bookings extends BaseClass {
                     <td class="text-center">
                         <button type="button" class="remove-booking-row"><span class="fas fa-times mt-3 text-danger"></span></button>
                     </td>
-</tr>`);
+                </tr>`);
         table.append(html);
         this.initializeDatePicker(
             `pickupDatePicker_${index}`,
