@@ -228,7 +228,10 @@ class HotelService
             $billingAgreementData['misc_charges'] = $requestData['misc_charges'];
             $oldBillingData = json_encode($billingAgreement);
 
-            $this->billingAgreementRepository->updateBillingAgreement($billingAgreement, $billingAgreementData);
+            if($billingAgreement)
+            {
+                $this->billingAgreementRepository->updateBillingAgreement($billingAgreement, $billingAgreementData);
+            }
 
             $this->activityLogService->addActivityLog('update', Hotel::class, $oldData, json_encode($hotelData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);
             $this->activityLogService->addActivityLog('create', BillingAgreement::class, $oldBillingData, json_encode($billingAgreementData), $log_headers['headers']['Origin'], $log_headers['headers']['User-Agent']);

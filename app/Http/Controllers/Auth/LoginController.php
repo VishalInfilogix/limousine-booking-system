@@ -10,6 +10,7 @@ use App\Services\ClientService;
 use App\Models\User;
 use App\Models\Hotel;
 use App\Models\Client;
+use App\Models\BillingAgreement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Str;
@@ -126,6 +127,32 @@ class LoginController extends Controller
 
                     $hotelCreate = Hotel::create($corporateData);
                     $hotelId = $hotelCreate->id;
+
+                    $billingAgreementData['hotel_id'] =  $hotelId;
+                    $billingAgreementData['per_trip_delivery'] = NULL;
+                    $billingAgreementData['peak_period_surcharge'] = NULL;
+                    $billingAgreementData['fixed_multiplier_midnight_surcharge_23_seats'] = NULL;
+                    $billingAgreementData['mid_night_surcharge_23_seats'] = NULL;
+                    $billingAgreementData['fixed_multiplier_midnight_surcharge_greater_then_23_seats'] = NULL;
+                    $billingAgreementData['midnight_surcharge_greater_then_23_seats'] = NULL;
+                    $billingAgreementData['fixed_multiplier_arrivel_waiting_time'] = NULL;
+                    $billingAgreementData['arrivel_waiting_time'] = NULL;
+                    $billingAgreementData['fixed_multiplier_departure_and_transfer_waiting'] = NULL;
+                    $billingAgreementData['departure_and_transfer_waiting'] = NULL;
+                    $billingAgreementData['fixed_multiplier_last_min_request_23_seats'] = NULL;
+                    $billingAgreementData['last_min_request_23_seats'] = NULL;
+                    $billingAgreementData['fixed_multiplier_last_min_request_greater_then_23_seats'] = NULL;
+                    $billingAgreementData['last_min_request_greater_then_23_seats'] = NULL;
+                    $billingAgreementData['fixed_multiplier_outside_city_surcharge_23_seats'] = NULL;
+                    $billingAgreementData['outside_city_surcharge_23_seats'] = NULL;
+                    $billingAgreementData['fixed_multiplier_outside_city_surcharge_greater_then_23_seats'] = NULL;
+                    $billingAgreementData['outside_city_surcharge_greater_then_23_seats'] = NULL;
+                    $billingAgreementData['fixed_multiplier_additional_stop'] = NULL;
+                    $billingAgreementData['additional_stop'] = NULL;
+                    $billingAgreementData['fixed_multiplier_misc_charges'] = NULL;
+                    $billingAgreementData['misc_charges'] = NULL;
+
+                    BillingAgreement::create($billingAgreementData);
                 }
                 $password = Str::random(8);
                 $registerData = [];
