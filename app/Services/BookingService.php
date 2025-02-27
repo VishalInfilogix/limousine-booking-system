@@ -994,7 +994,7 @@ class BookingService
                 'changedBy' => $loggedUserFullName,
                 'bookingId' => $booking->id,
             ];
-            $this->helper->sendEmail('vishalInfilogix@gmail.com', $mailDataForAdmin);
+            $this->helper->sendEmail('limousine@e1asia.com.sg', $mailDataForAdmin);
         } else {
             $mailDataForAdmin = [
                 'subject' => $subject,
@@ -1005,7 +1005,7 @@ class BookingService
                 'bookingId' => $booking->id,
             ];
 
-            $this->helper->sendEmail('vishalInfilogix@gmail.com', $mailDataForAdmin);
+            $this->helper->sendEmail('limousine@e1asia.com.sg', $mailDataForAdmin);
             $notifyUsers =  $this->userRepository->getAdmins();
         }
         $notificationType = 'booking';
