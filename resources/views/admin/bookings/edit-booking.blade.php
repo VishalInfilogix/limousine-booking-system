@@ -980,8 +980,8 @@
                                                                         $client['user']->toArray();
                                                                     }
                                                                 @endphp
-                                                                @if($client['user']['id'] !== $booking->created_by_id)
-                                                                    <option value="{{ $client['user']['id'] }}" {{ $clientId == $client['user']['id'] ? 'selected' : '';}}>
+                                                                @if($client['user_id'] !== $booking->created_by_id)
+                                                                    <option value="{{ $client['user_id'] }}" {{ $clientId == $client['user_id'] ? 'selected' : '';}}>
                                                                         <?= (!empty($client['user']['first_name']) ? ucwords($client['user']['first_name']) : '') . (!empty($client['user']['last_name']) ? ' ' . ucwords($client['user']['last_name']) : ''); ?>
                                                                     </option>
                                                                 @endif
@@ -1006,9 +1006,11 @@
                                                                     $client['user']->toArray();
                                                                 }
                                                             @endphp
-                                                            <option value="{{ $client['user']['id'] }}">
-                                                                <?= (!empty($client['user']['first_name']) ? ucwords($client['user']['first_name']) : '') . (!empty($client->user->last_name) ? ' ' . ucwords($client->user->last_name) : ''); ?>
+                                                            @if($client['user_id'] !== $booking->created_by_id)
+                                                            <option value="{{ $client['user_id'] }}">
+                                                                <?= (!empty($client['user']['first_name']) ? ucwords($client['user']['first_name']) : '') . (!empty($client['user']['last_name']) ? ' ' . ucwords($client['user']['last_name']) : ''); ?>
                                                             </option>
+                                                            @endif
                                                         @endforeach
                                                     </select>
                                                     <button type="button" id="addClient" class="col-sm-2"><span class="fa fa-plus mt-3"></span></button>

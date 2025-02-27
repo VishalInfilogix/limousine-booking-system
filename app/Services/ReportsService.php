@@ -42,7 +42,7 @@ class ReportsService
         $driverId = $requestData['driverId'] ?? null;
         $hotelId = $requestData['hotelId'] ?? null;
         $eventId = $requestData['eventId'] ?? null;
-        $clientId = $requestData['clientId'] ?? null;
+        $userId = $requestData['userId'] ?? null;
         $export = $requestData['format'] ?? null;
         $noPagination = $requestData['noPagination'] ?? false;
         if ($export) {
@@ -66,7 +66,7 @@ class ReportsService
             $startDate = null;
             $endDate = null;
         }
-        return $this->bookingRepository->getBookingsForReports($loggedUser, $startDate, $endDate, $search, $searchByBookingId, $page, $sortField, $sortDirection, $driverId, $hotelId, $eventId, $clientId, $noPagination, true);
+        return $this->bookingRepository->getBookingsForReports($loggedUser, $startDate, $endDate, $search, $searchByBookingId, $page, $sortField, $sortDirection, $driverId, $hotelId, $eventId, $userId, $noPagination, true);
         try {
         } catch (\Exception $e) {
             // Throw an exception with the error message if an error occurs

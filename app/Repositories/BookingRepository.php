@@ -627,10 +627,10 @@ class BookingRepository implements BookingInterface
         return $query->get();
     }
 
-    public function getBookingsForReports(User $loggedUser,  $startDate, $endDate, string $search = '', string $searchByBookingId = '', int $page = 1, string $sortField = 'id', string $sortDirection = 'asc', $driverId = null, $hotelId = null, $eventId = null, $clientId = null, $noPagination = false, $isDriverSchedule = false)
+    public function getBookingsForReports(User $loggedUser,  $startDate, $endDate, string $search = '', string $searchByBookingId = '', int $page = 1, string $sortField = 'id', string $sortDirection = 'asc', $driverId = null, $hotelId = null, $eventId = null, $userId = null, $noPagination = false, $isDriverSchedule = false)
     {
         // Filter Booking based on the provided parameters
-        $bookings = $this->filterBookingResultForReports($loggedUser, $startDate, $endDate, $search, $searchByBookingId, $driverId, $hotelId, $eventId, $clientId, $isDriverSchedule)->get();
+        $bookings = $this->filterBookingResultForReports($loggedUser, $startDate, $endDate, $search, $searchByBookingId, $driverId, $hotelId, $eventId, $userId, $isDriverSchedule)->get();
         if ($noPagination) {
             return  $bookings;
         }
@@ -650,7 +650,7 @@ class BookingRepository implements BookingInterface
         return $this->paginateResults($sortedCollection, $pageSize, $page);
     }
     
-    private function filterBookingResultForReports(User $loggedUser, $startDate, $endDate, string $search = '', string $searchByBookingId = '', $driverId = null, $hotelId = null, $eventId = null, $clientId = null, $isDriverSchedule = false)
+    private function filterBookingResultForReports(User $loggedUser, $startDate, $endDate, string $search = '', string $searchByBookingId = '', $driverId = null, $hotelId = null, $eventId = null, $userId = null, $isDriverSchedule = false)
     {
         $loggedUserId = $loggedUser->id;
         $loggedUserHotel = $loggedUser->client->hotel_id ?? null;
@@ -688,11 +688,8 @@ class BookingRepository implements BookingInterface
             });
         }
 
-        if (!empty($clientId)) {
-            $query->where(function ($query) use ($clientId) {
-                $query->where('created_by_id', $clientId)
-                      ->orWhereJsonContains('linked_clients', $clientId);
-            });
+        if (!empty($userId)) {
+            $query->where('created_by_id', $userId);
         }
 
         if (!empty($eventId)) {

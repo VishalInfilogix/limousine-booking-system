@@ -20,7 +20,7 @@ export default class DriverSchedule extends BaseClass {
         $(document).on("change", "#driversList", this.handleDriverFilter);
         $(document).on("change", "#hotelsList", this.handleHotelsFilter);
         $(document).on("change", "#eventsList", this.handleEventsFilter);
-        $(document).on("change", "#clientsList", this.handleClientsFilter);
+        $(document).on("change", "#usersList", this.handleUsersFilter);
         $(document).on("keyup", "#search", this.handleSearchFilter);
         $(document).on("keyup", "#search_by_booking_id", this.handleSearchFilter);
         $(document).on("change", "#exportFormat", this.handleExport);
@@ -30,7 +30,6 @@ export default class DriverSchedule extends BaseClass {
         $(document).on("change", "#hideAdditionalStops", this.toggalAdditionalStops);
         $(document).on("change", "#hideGuest", this.toggalGuest);
         $(document).on("change", "#hideEvent", this.toggalEvent);
-        $(document).on("change", "#hotelsList", this.getClientsOfCorporate);
         $(document).on(
             "click",
             "#sortBooking, #sortTime, #sortType,#sortPickUp,#sortDropOff, #sortAdditionalStops, #sortGuestName, #sortCorporate, #sortEvent, #sortContact, #sortRemarks, #sortDriver, #sortVehicle, #sortStatus, #sortBookedBy, #sortAccessGivenClients, #sortBookingDate",
@@ -92,7 +91,7 @@ export default class DriverSchedule extends BaseClass {
             let pickupDateRange = $("#pickupDate").val();
             const driverId = $("#driversList").val();
             const hotelId = $("#hotelsList").val();
-            const clientId = $("#clientsList").val();
+            const userId = $("#usersList").val();
             const eventId = $("#eventsList").val();
             const params = {
                 pickupDateRange: pickupDateRange,
@@ -102,7 +101,7 @@ export default class DriverSchedule extends BaseClass {
                 searchByBookingId: $("#search_by_booking_id").val(),
                 driverId: driverId,
                 hotelId: hotelId,
-                clientId: clientId,
+                userId: userId,
                 eventId: eventId,
             };
             const queryParams = $.param(params);
@@ -259,7 +258,7 @@ export default class DriverSchedule extends BaseClass {
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
-            const clientId = $("#clientsList").val();
+            const userId = $("#usersList").val();
             const search = $("#search").val();
             const searchByBookingId = $("#search_by_booking_id").val();
 
@@ -272,7 +271,7 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
-                clientId: clientId,
+                userId: userId,
                 search: search,
                 searchByBookingId: searchByBookingId
             };
@@ -292,7 +291,7 @@ export default class DriverSchedule extends BaseClass {
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
-            const clientId = $("#clientsList").val();
+            const userId = $("#usersList").val();
             const search = $("#search").val();
             const searchByBookingId = $("#search_by_booking_id").val();
 
@@ -305,7 +304,7 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
-                clientId: clientId,
+                userId: userId,
                 search: search,
                 searchByBookingId: searchByBookingId
             };
@@ -325,7 +324,7 @@ export default class DriverSchedule extends BaseClass {
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
-            const clientId = $("#clientsList").val();
+            const userId = $("#usersList").val();
             const search = $("#search").val();
             const searchByBookingId = $("#search_by_booking_id").val();
 
@@ -338,7 +337,7 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
-                clientId: clientId,
+                userId: userId,
                 search: search,
                 searchByBookingId: searchByBookingId
             };
@@ -352,13 +351,13 @@ export default class DriverSchedule extends BaseClass {
         }
     };
 
-    handleClientsFilter = (startDate, endDate) => {
+    handleUsersFilter = (startDate, endDate) => {
         try {
             let pickupDateRange = $("#pickupDate").val();
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
-            const clientId = $("#clientsList").val();
+            const userId = $("#usersList").val();
             const search = $("#search").val();
             const searchByBookingId = $("#search_by_booking_id").val();
 
@@ -371,7 +370,7 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
-                clientId: clientId,
+                userId: userId,
                 search: search,
                 searchByBookingId: searchByBookingId
             };
@@ -391,7 +390,7 @@ export default class DriverSchedule extends BaseClass {
             const hotelId = $("#hotelsList").val();
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
-            const clientId = $("#clientsList").val();
+            const userId = $("#usersList").val();
             const search = $("#search").val();
             const searchByBookingId = $("#search_by_booking_id").val();
 
@@ -404,7 +403,7 @@ export default class DriverSchedule extends BaseClass {
                 hotelId: hotelId,
                 eventId: eventId,
                 driverId: driverId,
-                clientId: clientId,
+                userId: userId,
                 search: search,
                 searchByBookingId: searchByBookingId
             };
@@ -450,6 +449,7 @@ export default class DriverSchedule extends BaseClass {
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
             const search = $("#search").val();
+            const userId = $("#usersList").val();
             const searchByBookingId = $("#search_by_booking_id").val();
             const isDisplayContact = $("#hideContact").prop("checked")
                 ? true
@@ -466,6 +466,7 @@ export default class DriverSchedule extends BaseClass {
             formData.append("driverId", driverId);
             formData.append("hotelId", hotelId);
             formData.append("eventId", eventId);
+            formData.append("userId", userId);
             formData.append("search", search);
             formData.append("searchByBookingId", searchByBookingId);
             formData.append("isDisplayContact", isDisplayContact);
@@ -533,42 +534,6 @@ export default class DriverSchedule extends BaseClass {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
     };
-
-    getClientsOfCorporate = () => {
-        try {
-            const hotel_id = $('#hotelsList').val();
-            const url = this.props.routes.clientsOfCorporates;
-            
-            axios
-                .get(url, {
-                    params: {
-                        hotel_id: hotel_id,
-                    }
-                })
-                .then((response) => {
-                    const statusCode = response.data.status.code;
-                    const message = response.data.status.message;
-                    const flash = new ErrorHandler(statusCode, message);
-                    
-                    if (statusCode === 200) {
-                        $('#clientsList').empty().append('<option value="">Select Client</option>');
-
-                        if (response.data.data.length > 0) {
-                            $.each(response.data.data, function(index, item) {
-                                $('#clientsList').append(`<option value="${item.user.id}">${item.user.first_name} ${item.user.last_name}</option>`);
-                            });
-                        }
-                    } else {
-                        throw flash;
-                    }
-                })
-                .catch((error) => {
-                    this.handleException(error);
-                });
-        } catch (error) {
-            this.handleException(error);
-        }
-    }
 }
 
 window.service = new DriverSchedule(props);

@@ -107,10 +107,12 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select id="clientsList" class="form-control form-select custom-select">
-                                <option value="">Select Client</option>
-                                @foreach ($clientsData as $client)
-                                    <option value="{{ $client->user->id }}">{{ $client->user->first_name . ' ' . $client->user->last_name }}</option>
+                            <select id="usersList" class="form-control form-select custom-select">
+                                <option value="">Select Booked By</option>
+                                @foreach ($usersData as $user)
+                                    @if(!empty($user->first_name))
+                                        <option value="{{ $user->id }}">{{ $user->first_name . ' ' . $user->last_name }}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>

@@ -8,6 +8,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Services\ClientService;
 use App\Models\User;
+use App\Models\Hotel;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -111,6 +112,21 @@ class LoginController extends Controller
             if (!$user) {
                 $log_headers = $this->getHttpData($request);
     
+                // find for Indivisuals Corporate
+                $indivisualsHotel = Hotel::where('name', 'Indivisuals')->first();
+
+                if(!empty($indivisualsHotel))
+                {
+                    $hotelId = $indivisualsHotel->id;
+                }else{
+                    $corporateData = [];
+                    $corporateData['name'] = 'Indivisuals';
+                    $corporateData['term_conditions'] = 'Terms And Conditions';
+                    $corporateData['created_by_id'] = NULL;
+
+                    $hotelCreate = Hotel::create($corporateData);
+                    $hotelId = $hotelCreate->id;
+                }
                 $password = Str::random(8);
                 $registerData = [];
                 $registerData['first_name'] = $request->first_name;
@@ -127,7 +143,7 @@ class LoginController extends Controller
                 $this->userService->sendPasswordEmail($userCreated, $registerData['password']);
 
                 $clientData['user_id'] = $userCreated->id;
-                $clientData['hotel_id'] = NULL;
+                $clientData['hotel_id'] = $hotelId;
                 $clientData['invoice'] = NULL;
                 $clientData['status'] = 'ACTIVE';
                 $clientData['entity'] = NULL;

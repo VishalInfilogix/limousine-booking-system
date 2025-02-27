@@ -8,8 +8,10 @@ use App\Models\Driver;
 use App\Models\Location;
 use App\Models\ServiceType;
 use App\Models\User;
+use App\Models\Client;
 use App\Models\UserType;
 use App\Models\Vehicle;
+use App\Models\Events;
 use App\Models\VehicleClass;
 use App\Repositories\Interfaces\BookingLogInterface;
 use App\Repositories\Interfaces\UserInterface;
@@ -259,6 +261,60 @@ class BookingLogService
                                     $logMessages[] = "Added instructions: {$newValue}";
                                 } else {
                                     $logMessages[] = "Changed instructions from {$oldValue} to {$newValue}";
+                                }
+                                break;
+                            case "event_id":
+                                if ($oldValue === null) {
+                                    $name = Events::find($newValue)->name;
+                                    $logMessages[] = "Added event: {$name}";
+                                } else {
+                                    $oldName = Events::find($oldValue)->name;
+                                    $newName = Events::find($newValue)->name;
+                                    $logMessages[] = "Changed event from {$oldName} to {$newName}";
+                                }
+                                break;
+                            case "additional_stops":
+                                if ($oldValue === null) {
+                                    $logMessages[] = "Added additional stops: {$newValue}";
+                                } else {
+                                    $logMessages[] = "Changed additional stops from {$oldValue} to {$newValue}";
+                                }
+                                break;
+                            case "child_seat_required":
+                                if ($oldValue === null) {
+                                    $logMessages[] = "Added child seats: {$newValue}";
+                                } else {
+                                    $logMessages[] = "Changed child seats from {$oldValue} to {$newValue}";
+                                }
+                                break;
+                            case "no_of_seats_required":
+                                if ($oldValue === null) {
+                                    $logMessages[] = "Added no of child seats: {$newValue}";
+                                } else {
+                                    $logMessages[] = "Changed no of child seats from {$oldValue} to {$newValue}";
+                                }
+                                break;
+                            case "linked_clients":
+                                if ($oldValue === null || $oldValue === '') {
+                                    $all_user_ids = explode(',', $newValue);
+
+                                    $names = User::whereIn('id', $all_user_ids)->get(['first_name', 'last_name'])->map(fn($user) => "{$user->first_name} {$user->last_name}")->implode(', ');
+
+                                    $logMessages[] = "Added linked clients: {$names}";
+                                } else {
+
+                                    $all_old_user_ids = explode(',', $oldValue);
+                                    $old_names = User::whereIn('id', $all_old_user_ids)->get(['first_name', 'last_name'])->map(fn($user) => "{$user->first_name} {$user->last_name}")->implode(', ');
+
+                                    $all_new_user_ids = explode(',', $newValue);
+                                    $new_names = User::whereIn('id', $all_new_user_ids)->get(['first_name', 'last_name'])->map(fn($user) => "{$user->first_name} {$user->last_name}")->implode(', ');
+
+                                    if($new_names == '')
+                                    {
+                                        $logMessages[] = "Removed linked clients : {$old_names}";
+                                    }else{
+                                        $logMessages[] = "Changed linked clients from {$old_names} to {$new_names}";
+                                    }
                                 }
                                 break;
                             default:

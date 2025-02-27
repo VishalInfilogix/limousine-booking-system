@@ -156,7 +156,7 @@ class BookingController extends Controller
     {
         try {
             $file = $request->file('attachment');
-            $this->bookingService->createBooking($request->all(), $file);
+            $create = $this->bookingService->createBooking($request->all(), $file);
             $this->helper->alertResponse(__('message.booking_created'), 'success');
             return redirect('bookings');
         } catch (\Exception $e) {
@@ -360,7 +360,6 @@ class BookingController extends Controller
             $corporateFairBillingDetailsService = $this->corporateFairBillingRepository->getCorporateFairBillingByHotelIdVehicleClassTripType($booking->client->hotel_id, $vehicleClassId, $service);
             $corporateFairBillingDetailsPerHour = $this->corporateFairBillingRepository->getCorporateFairBillingByHotelIdVehicleClassTripType($booking->client->hotel_id, $vehicleClassId, 'Hour');
         }
-        // return $booking->linked_clients;
         // return explode(',', $booking->linked_clients);
         return view('admin.bookings.edit-booking', compact('serviceTypes', 'driverOffDays', 'logs', 'vehicles', 'drivers', 'booking', 'locations', 'peakPeriods', 'vehicleTypes', 'events', 'corporateFairBillingDetailsService', 'corporateFairBillingDetailsPerHour', 'clients', 'hotelIdsFromLinkedCorporates'));
     }

@@ -438,7 +438,7 @@ class BookingService
             $linkedClients = join(',', $requestData['access_given_clients']);
     
             if (isset($requestData['access_given_clients']))
-                $bookingData['linked_clients'] = $requestData['access_given_clients'];
+                $bookingData['linked_clients'] = $linkedClients;
             if (isset($requestData['status']))
                 $bookingData['status'] = $requestData['status'];
             if (isset($requestData['pickup_date']))
@@ -794,12 +794,10 @@ class BookingService
                     $bookingData['vehicle_id'] = $requestData['vehicle_id'];
                 if (isset($requestData['vehicle_type_id']) && !empty($requestData['vehicle_type_id']))
                     $bookingData['vehicle_type_id'] = $requestData['vehicle_type_id'];
-                if (isset($requestData['status']) && !empty($requestData['status']))
+                if (isset($requestData['status']) && !empty($requestData['status'])){
                     $bookingData['status'] = $requestData['status'];
-                    if($requestData['status'] == 'CANCELLED')
-                    {
-                        $bookingData['client_asked_to_cancel'] = 'no';
-                    }
+                    $bookingData['client_asked_to_cancel'] = 'no';
+                }
                 if (isset($requestData['client_instructions']) && !empty($requestData['client_instructions']))
                     $bookingData['client_instructions'] = $requestData['client_instructions'];
                 if (isset($requestData['driver_remark']) && !empty($requestData['driver_remark']))
@@ -987,28 +985,27 @@ class BookingService
                 ];
                 $this->helper->sendEmail($hotelAdmin->email, $mailData);
             }
-            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
-            {
-                $mailDataForAdmin = [
-                    'subject' => $subject,
-                    'template' => 'booking-created-email',
-                    'name' => 'Limousine Team',
-                    'logs' => $message,
-                    'changedBy' => $loggedUserFullName . ' from ' . Auth::user()->client->hotel->name,
-                    'bookingId' => $booking->id,
-                ];
-            }else{
-                $mailDataForAdmin = [
-                    'subject' => $subject,
-                    'template' => 'booking-created-email',
-                    'name' => 'Limousine Team',
-                    'logs' => $message,
-                    'changedBy' => $loggedUserFullName,
-                    'bookingId' => $booking->id,
-                ];
-            }
-            $this->helper->sendEmail('limousine@e1asia.com.sg', $mailDataForAdmin);
+
+            $mailDataForAdmin = [
+                'subject' => $subject,
+                'template' => 'booking-created-email',
+                'name' => 'Limousine Team',
+                'logs' => $message,
+                'changedBy' => $loggedUserFullName,
+                'bookingId' => $booking->id,
+            ];
+            $this->helper->sendEmail('vishalInfilogix@gmail.com', $mailDataForAdmin);
         } else {
+            $mailDataForAdmin = [
+                'subject' => $subject,
+                'template' => 'booking-created-email',
+                'name' => 'Limousine Team',
+                'logs' => $message,
+                'changedBy' => $loggedUserFullName . ' from ' . Auth::user()->client->hotel->name,
+                'bookingId' => $booking->id,
+            ];
+
+            $this->helper->sendEmail('vishalInfilogix@gmail.com', $mailDataForAdmin);
             $notifyUsers =  $this->userRepository->getAdmins();
         }
         $notificationType = 'booking';
