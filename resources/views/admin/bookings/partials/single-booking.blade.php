@@ -656,13 +656,13 @@
                                 <option value="">Select One</option>
                                 @foreach ($hotelClients as $hotelClient)
                                     @php
-                                        $client = $hotelClient->client ?? null;
+                                        $client = $hotelClient ?? null;
                                     @endphp
                                     @if ($client)
                                         @if (old('client_id_for_event') == $client->id)
-                                            <option value="{{ $client->id }}" selected>{{ $hotelClient->name }}</option>
+                                            <option value="{{ $client->id }}" selected>{{ $client->name }}</option>
                                         @else
-                                            <option value="{{ $client->id }}">{{$hotelClient->name  }}</option>
+                                            <option value="{{ $client->id }}">{{$client->name  }}</option>
                                         @endif
                                     @endif
                                 @endforeach
@@ -682,13 +682,13 @@
                                     <option value="">Select One</option>
                                     @foreach ($multipleCorporatesHotelData as $hotelClient)
                                         @php
-                                            $client = $hotelClient->client ?? null;
+                                            $client = $hotelClient ?? null;
                                         @endphp
                                         @if ($client)
                                             @if (old('client_id') == $client->id)
-                                                <option value="{{ $client->id }}" selected>{{ $hotelClient->name }}</option>
+                                                <option value="{{ $client->id }}" selected>{{ $client->name }}</option>
                                             @else
-                                                <option value="{{ $client->id }}">{{$hotelClient->name  }}</option>
+                                                <option value="{{ $client->id }}">{{$client->name  }}</option>
                                             @endif
                                         @endif
                                     @endforeach

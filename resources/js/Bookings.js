@@ -65,6 +65,7 @@ export default class Bookings extends BaseClass {
             this.handleSorting
         );
         $(document).on("keyup", "#search", this.handleFilter);
+        $(document).on("keyup", "#search_by_booking_id", this.handleFilter);
         $(document).on("change", "#driversList", this.handleFilter);
         $(document).on(
             "click",
@@ -1000,6 +1001,7 @@ export default class Bookings extends BaseClass {
             const params = {
                 pickupDateRange: pickupDateRange,
                 search: $("#search").val(),
+                searchByBookingId: $("#search_by_booking_id").val(),
                 driverId: driverId,
             };
             const queryParams = $.param(params);
@@ -1020,6 +1022,7 @@ export default class Bookings extends BaseClass {
                 sortField: $(target).attr("id"),
                 sortDirection: sortOrder,
                 search: $("#search").val(),
+                searchByBookingId: $("#search_by_booking_id").val(),
                 driverId: driverId,
             };
             const queryParams = $.param(params);

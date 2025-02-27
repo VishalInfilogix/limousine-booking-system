@@ -63,7 +63,10 @@
             </div>
             <div class="container-fluid mt-2">
                 <div class="row align-items-center g-3">                    
-                    <div class="col-md-4">
+                    <div class="col-md-2">
+                        <input type="text" id="search_by_booking_id" name="search_by_booking_id" class="form-control" placeholder="Search By Booking Id">
+                    </div>                    
+                    <div class="col-md-2">
                         <input type="text" id="search" name="search" class="form-control" placeholder="Search">
                     </div>
                     <div class="col-md-4">

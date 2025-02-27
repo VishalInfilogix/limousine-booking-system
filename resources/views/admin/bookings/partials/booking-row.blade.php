@@ -148,7 +148,8 @@
             $userTypeSlug === null ||
                 in_array($userTypeSlug, ['admin', 'admin-staff']) ||
                 (in_array($userTypeSlug, ['client-admin', 'client-staff']) && 
-                    (($booking->status === 'PENDING' && $hoursDifference > 24) || ($booking->status === 'ACCEPTED' && $hoursDifference > 24))
+                    (($booking->status === 'PENDING') || ($booking->status === 'ACCEPTED'))
+                    && $hoursDifference > 24
                 ))
               <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
                   <i class="fas fa-pencil-alt mr-1"></i>

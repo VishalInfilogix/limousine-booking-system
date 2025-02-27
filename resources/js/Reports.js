@@ -22,6 +22,7 @@ export default class DriverSchedule extends BaseClass {
         $(document).on("change", "#eventsList", this.handleEventsFilter);
         $(document).on("change", "#clientsList", this.handleClientsFilter);
         $(document).on("keyup", "#search", this.handleSearchFilter);
+        $(document).on("keyup", "#search_by_booking_id", this.handleSearchFilter);
         $(document).on("change", "#exportFormat", this.handleExport);
         $(document).on("change", "#hideContact", this.toggalContact);
         $(document).on("change", "#hidePickup", this.toggalPickup);
@@ -98,6 +99,7 @@ export default class DriverSchedule extends BaseClass {
                 sortField: $(target).attr("id"),
                 sortDirection: sortOrder,
                 search: $("#search").val(),
+                searchByBookingId: $("#search_by_booking_id").val(),
                 driverId: driverId,
                 hotelId: hotelId,
                 clientId: clientId,
@@ -259,6 +261,7 @@ export default class DriverSchedule extends BaseClass {
             const driverId = $("#driversList").val();
             const clientId = $("#clientsList").val();
             const search = $("#search").val();
+            const searchByBookingId = $("#search_by_booking_id").val();
 
             if (startDate && endDate) {
                 pickupDateRange = startDate + " - " + endDate;
@@ -271,6 +274,7 @@ export default class DriverSchedule extends BaseClass {
                 driverId: driverId,
                 clientId: clientId,
                 search: search,
+                searchByBookingId: searchByBookingId
             };
 
             const queryParams = $.param(params);
@@ -290,6 +294,7 @@ export default class DriverSchedule extends BaseClass {
             const driverId = $("#driversList").val();
             const clientId = $("#clientsList").val();
             const search = $("#search").val();
+            const searchByBookingId = $("#search_by_booking_id").val();
 
             if (startDate && endDate) {
                 pickupDateRange = startDate + " - " + endDate;
@@ -302,6 +307,7 @@ export default class DriverSchedule extends BaseClass {
                 driverId: driverId,
                 clientId: clientId,
                 search: search,
+                searchByBookingId: searchByBookingId
             };
 
             const queryParams = $.param(params);
@@ -321,6 +327,7 @@ export default class DriverSchedule extends BaseClass {
             const driverId = $("#driversList").val();
             const clientId = $("#clientsList").val();
             const search = $("#search").val();
+            const searchByBookingId = $("#search_by_booking_id").val();
 
             if (startDate && endDate) {
                 pickupDateRange = startDate + " - " + endDate;
@@ -333,6 +340,7 @@ export default class DriverSchedule extends BaseClass {
                 driverId: driverId,
                 clientId: clientId,
                 search: search,
+                searchByBookingId: searchByBookingId
             };
 
             const queryParams = $.param(params);
@@ -352,6 +360,7 @@ export default class DriverSchedule extends BaseClass {
             const driverId = $("#driversList").val();
             const clientId = $("#clientsList").val();
             const search = $("#search").val();
+            const searchByBookingId = $("#search_by_booking_id").val();
 
             if (startDate && endDate) {
                 pickupDateRange = startDate + " - " + endDate;
@@ -364,6 +373,7 @@ export default class DriverSchedule extends BaseClass {
                 driverId: driverId,
                 clientId: clientId,
                 search: search,
+                searchByBookingId: searchByBookingId
             };
 
             const queryParams = $.param(params);
@@ -383,6 +393,7 @@ export default class DriverSchedule extends BaseClass {
             const driverId = $("#driversList").val();
             const clientId = $("#clientsList").val();
             const search = $("#search").val();
+            const searchByBookingId = $("#search_by_booking_id").val();
 
             if (startDate && endDate) {
                 pickupDateRange = startDate + " - " + endDate;
@@ -395,6 +406,7 @@ export default class DriverSchedule extends BaseClass {
                 driverId: driverId,
                 clientId: clientId,
                 search: search,
+                searchByBookingId: searchByBookingId
             };
 
             const queryParams = $.param(params);
@@ -438,6 +450,7 @@ export default class DriverSchedule extends BaseClass {
             const eventId = $("#eventsList").val();
             const driverId = $("#driversList").val();
             const search = $("#search").val();
+            const searchByBookingId = $("#search_by_booking_id").val();
             const isDisplayContact = $("#hideContact").prop("checked")
                 ? true
                 : false;
@@ -454,6 +467,7 @@ export default class DriverSchedule extends BaseClass {
             formData.append("hotelId", hotelId);
             formData.append("eventId", eventId);
             formData.append("search", search);
+            formData.append("searchByBookingId", searchByBookingId);
             formData.append("isDisplayContact", isDisplayContact);
             const url = this.props.routes.exportData;
             this.sendPostRequest(url, formData, true, format);

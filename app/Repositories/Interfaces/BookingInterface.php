@@ -71,7 +71,7 @@ interface BookingInterface
      * @param string           $sortDirection The direction for sorting ('asc' or 'desc') (default: 'desc').
      * @return \Illuminate\Pagination\LengthAwarePaginator A paginated list of sorted bookings.
      */
-    public function getBookings(User $loggedUser,  $startDate, $endDate, string $search = '', int $page = 1, string $sortField = 'id', string $sortDirection = 'asc', $driverId = null, $noPagination = false, $isDriverSchedule = false);
+    public function getBookings(User $loggedUser,  $startDate, $endDate, string $search = '', string $searchByBookingId = '', int $page = 1, string $sortField = 'id', string $sortDirection = 'asc', $driverId = null, $noPagination = false, $isDriverSchedule = false);
     /**
      * Retrieve the last pending bookings that are older than the specified threshold.
      *

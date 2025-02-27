@@ -28,7 +28,7 @@
                                     title="Edit Booking"> #{{ $log->booking_id }}</a>
                             @else
                                 <span class="semibold">{{ $log->user->first_name ?? null }}
-                                    {{ $log->user->last_name ?? null }}</span> {{ (str_contains($log->message, 'from 00:00') && $log->booking->pickup_time != '00:00:00') ? str_replace('from 00:00', 'from To Be Adviced', $log->message) : $log->message }} For Booking <a
+                                    {{ $log->user->last_name ?? null }}</span> {{ (str_contains($log->message, 'from 00:00') && (!empty($log->booking->pickup_time) && $log->booking->pickup_time != '00:00:00')) ? str_replace('from 00:00', 'from To Be Adviced', $log->message) : $log->message }} For Booking <a
                                     class="mx-1" href="{{ route('edit-booking', ['booking' => $log->booking_id]) }}"
                                     title="Edit Booking"># {{ $log->booking_id }}</a>
                             @endif

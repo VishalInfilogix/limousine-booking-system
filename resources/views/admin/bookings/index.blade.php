@@ -8,7 +8,7 @@
         <!-- Content Header (Page header) -->
         <section class="content-header border-bottom">
             <div class="container-fluid">
-                <div class="row align-items-center g-3">
+                <div class="row align-items-center g-2">
                     @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
                         <div class="col-xl-2">
                         @else
@@ -17,10 +17,13 @@
                     <h1 class="semibold head-sm">Bookings</h1>
                     <p class="normal text-xs">Booking Management</p>
                 </div>
+                <div class="col-xl-1">
+                    <input type="text" id="search_by_booking_id" name="search_by_booking_id" class="form-control" placeholder="Booking Id">
+                </div>
                 <div class="col-xl-2">
                     <input type="text" id="search" name="search" class="form-control" placeholder="Search">
                 </div>
-                <div class="col-xl-3">
+                <div class="col-xl-2">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-clock"></i></span>

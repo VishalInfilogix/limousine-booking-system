@@ -36,6 +36,7 @@ class ReportsService
         // Extract parameters from the request data or use default values
         $page = $requestData['page'] ?? 1;
         $search = $requestData['search'] ?? '';
+        $searchByBookingId = $requestData['searchByBookingId'] ?? '';
         $sortField = $requestData['sortField'] ?? 'id';
         $pickupDateRange = $requestData['pickupDateRange'] ?? null;
         $driverId = $requestData['driverId'] ?? null;
@@ -60,7 +61,12 @@ class ReportsService
             $startDate = null;
             $endDate = null;
         }
-        return $this->bookingRepository->getBookingsForReports($loggedUser, $startDate, $endDate, $search, $page, $sortField, $sortDirection, $driverId, $hotelId, $eventId, $clientId, $noPagination, true);
+        if(!empty($searchByBookingId))
+        {
+            $startDate = null;
+            $endDate = null;
+        }
+        return $this->bookingRepository->getBookingsForReports($loggedUser, $startDate, $endDate, $search, $searchByBookingId, $page, $sortField, $sortDirection, $driverId, $hotelId, $eventId, $clientId, $noPagination, true);
         try {
         } catch (\Exception $e) {
             // Throw an exception with the error message if an error occurs

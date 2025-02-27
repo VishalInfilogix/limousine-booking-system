@@ -75,6 +75,7 @@ class BookingService
             // Extract parameters from the request data or use default values
             $page = $requestData['page'] ?? 1;
             $search = $requestData['search'] ?? '';
+            $searchByBookingId = $requestData['searchByBookingId'] ?? '';
             $sortField = $requestData['sortField'] ?? 'id';
             $sortDirection = $requestData['sortDirection'] ?? 'desc';
             $pickupDateRange = $requestData['pickupDateRange'] ?? null;
@@ -102,7 +103,13 @@ class BookingService
                     $endDate = Carbon::now()->addDay()->startOfDay()->addHours(4)->toDateTimeString(); // Set end date to tomorrow at 4 AM
                 }
             }
-            return $this->bookingRepository->getBookings($loggedUser, $startDate, $endDate, $search, $page, $sortField, $sortDirection, $driverId);
+
+            if(!empty($searchByBookingId))
+            {
+                $startDate = "";
+                $endDate = "";    
+            }
+            return $this->bookingRepository->getBookings($loggedUser, $startDate, $endDate, $search, $searchByBookingId, $page, $sortField, $sortDirection, $driverId);
         } catch (\Exception $e) {
             // Throw an exception with the error message if an error occurs
             throw new \Exception($e->getMessage());
@@ -963,6 +970,7 @@ class BookingService
     private function createBookingNotification($loggedUser, $booking)
     {
         $userType =  $loggedUser->userType->type ?? null;
+        $userTypeSlug =  $loggedUser->userType->slug ?? null;
         $message = "added a new booking";
         $subject = "New Booking Created";
         $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
@@ -979,6 +987,27 @@ class BookingService
                 ];
                 $this->helper->sendEmail($hotelAdmin->email, $mailData);
             }
+            if($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin')
+            {
+                $mailDataForAdmin = [
+                    'subject' => $subject,
+                    'template' => 'booking-created-email',
+                    'name' => 'Limousine Team',
+                    'logs' => $message,
+                    'changedBy' => $loggedUserFullName . ' from ' . Auth::user()->client->hotel->name,
+                    'bookingId' => $booking->id,
+                ];
+            }else{
+                $mailDataForAdmin = [
+                    'subject' => $subject,
+                    'template' => 'booking-created-email',
+                    'name' => 'Limousine Team',
+                    'logs' => $message,
+                    'changedBy' => $loggedUserFullName,
+                    'bookingId' => $booking->id,
+                ];
+            }
+            $this->helper->sendEmail('limousine@e1asia.com.sg', $mailDataForAdmin);
         } else {
             $notifyUsers =  $this->userRepository->getAdmins();
         }
