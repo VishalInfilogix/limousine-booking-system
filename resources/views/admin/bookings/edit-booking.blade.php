@@ -973,9 +973,16 @@
                                                             autocomplete="off">
                                                             <option value="">Select Client</option>
                                                             @foreach ($clients as $client)
-                                                                @if($client->user->id !== $booking->created_by_id)
-                                                                    <option value="{{ $client->user->id }}" {{ $clientId == $client->user->id ? 'selected' : '';}}>
-                                                                        <?= (!empty($client->user->first_name) ? ucwords($client->user->first_name) : '') . (!empty($client->user->last_name) ? ' ' . ucwords($client->user->last_name) : ''); ?>
+                                                                @php
+                                                                    if(gettype($client) !== 'array')
+                                                                    {
+                                                                        $client->toArray();
+                                                                        $client['user']->toArray();
+                                                                    }
+                                                                @endphp
+                                                                @if($client['user']['id'] !== $booking->created_by_id)
+                                                                    <option value="{{ $client['user']['id'] }}" {{ $clientId == $client['user']['id'] ? 'selected' : '';}}>
+                                                                        <?= (!empty($client['user']['first_name']) ? ucwords($client['user']['first_name']) : '') . (!empty($client['user']['last_name']) ? ' ' . ucwords($client['user']['last_name']) : ''); ?>
                                                                     </option>
                                                                 @endif
                                                             @endforeach
