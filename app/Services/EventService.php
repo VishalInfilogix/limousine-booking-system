@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Events;
+use App\Models\Client;
 use App\Repositories\Interfaces\EventInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -93,7 +94,8 @@ class EventService
 
             if ($loggedUserTypeSlug === null || in_array($loggedUserTypeSlug, ['admin', 'admin-staff']))
             {
-                $hotel_id = $requestData['hotel_id'];
+                $hotelId = Client::where('id', $requestData['hotel_id'])->select('hotel_id')->first();
+                $hotel_id = $hotelId->hotel_id;
             }else{
                 $multipleCorporatesHotelData = NULL;
             

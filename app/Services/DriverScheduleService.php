@@ -60,6 +60,7 @@ class DriverScheduleService
             // Extract parameters from the request data or use default values
             $page = $requestData['page'] ?? 1;
             $search = $requestData['search'] ?? '';
+            $searchByBookingId = $requestData['searchByBookingId'] ?? '';
             $sortField = $requestData['sortField'] ?? 'id';
             $pickupDateRange = $requestData['pickupDateRange'] ?? null;
             $driverId = $requestData['driverId'] ?? null;
@@ -81,7 +82,7 @@ class DriverScheduleService
                 $startDate = null;
                 $endDate = null;
             }
-            return $this->bookingRepository->getBookings($loggedUser, $startDate, $endDate, $search, $page, $sortField, $sortDirection, $driverId, $noPagination, true);
+            return $this->bookingRepository->getBookings($loggedUser, $startDate, $endDate, $search, $searchByBookingId, $page, $sortField, $sortDirection, $driverId, $noPagination, true);
         } catch (\Exception $e) {
             // Throw an exception with the error message if an error occurs
             throw new \Exception($e->getMessage());

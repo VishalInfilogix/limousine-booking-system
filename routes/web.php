@@ -23,10 +23,21 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\NotificationController;
 use \Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/test', function () {
     return phpinfo();
 });
+
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+
+    return "Cache, Config, Routes, and Views Cleared!";
+});
+
 
 Route::group(['middleware' => ['guest', 'web']], function () {
     Route::get('/', [LoginController::class, 'index'])->name('login');

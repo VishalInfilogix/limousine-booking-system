@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Events;
 use App\Models\User;
+use App\Models\Client;
 use App\Repositories\Interfaces\EventInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -223,7 +224,8 @@ class EventRepository implements EventInterface
     }
     public function getEventsByHotel(User $loggedUser, int $hotel_id = null)
     {
-        $events = $this->filterEventResultByHotel($loggedUser, $hotel_id)->get();
+        $hotelId = Client::where('id', $hotel_id)->select('hotel_id')->first();
+        $events = $this->filterEventResultByHotel($loggedUser, $hotelId->hotel_id)->get();
 
         return $events;
     }

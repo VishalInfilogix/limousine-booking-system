@@ -178,12 +178,12 @@
                                                 <option value="">Select One</option>
                                                 @foreach ($hotelClients as $hotelClient)
                                                     @php
-                                                        $client = $hotelClient ?? null;
+                                                        $client = $hotelClient->client ?? null;
                                                     @endphp
                                                     @if ($client)
                                                         @if (old('multiple_client_id.' . $index) == $client->id)
                                                             <option value="{{ $client->id }}" selected>
-                                                                {{ !empty($hotelClient->name) ? $hotelClientname : '' }}</option>
+                                                                {{ !empty($hotelClient->name) ? $hotelClient->name : '' }}</option>
                                                         @else
                                                             <option value="{{ $client->id }}">
                                                                 {{ !empty($hotelClient->name) ? $hotelClient->name : '' }}
@@ -210,15 +210,15 @@
                                                     <option value="">Select One</option>
                                                     @foreach ($multipleCorporatesHotelData as $hotelClient)
                                                         @php
-                                                            $client = $hotelClient ?? null;
+                                                            $client = $hotelClient->client ?? null;
                                                         @endphp
                                                         @if ($client)
                                                             @if (old('multiple_client_id.' . $index) == $client->id)
                                                                 <option value="{{ $client->id }}" selected>
-                                                                    {{ !empty($client->name) ? $client->name : '' }}</option>
+                                                                    {{ !empty($client->name) ? $hotelClient->name : '' }}</option>
                                                             @else
                                                                 <option value="{{ $client->id }}">
-                                                                    {{ !empty($client->name) ? $client->name : '' }}
+                                                                    {{ !empty($client->name) ? $hotelClient->name : '' }}
                                                                 </option>
                                                             @endif
                                                         @endif

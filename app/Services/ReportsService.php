@@ -186,7 +186,7 @@ class ReportsService
                             {
                                 $clientDetails .= ',';
                             }
-                            $clientDetails .= $client->first_name . ' ' . $client->last_name;
+                            $clientDetails .= (!empty($client->first_name) ? $client->first_name : '') . ' ' . (!empty($client->last_name) ? $client->last_name : '');
                         }
 
                     }
@@ -207,7 +207,7 @@ class ReportsService
                 $driverName,
                 $vehicle,
                 $schedule->status,
-                $schedule->createdBy->first_name . ' ' . $schedule->createdBy->last_name ?? null,
+                ($schedule->createdBy->first_name ?? null) . ' ' . ($schedule->createdBy->last_name ?? null),
                 $clientDetails,
                 date('d-m-Y H:i', strtotime($schedule->created_at)) ?? null,
             ];

@@ -156,7 +156,7 @@ class BookingController extends Controller
     {
         try {
             $file = $request->file('attachment');
-            $create = $this->bookingService->createBooking($request->all(), $file);
+            $this->bookingService->createBooking($request->all(), $file);
             $this->helper->alertResponse(__('message.booking_created'), 'success');
             return redirect('bookings');
         } catch (\Exception $e) {
@@ -355,7 +355,7 @@ class BookingController extends Controller
         $corporateFairBillingDetailsService = null;
         $corporateFairBillingDetailsPerHour = null;
 
-        if(!empty($vehicleClassId) && !empty($service))
+        if(!empty($vehicleClassId) && !empty($service) && !empty($$booking->client->hotel_id))
         {
             $corporateFairBillingDetailsService = $this->corporateFairBillingRepository->getCorporateFairBillingByHotelIdVehicleClassTripType($booking->client->hotel_id, $vehicleClassId, $service);
             $corporateFairBillingDetailsPerHour = $this->corporateFairBillingRepository->getCorporateFairBillingByHotelIdVehicleClassTripType($booking->client->hotel_id, $vehicleClassId, 'Hour');
