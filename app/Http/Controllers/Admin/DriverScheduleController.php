@@ -65,7 +65,11 @@ class DriverScheduleController extends Controller
             // Retrieve booking data based on the filter criteria
             $driversBooking = $this->driverScheduleService->getDriversBookingData($request->query());
             // Render the driver schedule listing partial view with the filtered data
-            $data = ['html' => view('admin.driver-schedule.partials.driver-schedule-listing', compact('driversBooking'))->render(), "total" => count($driversBooking)];
+            $data = [
+                'html' => view('admin.driver-schedule.partials.driver-schedule-listing', compact('driversBooking'))->render(),
+                'pagination' => $driversBooking->links('pagination::bootstrap-5')->render(), // Include pagination HTML
+                'total' => $driversBooking->total(), // Use total() for paginated collection
+            ];
             // Return a JSON response with the updated booking listing HTML
             return $this->handleResponse($data, __("message.driver_schedule_filtered"), Response::HTTP_OK);
         } catch (\Exception $e) {

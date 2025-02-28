@@ -30,6 +30,29 @@ export default class DriverSchedule extends BaseClass {
             this.handleSorting
         );
         $(document).on("change", "#hideContact", this.toggalContact);
+
+        let self = this;
+
+        $(document).on("click", ".pagination a", function (event) {
+            event.preventDefault();
+            let pageUrl = $(this).attr("href");
+
+            if (pageUrl.includes("filter-drivers-bookings")) {
+                let pickupDateRange = $("#pickupDate").val();
+                const driverId = $("#driversList").val();
+                const params = {
+                    pickupDateRange: pickupDateRange,
+                    search: $("#search").val(),
+                    driverId: driverId,
+                };
+
+                const queryParams = $.param(params);
+
+                self.handleFilterRequest(pageUrl + "&" + queryParams);
+            } else {
+                window.location.href = pageUrl;
+            }
+        });
     }
     toggalContact = ({ target }) => {
         const isChecked = target.checked;
@@ -267,6 +290,10 @@ export default class DriverSchedule extends BaseClass {
                 if (statusCode === 200) {
                     const tbody = $("#driverScheduleTable tbody");
                     tbody.html(response.data.data.html);
+
+                    const pagination = $(".card-footer");
+                    pagination.html(response.data.data.pagination);
+
                     if (response.data.data.total > 0) {
                         this.handleSendScheduleButton();
                         this.handleExportOptions();

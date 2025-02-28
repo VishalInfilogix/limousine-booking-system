@@ -50,11 +50,15 @@ class ReportsController extends Controller
 
     public function filterReports(Request $request)
     {
-        // Retrieve booking data based on the filter criteria
-        $driversBooking = $this->reportsService->getReportsBookingData($request->query());
-        // Render the driver schedule listing partial view with the filtered data
-        $data = ['html' => view('admin.reports.partials.reports-listing', compact('driversBooking'))->render(), "total" => count($driversBooking)];
         try {
+            // Retrieve booking data based on the filter criteria
+            $driversBooking = $this->reportsService->getReportsBookingData($request->query());
+            // Render the driver schedule listing partial view with the filtered data
+            $data = [
+                'html' => view('admin.reports.partials.reports-listing', compact('driversBooking'))->render(),
+                'pagination' => $driversBooking->links('pagination::bootstrap-5')->render(), // Include pagination HTML
+                'total' => $driversBooking->total(), // Use total() for paginated collection
+            ];
             // Return a JSON response with the updated booking listing HTML
             return $this->handleResponse($data, __("message.reports_filtered"), Response::HTTP_OK);
         } catch (\Exception $e) {

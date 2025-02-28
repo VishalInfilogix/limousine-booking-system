@@ -30,6 +30,40 @@ export default class DriverSchedule extends BaseClass {
         $(document).on("change", "#hideAdditionalStops", this.toggalAdditionalStops);
         $(document).on("change", "#hideGuest", this.toggalGuest);
         $(document).on("change", "#hideEvent", this.toggalEvent);
+
+        let self = this;
+
+        $(document).on("click", ".pagination a", function (event) {
+            event.preventDefault();
+            let pageUrl = $(this).attr("href");
+
+            if (pageUrl.includes("filter-reports")) {
+                let pickupDateRange = $("#pickupDate").val();
+                const hotelId = $("#hotelsList").val();
+                const eventId = $("#eventsList").val();
+                const driverId = $("#driversList").val();
+                const userId = $("#usersList").val();
+                const search = $("#search").val();
+                const searchByBookingId = $("#search_by_booking_id").val();
+
+                const params = {
+                    pickupDateRange: pickupDateRange,
+                    hotelId: hotelId,
+                    eventId: eventId,
+                    driverId: driverId,
+                    userId: userId,
+                    search: search,
+                    searchByBookingId: searchByBookingId
+                };
+
+                const queryParams = $.param(params);
+
+                self.handleFilterRequest(pageUrl + "&" + queryParams);
+            } else {
+                window.location.href = pageUrl;
+            }
+        });
+
         $(document).on(
             "click",
             "#sortBooking, #sortTime, #sortType,#sortPickUp,#sortDropOff, #sortAdditionalStops, #sortGuestName, #sortCorporate, #sortEvent, #sortContact, #sortRemarks, #sortDriver, #sortVehicle, #sortStatus, #sortBookedBy, #sortAccessGivenClients, #sortBookingDate",
@@ -426,6 +460,10 @@ export default class DriverSchedule extends BaseClass {
                 if (statusCode === 200) {
                     const tbody = $("#reportsTable tbody");
                     tbody.html(response.data.data.html);
+
+                    const pagination = $(".card-footer");
+                    pagination.html(response.data.data.pagination);
+
                     if (response.data.data.total > 0) {
                         this.handleExportOptions();
                     }
@@ -439,7 +477,7 @@ export default class DriverSchedule extends BaseClass {
                 $("#loader").hide();
                 this.handleException(error);
             });
-    };
+    };    
 
     handleExport = (startDate, endDate) => {
         try {
