@@ -162,7 +162,7 @@ class ClientRepository implements ClientInterface
                     $value = strtolower($innerQuery->user->userType->name ?? 'zzzz');
                     break;
                 default:
-                    $value = $innerQuery->id;
+                    $value = strtolower($innerQuery->hotel->name ?? 'zzzz');
                     break;
             }
             return $value;

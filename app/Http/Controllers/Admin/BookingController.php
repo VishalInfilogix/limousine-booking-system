@@ -354,8 +354,7 @@ class BookingController extends Controller
 
         $corporateFairBillingDetailsService = null;
         $corporateFairBillingDetailsPerHour = null;
-
-        if(!empty($vehicleClassId) && !empty($service) && !empty($$booking->client->hotel_id))
+        if(!empty($vehicleClassId) && !empty($service) && !empty($booking->client->hotel_id))
         {
             $corporateFairBillingDetailsService = $this->corporateFairBillingRepository->getCorporateFairBillingByHotelIdVehicleClassTripType($booking->client->hotel_id, $vehicleClassId, $service);
             $corporateFairBillingDetailsPerHour = $this->corporateFairBillingRepository->getCorporateFairBillingByHotelIdVehicleClassTripType($booking->client->hotel_id, $vehicleClassId, 'Hour');

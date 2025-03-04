@@ -77,7 +77,7 @@ class ClientController extends Controller
      */
     public function create(Request $request)
     {
-        $hotels = $this->hotelService->getHotels();
+        $hotels = $this->hotelService->getHotels()->sortBy(fn($hotel) => strtolower($hotel->name));
         // Retrieve entities  data from constatnts
         $entities = config('constants.entities');
         $userTypeData = $this->userTypeService->getUserType(UserType::CLIENT);
@@ -197,7 +197,7 @@ class ClientController extends Controller
         // Load client data including associated user
         $clientData = $client->load(['user.userType', 'multiCorporates']);
         
-        $hotels = $this->hotelService->getHotels();
+        $hotels = $this->hotelService->getHotels()->sortBy(fn($hotel) => strtolower($hotel->name));
 
         // Retrieve entities  data from constatnts
         $entities = config('constants.entities');

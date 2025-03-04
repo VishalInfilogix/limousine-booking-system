@@ -79,6 +79,15 @@
         {
             $additionalStopsVal = explode('||', $booking->additional_stops);
         }
+        $countryCodes = explode(',', $booking->country_code ?? '');
+        $phones = explode(',', $booking->phone ?? '');
+
+        $contacts = [];
+        foreach ($countryCodes as $index => $code) {
+            $phone = $phones[$index] ?? null;
+
+            $contacts[] = $index+1 . '. ' . ($code ? '+(' . $code . ') ' : '') . ($phone);
+        }
         $firstName = $booking->updatedBy->first_name ?? null;
         $lastName = $booking->updatedBy->last_name ?? null;
         $fullName = CustomHelper::getFullName($firstName, $lastName);
@@ -195,9 +204,15 @@
       @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
           <td class="text-truncate">{!! $hotelValue !!}</td>
       @endif
-      <td @if ($isEditable) data-name="phone" data-old="{{ $booking->phone }}" data-country-code="{{ $booking->country_code }}" @endif
-          class="text-truncate" style="max-width: 200px" title="{{ $booking->country_code ? '+(' . $booking->country_code . ')' : '' }}{{ $booking->phone ?? 'N/A' }}">
-          {{ $booking->country_code ? '+(' . $booking->country_code . ')' : '' }}{{ $booking->phone ?? 'N/A' }}</td>
+        <td @if ($isEditable) data-name="phone" data-old="{{ $booking->phone }}" data-country-code="{{ $booking->country_code }}" @endif
+          class="text-truncate" style="max-width: 200px" title="{{ $booking->country_code ? '+(' . $booking->country_code . ')' : '' }}{{ $booking->phone ?? 'N/A' }}">            
+            @foreach($contacts as $index => $contact)
+                {{ $contact }}
+                @if($index+1 != count($contacts))
+                    <br>
+                @endif
+            @endforeach
+        </td>
       <td @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff'])) data-name="driver_id" data-old="{{ $driverValue }}" data-old-id="{{ $booking->driver_id }}" @endif
           class="text-truncate">{!! $driverValue ?? 'N/A' !!}</td>
       <td @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff'])) data-name="vehicle_id" data-old="{{ $vehicleValue }}" data-old-id="{{ $booking->vehicle_id }}" @endif

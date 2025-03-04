@@ -637,7 +637,11 @@ class BookingRepository implements BookingInterface
 
         foreach($bookings as $booking)
         {
-            $booking->linkedClients = $this->model->linkedClients($booking->linked_clients);
+            $linkedClients = null;
+
+            $linkedClients = explode(',', $booking->linked_clients);
+            
+            $booking->linkedClients = $this->model->linkedClients($linkedClients);
         }
         
         // Sort the bookings based on the specified field and direction
@@ -843,9 +847,9 @@ class BookingRepository implements BookingInterface
                     $value = $innerQuery->created_at ?? 'zzzz';
                     break;
                 case 'sortAccessGivenClients':
-                    $firstLinkedClient = $innerQuery->linkedClients->first();
+                    $firstLinkedClient = !empty($innerQuery->linkedClients) ? $innerQuery->linkedClients->first() : null;
 
-                    $value = $firstLinkedClient 
+                    $value = $firstLinkedClient && !empty($firstLinkedClient)
                         ? ($firstLinkedClient->first_name . ' ' . $firstLinkedClient->last_name) 
                         : 'zzzz';
 

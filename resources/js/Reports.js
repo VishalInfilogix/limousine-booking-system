@@ -149,7 +149,6 @@ export default class DriverSchedule extends BaseClass {
     handleExportOptions = () => {
         const html = `<select id="exportFormat" class="form-control form-select custom-select">
                                 <option value="">Export</option>
-                                <option value="pdf">Image</option>
                                 <option value="excel">Excel</option>
                             </select>`;
         $("#exportOptions").html(html);
@@ -492,6 +491,21 @@ export default class DriverSchedule extends BaseClass {
             const isDisplayContact = $("#hideContact").prop("checked")
                 ? true
                 : false;
+            const isDisplayPickup = $("#hidePickup").prop("checked")
+                ? true
+                : false;
+            const isDisplayDropOff = $("#hideDropOff").prop("checked")
+                ? true
+                : false;
+            const isDisplayAdditionalStops = $("#hideAdditionalStops").prop("checked")
+                ? true
+                : false;
+            const isDisplayGuest = $("#hideGuest").prop("checked")
+                ? true
+                : false;
+            const isDisplayEvent = $("#hideEvent").prop("checked")
+                ? true
+                : false;
             if (startDate && endDate) {
                 pickupDateRange = startDate + " - " + endDate;
             }
@@ -508,6 +522,11 @@ export default class DriverSchedule extends BaseClass {
             formData.append("search", search);
             formData.append("searchByBookingId", searchByBookingId);
             formData.append("isDisplayContact", isDisplayContact);
+            formData.append("isDisplayPickup", isDisplayPickup);
+            formData.append("isDisplayDropOff", isDisplayDropOff);
+            formData.append("isDisplayAdditionalStops", isDisplayAdditionalStops);
+            formData.append("isDisplayGuest", isDisplayGuest);
+            formData.append("isDisplayEvent", isDisplayEvent);
             const url = this.props.routes.exportData;
             this.sendPostRequest(url, formData, true, format);
         } catch (error) {

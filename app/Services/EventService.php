@@ -81,7 +81,7 @@ class EventService
     /**
      * Create a new event.
      */
-    public function createEvent(array $requestData, $log_headers)
+    public function createEvent(array $requestData, $log_headers, $fromBooking)
     {
         DB::beginTransaction();
         try {
@@ -94,8 +94,13 @@ class EventService
 
             if ($loggedUserTypeSlug === null || in_array($loggedUserTypeSlug, ['admin', 'admin-staff']))
             {
-                $hotelId = Client::where('id', $requestData['hotel_id'])->select('hotel_id')->first();
-                $hotel_id = $hotelId->hotel_id;
+                if($fromBooking == 'from booking')
+                {
+                    $hotelId = Client::where('id', $requestData['hotel_id'])->select('hotel_id')->first();
+                    $hotel_id = $hotelId->hotel_id;
+                }else{
+                    $hotel_id = $requestData['hotel_id'];
+                }
             }else{
                 $multipleCorporatesHotelData = NULL;
             

@@ -82,7 +82,6 @@
                         @if (!$driversBooking->isEmpty())
                             <select id="exportFormat" class="form-control form-select custom-select">
                                 <option value="">Export</option>
-                                <option value="pdf">Image</option>
                                 <option value="excel">Excel</option>
                             </select>
                         @endIf

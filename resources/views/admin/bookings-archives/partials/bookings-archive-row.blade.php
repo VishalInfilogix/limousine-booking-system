@@ -127,13 +127,15 @@
       data-is-notified="{{ $booking->is_driver_notified }}" data-is-acknowledge="{{ $booking->is_driver_acknowledge }}"
       data-driver-id="{{ $booking->driver_id }}" data-pickup-date="{{ $booking->pickup_date }}">
       @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
-          <td class="sticky-column">
-              <div class="custom-control custom-checkbox">
-                  <input class="custom-control-input bookingTableCheckbox cellCheckbox" type="checkbox"
-                      id="bulkBookingAction_{{ $booking->id }}">
-                  <label for="bulkBookingAction_{{ $booking->id }}" class="custom-control-label"></label>
-              </div>
-          </td>
+        @if($user->department == 'Management')
+            <td class="sticky-column">
+                <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input bookingTableCheckbox cellCheckbox" type="checkbox"
+                        id="bulkBookingAction_{{ $booking->id }}">
+                    <label for="bulkBookingAction_{{ $booking->id }}" class="custom-control-label"></label>
+                </div>
+            </td>
+        @endif
       @endif
       @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
         <td class="sticky-column">

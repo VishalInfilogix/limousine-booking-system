@@ -118,7 +118,18 @@
         <td class="text-truncate">{{ $drivers->driver->name ?? 'N/A' }}</td>
         <td class="text-truncate">{!! $Vehicle ?? 'N/A' !!}</td>
         <td class="text-truncate">{!! $drivers->status ?? 'N/A' !!}</td>
-        <td class="text-truncate">{!! $drivers->createdBy->first_name . ' ' . $drivers->createdBy->last_name ?? 'N/A' !!}</td>
+        <td class="text-truncate">
+            @if(!empty($drivers->createdBy->first_name) && !empty($drivers->createdBy->last_name))
+                @if(!empty($drivers->createdBy->first_name))
+                    {{ $drivers->createdBy->first_name }}
+                @endif
+                @if(!empty($drivers->createdBy->last_name))
+                    {{ ' ' . $drivers->createdBy->last_name }}
+                @endif
+            @else
+                N/A
+            @endif
+        </td>
         <td class="text-truncate">
             @if(!empty($drivers->linkedClients))
                 @foreach($drivers->linkedClients as $clientKey => $client)

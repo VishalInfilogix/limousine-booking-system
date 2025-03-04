@@ -26,10 +26,10 @@ class EditBookingRequest extends FormRequest
             'pickup_time' => 'nullable|date_format:H:i',
             'departure_time' => 'nullable|date_format:d/m/Y H:i',
             'no_of_hours' => 'nullable|numeric|min:3|max:24',
-            'phone' => 'required',
+            'phone.*' => 'required',
             'total_pax' => 'nullable|numeric|digits_between:1,23',
             'total_luggage' => 'nullable|numeric|max:100',
-            'guest_name' => 'required|min:3|max:50',
+            'guest_name.*' => 'required|min:3|max:50',
             // "arrival_charge" => 'nullable|required_if:service_type_id,1|regex:/^\d{1,8}(\.\d{1,2})?$/',
             // "transfer_charge" => 'nullable|required_if:service_type_id,2|regex:/^\d{1,8}(\.\d{1,2})?$/',
             // "departure_charge" => 'nullable|required_if:service_type_id,3|regex:/^\d{1,8}(\.\d{1,2})?$/',
@@ -78,7 +78,7 @@ class EditBookingRequest extends FormRequest
             'no_of_hours.min' => __("validation.custom.no_of_hours.min"),
             'no_of_hours.max' => __("validation.custom.no_of_hours.max"),
 
-            'phone.required' => __("validation.custom.phone.required"),
+            'phone.*.required' => __("validation.custom.phone.required"),
             // 'phone.digits_between' => __("validation.custom.phone.digits_between"),
 
             'total_pax.required' => __("validation.custom.total_pax_booking.required"),
@@ -91,9 +91,9 @@ class EditBookingRequest extends FormRequest
             'total_luggage.max' => __("validation.custom.total_luggage_booking.max"),
 
 
-            'guest_name.required' => __("validation.custom.guest_name.required"),
-            'guest_name.min' => __("validation.custom.guest_name.min"),
-            'guest_name.max' => __("validation.custom.guest_name.max"),
+            'guest_name.*.required' => __("validation.custom.guest_name.required"),
+            'guest_name.*.min' => __("validation.custom.guest_name.min"),
+            'guest_name.*.max' => __("validation.custom.guest_name.max"),
         ];
     }
 }

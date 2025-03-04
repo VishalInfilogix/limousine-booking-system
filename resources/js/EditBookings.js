@@ -43,6 +43,8 @@ export default class EditBookings extends BaseClass {
         $(document).on("click", "#addClient", this.handleAddClient);
         $(document).on("click", ".remove-stop", this.handleRemoveStop);
         $(document).on("click", ".remove-client", this.handleRemoveClient);
+        $(document).on("click", "#addGuest", this.handleAddGuest);
+        $(document).on("click", ".remove-guest", this.handleRemoveGuest);
         $(document).on(
             "change",
             "#service-types, #is-peak-period-surcharge, #is-mid-night-surcharge, #is-arr-waiting-time-surcharge, #is-out-of-city-surcharge, #is-last-minute-booking-surcharge, #is-additional-stop-charge, #is-misc-surcharge",
@@ -91,6 +93,58 @@ export default class EditBookings extends BaseClass {
             this.handleException(error);
         }
     };
+
+    handleAddGuest = () => {
+        const lastGuestInputContainer = $(".phone")
+            .last().parent().parent().parent();
+        const lastId = parseInt(
+            lastGuestInputContainer.find(".phone").attr("id").split("-")[2]
+        );
+        const newId = lastId + 1;
+        const newGuestInput = `
+        <li class="list-group-item border-top-0">
+            <div class="form-group row row-gap-2 mb-0">
+                <button type="button" class="remove-guest" style="color:white; background-color:red; padding: 10px;">Remove Guest</button>
+            </div>
+        </li>
+        <li class="list-group-item border-top-0">
+            <div class="form-group row row-gap-2 mb-0">
+                <label for="guest-name-${newId}" class="col-sm-6 col-form-label">Guest Name</label>
+                <div class="col-sm-6">
+                    <input type="text" id="guest-name-${newId}" name="guest_name[]"
+                        value=""
+                        class="form-control @error('is_cross_border') is-invalid @enderror guest-name"
+                        placeholder="Guest Name">
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="form-group row row-gap-2 mb-0">
+                <label for="contact-number-${newId}" class="col-sm-6 col-form-label">Contact
+                    Number</label>
+                <div class="col-sm-2">
+                    <input type="text" value=""
+                        id="country-code-${newId}" name="country_code[]"
+                        class="form-control @error('country_code') is-invalid @enderror country-code"
+                        placeholder="Country Code" autocomplete="off">
+                </div>
+                <div class="col-sm-4">
+                    <input type="text" name="phone[]" value=""
+                        id="contact-number-${newId}"
+                        class="form-control @error('phone') is-invalid @enderror phone"
+                        placeholder="Contact Number" autocomplete="off">
+                </div>
+            </div>
+        </li>
+        `;
+        $(newGuestInput).insertBefore($('#addGuest').parent().parent());
+    }
+
+    handleRemoveGuest = ({ target }) => {
+        $(target).parent().parent().prev().prev().remove();
+        $(target).parent().parent().prev().remove();
+        $(target).parent().parent().remove();
+    }
 
     handleCancelModal = ({ target }) => {
         try {
@@ -638,6 +692,7 @@ export default class EditBookings extends BaseClass {
             additionalCharges +
             miscCharges+
             extraChildSeatCharges;
+        totalCharges = $('#booking-status-for-total-charges').val() == 'CANCELLED' ? 0 : totalCharges;
         $("#total-charges").text(totalCharges);
         $("#total-charge").val(totalCharges);
     };
@@ -1043,12 +1098,12 @@ export default class EditBookings extends BaseClass {
                     customMin: true,
                     max: 24,
                 },
-                country_code: {
+                "country_code[]": {
                     minlength: 1,
                     // maxlength: 3,
                     // digits: true,
                 },
-                phone: {
+                "phone[]": {
                     required: true,
                     // digits: true,
                     minlength: 6,
@@ -1073,7 +1128,7 @@ export default class EditBookings extends BaseClass {
                     digits: true,
                     max: 100,
                 },
-                guest_name: {
+                "guest_name": {
                     required: true,
                     minlength: 3,
                     maxlength: 50,
@@ -1219,12 +1274,12 @@ export default class EditBookings extends BaseClass {
                     digits: this.languageMessage.no_of_hours.digits,
                     max: this.languageMessage.no_of_hours.max,
                 },
-                country_code: {
+                "country_code[]": {
                     minlength: this.languageMessage.country_code.min,
                     // maxlength: this.languageMessage.country_code.max,
                     // digits: this.languageMessage.country_code.integer,
                 },
-                phone: {
+                "phone[]": {
                     required: this.languageMessage.phone.required,
                     // digits: this.languageMessage.phone.regex,
                     minlength: this.languageMessage.phone.min,
@@ -1242,7 +1297,7 @@ export default class EditBookings extends BaseClass {
                     digits: this.languageMessage.total_luggage_booking.digits,
                     max: this.languageMessage.total_luggage_booking.max,
                 },
-                guest_name: {
+                "guest_name[]": {
                     required: this.languageMessage.guest_name.required,
                     minlength: this.languageMessage.guest_name.min,
                     maxlength: this.languageMessage.guest_name.max,

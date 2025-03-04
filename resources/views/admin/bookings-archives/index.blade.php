@@ -42,9 +42,11 @@
                 <div class="col-xl-2">
                     <div class="d-flex flex-wrap gap-3 justify-content-end">
                         @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
-                            <button class="float-md-right inner-theme-btn bg-danger px-2" id="bulkDelete"
-                                title="Bulk Delete">
-                                <i class="fa fa-solid fa-trash"></i> Bulk Delete</button>
+                            @if($user->department == 'Management')
+                                <button class="float-md-right inner-theme-btn bg-danger px-2" id="bulkDelete"
+                                    title="Bulk Delete">
+                                    <i class="fa fa-solid fa-trash"></i> Bulk Delete</button>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -66,13 +68,15 @@
                         <thead>
                             <tr>
                                 @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
-                                    <th style="width: 10px">
-                                        <div class="custom-control custom-checkbox">
-                                            <input class="custom-control-input bookingArchiveTableCheckbox" type="checkbox"
-                                                id="bulkBookingAction">
-                                            <label for="bulkBookingAction" class="custom-control-label"></label>
-                                        </div>
-                                    </th>
+                                    @if($user->department == 'Management')
+                                        <th style="width: 10px">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input bookingArchiveTableCheckbox" type="checkbox"
+                                                    id="bulkBookingAction">
+                                                <label for="bulkBookingAction" class="custom-control-label"></label>
+                                            </div>
+                                        </th>
+                                    @endif
                                 @endif
                                 @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
                                 <th>Action</th>

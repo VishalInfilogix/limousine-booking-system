@@ -123,8 +123,7 @@ class Booking extends Model
 
     public function linkedClients($linkedClients)
     {
-        $clientIds = json_decode($linkedClients, true) ?? [];
-        return User::whereIn('id', $clientIds)->get();
+        return User::whereIn('id', $linkedClients)->get();
     }
 
 

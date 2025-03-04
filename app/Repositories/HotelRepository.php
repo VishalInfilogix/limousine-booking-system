@@ -140,7 +140,7 @@ class HotelRepository implements HotelInterface
                     $value = strtolower($innerQuery->status ?? 'zzzz');
                     break;
                 default:
-                    $value = $innerQuery->id;
+                    $value = strtolower($innerQuery->name ?? 'zzzz');
                     break;
             }
             return $value;
@@ -188,7 +188,7 @@ class HotelRepository implements HotelInterface
      */
     public function getHotelData(): Collection
     {
-        return $this->model->where('status', 'ACTIVE')->get();
+        return $this->model->where('status', 'ACTIVE')->orderBy('name', 'ASC')->get();
     }
     /**
      * Retrieves a collection of hotels based on the given array of hotel IDs and an optional status.
@@ -216,7 +216,7 @@ class HotelRepository implements HotelInterface
 
     public function getHotelClientAdmins(): ?Collection
     {
-        return $this->model->with(['client.user'])->get();
+        return $this->model->with(['client.user'])->orderBy('name', 'ASC')->get();
     }
 
     public function getActiveHotelsData(): Collection

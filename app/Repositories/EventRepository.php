@@ -141,12 +141,14 @@ class EventRepository implements EventInterface
         $sortFunction = $sortDirection == 'asc' ? 'sortBy' : 'sortByDesc';
         return $events->$sortFunction(function ($innerQuery) use ($sortField) {
             switch ($sortField) {
+                case 'sortCorporate':
+                    return strtolower($innerQuery->hotel->name ?? 'zzzz');
                 case 'sortName':
                     return strtolower($innerQuery->name ?? 'zzzz');
                 case 'sortStatus':
                     return strtolower($innerQuery->status ?? 'zzzz');
                 default:
-                    return $innerQuery->id;
+                    return strtolower($innerQuery->hotel->name ?? 'zzzz');
             }
         });
     }
@@ -155,12 +157,14 @@ class EventRepository implements EventInterface
         $sortFunction = $sortDirection == 'asc' ? 'sortBy' : 'sortByDesc';
         return $events->$sortFunction(function ($innerQuery) use ($sortField) {
             switch ($sortField) {
+                case 'sortCorporate':
+                    return strtolower($innerQuery->hotel->name ?? 'zzzz');
                 case 'sortName':
                     return strtolower($innerQuery->name ?? 'zzzz');
                 case 'sortStatus':
                     return strtolower($innerQuery->status ?? 'zzzz');
                 default:
-                    return $innerQuery->id;
+                    return strtolower($innerQuery->hotel->name ?? 'zzzz');
             }
         });
     }

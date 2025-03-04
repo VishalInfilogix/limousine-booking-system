@@ -33,10 +33,13 @@ class ReportsController extends Controller
     public function index(Request $request)
     {
         try {
-            $driverData = $this->driverService->getActiveDrivers($request->query());
-            $hotelsData = $this->hotelService->getActiveHotels($request->query());
-            $usersData = $this->userService->getAllusers($request->query());
-            $eventsData = $this->eventService->getActiveEvents($request->query());
+            $driverData = $this->driverService->getActiveDrivers($request->query())->sortBy(fn($driver) => strtolower($driver->name));
+            $hotelsData = $this->hotelService->getActiveHotels($request->query())->sortBy(fn($hotel) => strtolower($hotel->name));
+            $usersData = $this->userService->getAllUsers($request->query())->sortBy(function ($user) {
+                $fullName = strtolower(trim($user->first_name . ' ' . ($user->last_name ?? '')));
+                return $fullName;
+            });            
+            $eventsData = $this->eventService->getActiveEvents($request->query())->sortBy(fn($event) => strtolower($event->name));
             $driversBooking = $this->reportsService->getReportsBookingData($request->query());
             return view('admin.reports.index', compact('driverData', 'driversBooking', 'hotelsData', 'eventsData', 'usersData'));
         } catch (\Exception $e) {

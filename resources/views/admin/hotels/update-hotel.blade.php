@@ -108,7 +108,7 @@
                                     @if(!empty($vehicleClasses))
                                         @foreach($vehicleClasses as $vehicleClass)
                                             <div class="form-group row g-2 mx-4">
-                                                <label for="perTripArr_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }} <span class="text-danger">*</span></label>
+                                                <label for="perTripArr_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }}</label>
                                                 <div class="col-sm-8">
                                                     @php
                                                         $amountData = $hotel->fairBilling->where('billing_type', 'Arrival')->where('vehicle_class_id', $vehicleClass->id)->first();
@@ -139,7 +139,7 @@
                                     @if(!empty($vehicleClasses))
                                         @foreach($vehicleClasses as $vehicleClass)
                                             <div class="form-group row g-2 mx-4">
-                                                <label for="perTripDep_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }} <span class="text-danger">*</span></label>
+                                                <label for="perTripDep_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }}</label>
                                                 <div class="col-sm-8">
                                                     @php
                                                         $amountData = $hotel->fairBilling->where('billing_type', 'Departure')->where('vehicle_class_id', $vehicleClass->id)->first();
@@ -169,7 +169,7 @@
                                     @if(!empty($vehicleClasses))
                                         @foreach($vehicleClasses as $vehicleClass)
                                             <div class="form-group row g-2 mx-4">
-                                                <label for="perTripTransfer_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }} <span class="text-danger">*</span></label>
+                                                <label for="perTripTransfer_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }}</label>
                                                 <div class="col-sm-8">
                                                     @php
                                                         $amountData = $hotel->fairBilling->where('billing_type', 'Transfer')->where('vehicle_class_id', $vehicleClass->id)->first();
@@ -214,7 +214,7 @@
                                     @if(!empty($vehicleClasses))
                                         @foreach($vehicleClasses as $vehicleClass)
                                             <div class="form-group row g-2 mx-4">
-                                                <label for="perHourDelivery_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }} <span class="text-danger">*</span></label>
+                                                <label for="perHourDelivery_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }}</label>
                                                 <div class="col-sm-8">
                                                     @php
                                                         $amountData = $hotel->fairBilling->where('billing_type', 'Hour')->where('vehicle_class_id', $vehicleClass->id)->first();

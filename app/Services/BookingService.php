@@ -208,6 +208,8 @@ class BookingService
             $status = Booking::PENDING;
 
             $guestname = join(',', $requestData['guest_name']);
+            $countryCode = join(',', $requestData['country_code']);
+            $phone = join(',', $requestData['phone']);
             $additional_stops = !empty($requestData['additional_stops']) 
             ? join('||', array_filter($requestData['additional_stops'])) 
             : '';
@@ -231,8 +233,8 @@ class BookingService
             $bookingData['departure_time'] = ((int)$requestData['service_type_id'] === 3) ? ($requestData['departure_time'] ? Carbon::createFromFormat('d/m/Y H:i', $requestData['departure_time'])->format('Y-m-d H:i:s') : null) : null;
             $bookingData['flight_detail'] = (isset($requestData['flight_detail']) && !empty($requestData['flight_detail'])) ? $requestData['flight_detail'] : null;
             $bookingData['no_of_hours'] = ((int)$requestData['service_type_id'] === 4)  ? ($requestData['no_of_hours'] ? $requestData['no_of_hours'] : null) : null;
-            $bookingData['country_code'] = $requestData['country_code'];
-            $bookingData['phone'] = $requestData['phone'];
+            $bookingData['country_code'] = $countryCode;
+            $bookingData['phone'] = $phone;
             $bookingData['total_pax'] = ((int)$requestData['service_type_id'] !== 5)  ? ($requestData['total_pax']  ?  $requestData['total_pax']  : null) : null;
             $bookingData['total_luggage'] = ((int)$requestData['service_type_id'] !== 5)  ? ($requestData['total_luggage']  ?  $requestData['total_luggage']  : 0) : 0;
             $bookingData['client_instructions'] = $requestData['client_instructions'];
@@ -457,6 +459,10 @@ class BookingService
             if (isset($requestData['event_id']) && !empty($requestData['event_id'])) {
                 $eventId = $requestData['event_id'];
             }
+            $guestname = join(',', $requestData['guest_name']);
+            $countryCode = join(',', $requestData['country_code']);
+            $phone = join(',', $requestData['phone']);
+
             if (isset($requestData['event_id']))
                 $bookingData['event_id'] = $eventId;
             if (isset($requestData['service_type_id']))
@@ -472,11 +478,11 @@ class BookingService
             if (isset($requestData['no_of_hours']))
                 $bookingData['no_of_hours'] = $requestData['no_of_hours'];
             if (isset($requestData['guest_name']))
-                $bookingData['guest_name'] = $requestData['guest_name'];
+                $bookingData['guest_name'] = $guestname;
             if (isset($requestData['country_code']))
-                $bookingData['country_code'] = $requestData['country_code'];
+                $bookingData['country_code'] = $countryCode;
             if (isset($requestData['phone']))
-                $bookingData['phone'] = $requestData['phone'];
+                $bookingData['phone'] = $phone;
             if (isset($requestData['total_pax']))
                 $bookingData['total_pax'] = $requestData['total_pax'];
             if (isset($requestData['total_luggage']))
@@ -758,8 +764,10 @@ class BookingService
                     $bookingData['guest_name'] = $requestData['guest_name'];
                 if (isset($requestData['pickup_date']) && !empty($requestData['pickup_date']))
                     $bookingData['pickup_date'] =   Carbon::createFromFormat('d/m/Y', $requestData['pickup_date'])->format('Y-m-d');
-                if (isset($requestData['pickup_time']) && !empty($requestData['pickup_time']))
+                if (isset($requestData['pickup_time']) && !empty($requestData['pickup_time'])){
                     $bookingData['pickup_time'] = Carbon::createFromFormat('H:i', $requestData['pickup_time'])->format('H:i:s');
+                    $bookingData['to_be_advised_status'] = 'no';
+                }
                 if (isset($requestData['pick_up_location']) && !empty($requestData['pick_up_location']))
                     $bookingData['pick_up_location'] = $requestData['pick_up_location'];
                 if (isset($requestData['pick_up_location_id']) && !empty($requestData['pick_up_location_id']))

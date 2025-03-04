@@ -452,36 +452,6 @@
                 @enderror
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label for="country_code">
-                    <span title="The country code must be an number." class="fa fa-info-circle"
-                        aria-hidden="true"></span>
-                    Country Code 
-                </label>
-                <input type="text" id="country_code" name="country_code" value="{{ old('country_code') }}"
-                    class="form-control @error('country_code') is-invalid @enderror" placeholder="Code"
-                    autocomplete="off" autofocus>
-                @error('country_code')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                @enderror
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label for="phone">Contact <span class="text-danger">*</span></label>
-                <input type="text" id="phone" name="phone" value="{{ old('phone') }}"
-                    class="form-control @error('phone') is-invalid @enderror" placeholder="Contact"
-                    autocomplete="off">
-                @error('phone')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                @enderror
-            </div>
-        </div>
         <div class="col-md-2" id="totalPaxDiv" style="display:{{ $totalPaxDiv }};">
             <div class="form-group">
                 <label for="totalPax">Total Pax <span class="text-danger" id="totalPaxSpan"
@@ -605,31 +575,67 @@
         </div>
     </div>
     <div class="row" id="guestContainer">
-        @foreach (old('guest_name', ['']) as $index => $guest)
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="guestName_{{ $index }}">Name of Guest(s) <span
-                            class="text-danger">*</span></label>
-                    <input type="text" id="guestName_{{ $index }}" name="guest_name[]"
-                        value="{{ $guest }}"
-                        class="form-control guest-name @error('guest_name.' . $index) is-invalid @enderror"
-                        placeholder="Name of Guest(s)" autocomplete="off" autofocus>
-                    @error('guest_name.' . $index)
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
+        <div class="row">
+            @foreach (old('guest_name', ['']) as $index => $guest)
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="guestName_{{ $index }}">Name of Guest(s) <span
+                                class="text-danger">*</span></label>
+                        <input type="text" id="guestName_{{ $index }}" name="guest_name[]"
+                            value="{{ $guest }}"
+                            class="form-control guest-name @error('guest_name.' . $index) is-invalid @enderror"
+                            placeholder="Name of Guest(s)" autocomplete="off" autofocus>
+                        @error('guest_name.' . $index)
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-1 mt-4 iconContainer">
-                @if ($loop->last)
-                    <button type="button" id="addGuest"><span class="fa fa-plus mt-3"></span></button>
-                @else
-                    <button type="button" class="remove-guest"><span
-                            class="fas fa-times mt-3 text-danger"></span></button>
-                @endif
-            </div>
-        @endforeach
+            @endforeach
+            @foreach (old('country_code', ['']) as $index => $country_code)
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="country_code_{{ $index }}">
+                            <span title="The country code must be an number." class="fa fa-info-circle"
+                                aria-hidden="true"></span>
+                            Country Code 
+                        </label>
+                        <input type="text" id="country_code_{{ $index }}" name="country_code[]" value="{{ $country_code }}"
+                            class="form-control @error('country_code.' . $index) is-invalid @enderror" placeholder="Code"
+                            autocomplete="off" autofocus>
+                        @error('country_code.' . $index)
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+            @endforeach
+            @foreach (old('phone', ['']) as $index => $phone)
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="phone_{{ $index }}">Contact <span class="text-danger">*</span></label>
+                        <input type="text" id="phone_{{ $index }}" name="phone[]" value="{{ $phone }}"
+                            class="form-control @error('phone.' . $index) is-invalid @enderror phone" placeholder="Contact"
+                            autocomplete="off">
+                        @error('phone.' . $index)
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4 iconContainer">
+                    @if ($loop->last)
+                        <button type="button" id="addGuest"><span class="fa fa-plus mt-3"></span></button>
+                    @else
+                        <button type="button" class="remove-guest"><span
+                                class="fas fa-times mt-3 text-danger"></span></button>
+                    @endif
+                </div>
+            @endforeach
+        </div>
     </div>
     <div class="text-right mt-5 pt-3 border-top">
         <button type="submit" id="addBookingFormButton" class="btn btn-outline-primary mx-2" title="Save">Save</button>

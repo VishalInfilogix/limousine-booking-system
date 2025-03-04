@@ -83,7 +83,7 @@ class EventsController extends Controller
             $log_headers = $this->getHttpData($request);
         
             // Create a new event using eventService
-            $this->eventService->createEvent($request->all(), $log_headers);
+            $this->eventService->createEvent($request->all(), $log_headers, 'not from booking');
 
             // Display success message and redirect to events listing
             $this->helper->alertResponse(__('message.event_created'), 'success');
@@ -242,7 +242,7 @@ class EventsController extends Controller
             $log_headers = $this->getHttpData($request);
         
             // Create a new event using eventService
-            $this->eventService->createEvent($request->all(), $log_headers);
+            $this->eventService->createEvent($request->all(), $log_headers, 'from booking');
 
             return $this->handleResponse([], __("message.event_created"), Response::HTTP_OK);
         } catch (\Exception $e) {

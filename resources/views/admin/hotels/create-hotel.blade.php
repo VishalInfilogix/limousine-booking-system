@@ -108,7 +108,7 @@
                                     @if(!empty($vehicleClasses))
                                         @foreach($vehicleClasses as $vehicleClass)
                                             <div class="form-group row g-2 mx-4">
-                                                <label for="perTripArr_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }} <span class="text-danger">*</span></label>
+                                                <label for="perTripArr_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }}</label>
                                                 <div class="col-sm-8">
                                                     <input type="text" id="perTripArr_{{ $vehicleClass->id }}" name="per_trip_arr_{{ $vehicleClass->id }}"
                                                         value="{{ old('per_trip_arr_' . $vehicleClass->id) }}"
@@ -129,7 +129,7 @@
                                     @if(!empty($vehicleClasses))
                                         @foreach($vehicleClasses as $vehicleClass)
                                             <div class="form-group row g-2 mx-4">
-                                                <label for="perTripDep_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }} <span class="text-danger">*</span></label>
+                                                <label for="perTripDep_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }}</label>
                                                 <div class="col-sm-8">
                                                     <input type="text" id="perTripDep_{{ $vehicleClass->id }}" name="per_trip_dep_{{ $vehicleClass->id }}"
                                                         value="{{ old('per_trip_dep_' . $vehicleClass->id) }}"
@@ -150,7 +150,7 @@
                                     @if(!empty($vehicleClasses))
                                         @foreach($vehicleClasses as $vehicleClass)
                                             <div class="form-group row g-2 mx-4">
-                                                <label for="perTripTransfer_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }} <span class="text-danger">*</span></label>
+                                                <label for="perTripTransfer_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }}</label>
                                                 <div class="col-sm-8">
                                                     <input type="text" id="perTripTransfer_{{ $vehicleClass->id }}" name="per_trip_transfer_{{ $vehicleClass->id }}"
                                                         value="{{ old('per_trip_transfer_' . $vehicleClass->id) }}"
@@ -185,7 +185,7 @@
                                     @if(!empty($vehicleClasses))
                                         @foreach($vehicleClasses as $vehicleClass)
                                             <div class="form-group row g-2 mx-4">
-                                                <label for="perHourDelivery_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }} <span class="text-danger">*</span></label>
+                                                <label for="perHourDelivery_{{ $vehicleClass->id }}" class="col-sm-4 col-form-label">{{ $vehicleClass->name }}</label>
                                                 <div class="col-sm-8">
                                                     <input type="text" id="perHourDelivery_{{ $vehicleClass->id }}" name="per_hour_rate_{{ $vehicleClass->id }}"
                                                         value="{{ old('per_hour_rate_' . $vehicleClass->id) }}"

@@ -503,50 +503,103 @@
                             </div>
                             <div class="card-body p-0">
                                 <ul class="list-group list-group-unbordered mb-3">
+                                    @php
+                                        $allGuests = !empty($booking->guest_name) ? explode(',', $booking->guest_name) : NULL;
+                                        $allCountryCodes = !empty($booking->country_code) ? explode(',', $booking->country_code) : NULL;
+                                        $allPhones = !empty($booking->phone) ? explode(',', $booking->phone) : NULL;
+
+                                    @endphp
+                                    @if(!empty($allGuests))
+                                        @foreach($allGuests as $guest_key => $guest)
+                                            <li class="list-group-item border-top-0">
+                                                <div class="form-group row row-gap-2 mb-0">
+                                                    <label for="guest-name-{{$guest_key}}" class="col-sm-6 col-form-label">Guest Name</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" id="guest-name-{{$guest_key}}" name="guest_name[]"
+                                                            value="{{ $guest }}"
+                                                            class="form-control @error('is_cross_border.' . $guest_key) is-invalid @enderror guest-name"
+                                                            placeholder="Guest Name">
+                                                        @error('guest.' . $guest_key)
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $message }}</strong>
+                                                            </span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="form-group row row-gap-2 mb-0">
+                                                    <label for="contact-number-{{$guest_key}}" class="col-sm-6 col-form-label">Contact
+                                                        Number</label>
+                                                    <div class="col-sm-2">
+                                                        <input type="text" value="{{ !empty($allCountryCodes[$guest_key]) ? $allCountryCodes[$guest_key] : '' }}"
+                                                            id="country-code-{{$guest_key}}" name="country_code[]"
+                                                            class="form-control @error('country_code.' . $guest_key) is-invalid @enderror country-code"
+                                                            placeholder="Country Code" autocomplete="off">
+                                                        @error('country_code.' . $guest_key)
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $message }}</strong>
+                                                            </span>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <input type="text" name="phone[]" value="{{ !empty($allPhones[$guest_key]) ? $allPhones[$guest_key] : '' }}"
+                                                            id="contact-number-{{$guest_key}}"
+                                                            class="form-control @error('phone.' . $guest_key) is-invalid @enderror phone"
+                                                            placeholder="Contact Number" autocomplete="off">
+                                                        @error('phone.' . $guest_key)
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $message }}</strong>
+                                                            </span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            @if($guest_key + 1 !== count($allGuests))
+                                                <li class="list-group-item border-top-0">
+                                                    <div class="form-group row row-gap-2 mb-0">
+                                                        <button type="button" class="remove-guest" style="color:white; background-color:red; padding: 10px;">Remove Guest</button>
+                                                    </div>
+                                                </li> 
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <li class="list-group-item border-top-0">
+                                            <div class="form-group row row-gap-2 mb-0">
+                                                <label for="guest-name-0" class="col-sm-6 col-form-label">Guest Name</label>
+                                                <div class="col-sm-6">
+                                                    <input type="text" id="guest-name-0" name="guest_name[]"
+                                                        value=""
+                                                        class="form-control @error('is_cross_border') is-invalid @enderror guest-name"
+                                                        placeholder="Guest Name">
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="form-group row row-gap-2 mb-0">
+                                                <label for="contact-number-0" class="col-sm-6 col-form-label">Contact
+                                                    Number</label>
+                                                <div class="col-sm-2">
+                                                    <input type="text" value=""
+                                                        id="country-code-0" name="country_code[]"
+                                                        class="form-control @error('country_code') is-invalid @enderror country-code"
+                                                        placeholder="Country Code" autocomplete="off">
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input type="text" name="phone[]" value=""
+                                                        id="contact-number-0"
+                                                        class="form-control @error('phone') is-invalid @enderror phone"
+                                                        placeholder="Contact Number" autocomplete="off">
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endif
                                     <li class="list-group-item border-top-0">
                                         <div class="form-group row row-gap-2 mb-0">
-                                            <label for="guest-name" class="col-sm-6 col-form-label">Guest Name</label>
-                                            <div class="col-sm-6">
-                                                <input type="text" id="guest-name" name="guest_name"
-                                                    value="{{ $booking->guest_name }}"
-                                                    class="form-control @error('is_cross_border') is-invalid @enderror"
-                                                    placeholder="Guest Name">
-                                                @error('guest_name')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
+                                            <button type="button" id="addGuest" style="color:white; background-color:black; padding: 10px;">Add Guest</button>
                                         </div>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <div class="form-group row row-gap-2 mb-0">
-                                            <label for="contact-number" class="col-sm-6 col-form-label">Contact
-                                                Number</label>
-                                            <div class="col-sm-2">
-                                                <input type="text" value="{{ $booking->country_code }}"
-                                                    id="country-code" name="country_code"
-                                                    class="form-control @error('country_code') is-invalid @enderror"
-                                                    placeholder="Country Code" autocomplete="off">
-                                                @error('country_code')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <input type="text" name="phone" value="{{ $booking->phone }}"
-                                                    id="contact-number"
-                                                    class="form-control @error('phone') is-invalid @enderror"
-                                                    placeholder="Contact Number" autocomplete="off">
-                                                @error('phone')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </li>
+                                    </li>                                    
+                                    
                                     <li class="list-group-item" id="noOfPax" style="display:{{ $noOfPax }};">
                                         <div class="form-group row row-gap-2 mb-0">
                                             <label for="no-of-pax" class="col-sm-6 col-form-label">Number of Pax</label>
@@ -2037,10 +2090,12 @@
                                                 <div class="col-sm-1"></div>
                                                 <div class="col-sm-5 text-left"><span class="bold">Total</span></div>
                                                 <div class="col-sm-6 text-right"><span
-                                                        id="total-charges">{{ $totalBillingCharges }}</span>
+                                                        id="total-charges">{{ $booking->status == 'CANCELLED' ? 0 : $totalBillingCharges; }}</span>
                                                 </div>
+                                                <input type="hidden" name="booking_status_for_total_charges" id="booking-status-for-total-charges"
+                                                    value="{{ $booking->status }}" />
                                                 <input type="hidden" name="total_charge" id="total-charge"
-                                                    value="{{ $totalBillingCharges }}" />
+                                                    value="{{ $booking->status == 'CANCELLED' ? 0 : $totalBillingCharges; }}" />
                                             </div>
                                         </li>
                                     </ul>

@@ -631,7 +631,7 @@ export default class Bookings extends BaseClass {
                 },
                 phone: {
                     required: true,
-                    digits: true,
+                    // digits: true,
                     minlength: 6,
                     // maxlength: 10,
                 },
@@ -1609,7 +1609,7 @@ export default class Bookings extends BaseClass {
         $(".multiple_phone").each((i, e) => {
             $(e).rules("add", {
                 required: true,
-                digits: true,
+                // digits: true,
                 minlength: 6,
                 // maxlength: 10,
                 messages: {
@@ -2304,12 +2304,12 @@ export default class Bookings extends BaseClass {
                     dateTimeFormat: true,
                     departureDateTimeCheck: true,
                 },
-                country_code: {
+                "country_code[]": {
                     minlength: 1,
                     // maxlength: 3,
                     digits: true,
                 },
-                phone: {
+                "phone[]": {
                     required: true,
                     digits: true,
                     minlength: 6,
@@ -2392,13 +2392,13 @@ export default class Bookings extends BaseClass {
                     digits: this.languageMessage.no_of_hours.digits,
                     max: this.languageMessage.no_of_hours.max,
                 },
-                country_code: {
+                "country_code[]": {
                     required: this.languageMessage.country_code.required,
                     minlength: this.languageMessage.country_code.min,
                     // maxlength: this.languageMessage.country_code.max,
                     digits: this.languageMessage.country_code.integer,
                 },
-                phone: {
+                "phone[]": {
                     required: this.languageMessage.phone.required,
                     // digits: this.languageMessage.phone.regex,
                     minlength: this.languageMessage.phone.min,
@@ -2577,33 +2577,52 @@ export default class Bookings extends BaseClass {
 
     }
     handleRemoveGuest = ({ target }) => {
-        $(target).closest(".col-md-1").prev(".col-md-3").remove();
-        $(target).closest(".col-md-1").remove();
+        $(target).closest('.row').remove();
     };
 
     handleAddGuest = () => {
-        const lastGuestInputContainer = $(".guest-name")
-            .last()
-            .closest(".col-md-3");
+        const lastGuestInputContainer = $(".phone")
+            .last().parent().parent()
+            .parent();
         const lastId = parseInt(
-            lastGuestInputContainer.find(".guest-name").attr("id").split("_")[1]
+            lastGuestInputContainer.find(".phone").attr("id").split("_")[1]
         );
         const newId = lastId + 1;
         const newGuestInput = `
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="guestName_${newId}">Name of Guest(s) <span class="text-danger">*</span></label>
-                    <input type="text" id="guestName_${newId}" name="guest_name[]" class="form-control guest-name" placeholder="Name of Guest(s)" autocomplete="off" autofocus>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="guestName_${newId}">Name of Guest(s) <span class="text-danger">*</span></label>
+                        <input type="text" id="guestName_${newId}" name="guest_name[]" class="form-control guest-name" placeholder="Name of Guest(s)" autocomplete="off" autofocus>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="country_code_${newId}">
+                            <span title="The country code must be an number." class="fa fa-info-circle"
+                                aria-hidden="true"></span>
+                            Country Code 
+                        </label>
+                        <input type="text" id="country_code_${newId}" name="country_code[]" value=""
+                            class="form-control" placeholder="Code"
+                            autocomplete="off" autofocus>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="phone_${newId}">Contact <span class="text-danger">*</span></label>
+                        <input type="text" id="phone_${newId}" name="phone[]" value=""
+                            class="form-control phone" placeholder="Contact"
+                            autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4 iconContainer">
+                    <button type="button" class="remove-guest"><span class="fas fa-times mt-3 text-danger"></span></button>
                 </div>
             </div>`;
 
-        const newGuestRemoveEl = `
-            <div class="col-md-1 mt-4 iconContainer">
-                <button type="button" class="remove-guest"><span class="fas fa-times mt-3 text-danger"></span></button>
-            </div>`;
-
         $(newGuestInput).insertAfter(lastGuestInputContainer);
-        $(newGuestRemoveEl).insertAfter(lastGuestInputContainer);
+        // $(newGuestRemoveEl).insertAfter(lastGuestInputContainer);
     };
 
     handleRemoveStop = ({ target }) => {
@@ -2867,7 +2886,7 @@ export default class Bookings extends BaseClass {
         $("#phone_" + lastId + "_" + lastGuestId).each((i, e) => {
             $(e).rules("add", {
                 required: true,
-                digits: true,
+                // digits: true,
                 minlength: 6,
                 // maxlength: 10,
                 messages: {
@@ -2882,7 +2901,7 @@ export default class Bookings extends BaseClass {
             $(e).rules("add", {
                 minlength: 1,
                 // maxlength: 3,
-                digits: true,
+                // digits: true,
                 messages: {
                     minlength: this.languageMessage.country_code.min,
                     // maxlength: this.languageMessage.country_code.max,
