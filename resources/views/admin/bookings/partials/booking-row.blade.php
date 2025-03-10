@@ -1,4 +1,4 @@
-    @php
+@php
         use App\CustomHelper;
         $user = Auth::user();
         $userTypeSlug = $user->userType->slug ?? null;

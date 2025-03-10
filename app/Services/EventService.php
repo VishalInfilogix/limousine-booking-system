@@ -64,14 +64,14 @@ class EventService
         }
     }
 
-    public function getEventDataByHotel($hotel_id)
+    public function getEventDataByHotel($client_id)
     {
         try {
             // Retrieve the logged-in user
             $loggedUser = Auth::user();
 
             // Get paginated event data using the event repository
-            return $this->eventRepository->getEventsByHotel($loggedUser, $hotel_id);
+            return $this->eventRepository->getEventsByHotel($loggedUser, $client_id);
         } catch (\Exception $e) {
             // Throw an exception with the error message if an error occurs
             throw new \Exception($e->getMessage());

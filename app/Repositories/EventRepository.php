@@ -226,9 +226,9 @@ class EventRepository implements EventInterface
         }
         return $query->get();
     }
-    public function getEventsByHotel(User $loggedUser, int $hotel_id = null)
+    public function getEventsByHotel(User $loggedUser, int $client_id = null)
     {
-        $hotelId = Client::where('id', $hotel_id)->select('hotel_id')->first();
+        $hotelId = Client::where('id', $client_id)->select('hotel_id')->first();
         $events = $this->filterEventResultByHotel($loggedUser, $hotelId->hotel_id)->get();
 
         return $events;

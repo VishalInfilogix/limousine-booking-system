@@ -1208,7 +1208,7 @@
                                                         <input type="text" id="arrival-charge" name="arrival_charge"
                                                             value="{{$amount}}"
                                                             class="form-control @error('arrival_charge') is-invalid @enderror"
-                                                            placeholder="Per Trip Arrival" readonly>
+                                                            placeholder="Per Trip Arrival" {{$loggedUserType === 'client-staff' || $loggedUserType === 'client-admin' ? 'readonly' : ''}}>
                                                     </div>
                                                     @error('arrival_charge')
                                                         <span class="invalid-feedback" role="alert">
@@ -1256,7 +1256,7 @@
                                                         <input type="text" id="transfer-charge" name="transfer_charge"
                                                             value="{{ $amount }}"
                                                             class="form-control @error('transfer_charge') is-invalid @enderror"
-                                                            placeholder="Per Trip Transfer" readonly>
+                                                            placeholder="Per Trip Transfer" {{$loggedUserType === 'client-staff' || $loggedUserType === 'client-admin' ? 'readonly' : ''}}>
                                                     </div>
                                                     @error('transfer_charge')
                                                         <span class="invalid-feedback" role="alert">
@@ -1306,7 +1306,7 @@
                                                             name="departure_charge"
                                                             value="{{ $amount }}"
                                                             class="form-control @error('departure_charge') is-invalid @enderror"
-                                                            placeholder="Per Trip Departure" readonly>
+                                                            placeholder="Per Trip Departure" {{$loggedUserType === 'client-staff' || $loggedUserType === 'client-admin' ? 'readonly' : ''}}>
                                                     </div>
                                                     @error('departure_charge')
                                                         <span class="invalid-feedback" role="alert">
@@ -1337,11 +1337,19 @@
                                                 <div class="col-sm-3">
                                                     @php
                                                         $amount = 0.00;
+                                                        $original_amount = 0.00;
                                                         if(!empty($corporateFairBillingDetailsPerHour))
                                                         {
                                                             if($corporateFairBillingDetailsPerHour->billing_type == 'Hour')
                                                             {
-                                                                $amount = $corporateFairBillingDetailsPerHour->amount;
+                                                                $original_amount = $corporateFairBillingDetailsPerHour->amount;
+
+                                                                if(!empty($booking->no_of_hours))
+                                                                {
+                                                                    $amount = $original_amount * $booking->no_of_hours;
+                                                                }else{
+                                                                    $amount = $original_amount;
+                                                                }
                                                             }
                                                         }
                                                     @endphp
@@ -1354,7 +1362,10 @@
                                                         <input type="text" id="disposal-charge" name="disposal_charge"
                                                             value="{{ $amount }}"
                                                             class="form-control @error('disposal_charge') is-invalid @enderror"
-                                                            placeholder="Per Hour Rate" readonly>
+                                                            placeholder="Per Hour Rate" {{$loggedUserType === 'client-staff' || $loggedUserType === 'client-admin' ? 'readonly' : ''}}>
+                                                    <input type="hidden" id="original-disposal-charge" name="original_disposal_charge"
+                                                        value="{{ $original_amount }}"
+                                                        class="form-control">
                                                     </div>
                                                     @error('disposal_charge')
                                                         <span class="invalid-feedback" role="alert">
@@ -1804,9 +1815,7 @@
                                                     </div>
                                                 </div>
                                                 <label for="last-minute-surcharge"
-                                                    class="col-sm-4 col-form-label py-0">Last
-                                                    Minute
-                                                    Booking Surcharge</label>
+                                                    class="col-sm-4 col-form-label py-0">Additional Charges</label>
                                                 <div class="col-sm-4 text-sm">
                                                     <input type="text" id="'last-minute-charge-description"
                                                         name="last_minute_charge_description"
@@ -1950,7 +1959,7 @@
                                                                 name="additional_stop_surcharge"
                                                                 value="{{ $additional_stop_charges_from_stops ?? null }}"
                                                                 class="form-control @error('additional_stop_surcharge') is-invalid @enderror"
-                                                                placeholder="Additional Stop Charges" {{$loggedUserType !== 'admin' ? 'readonly' : ''}}>
+                                                                placeholder="Additional Stop Charges" {{$loggedUserType === 'client-staff' || $loggedUserType === 'client-admin' ? 'readonly' : ''}}>
                                                         </div>
                                                     </div>
                                                     @error('additional_stop_surcharge')
@@ -2079,7 +2088,7 @@
                                                                 name="extra_seat_child_charge"
                                                                 value="10.00"
                                                                 class="form-control"
-                                                                placeholder="Extra Child Seat Charges" {{$loggedUserType !== 'admin' ? 'readonly' : ''}}>
+                                                                placeholder="Extra Child Seat Charges" {{$loggedUserType === 'client-staff' || $loggedUserType === 'client-admin' ? 'readonly' : ''}}>
                                                         </div>
                                                     </div>
                                                 </div>

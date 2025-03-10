@@ -266,32 +266,34 @@ class ClientRepository implements ClientInterface
         return $this->model->whereIn('user_id', $userIds)->pluck('id')->toArray();
     }
 
-    public function getClientsByHotel(User $loggedUser, int $hotel_id = null)
+    public function getClientsByHotel(User $loggedUser, int $client_id = null)
     {
-        $clients = $this->filterClientResultByHotel($loggedUser, $hotel_id)->get();
+        $clients = $this->filterClientResultByHotel($loggedUser, $client_id)->get();
 
         return $clients;
     }
 
-    private function filterClientResultByHotel(User $loggedUser, int $hotel_id = null)
+    private function filterClientResultByHotel(User $loggedUser, int $client_id = null)
     {
+        $hotelId = $this->model->where('id', $client_id)->first();        
         $query = $this->model->query();
-        $query->where('hotel_id', $hotel_id)->with('user');
+        $query->where('hotel_id', $hotelId->hotel_id)->with('user');
 
         return $query;
     }
 
-    public function getClientsByLinkedHotel(int $hotel_id = null)
+    public function getClientsByLinkedHotel(int $client_id = null)
     {
-        $clients = $this->filterClientResultByLinkedHotel($hotel_id)->get();
+        $clients = $this->filterClientResultByLinkedHotel($client_id)->get();
 
         return $clients;
     }
 
-    private function filterClientResultByLinkedHotel(int $hotel_id = null)
+    private function filterClientResultByLinkedHotel(int $client_id = null)
     {
+        $hotelId = $this->model->where('id', $client_id)->first();
         $query = $this->clientMultiCorporateModel->query();
-        $query->where('hotel_id', $hotel_id)->with('client.user');
+        $query->where('hotel_id', $hotelId->hotel_id)->with('client.user');
 
         return $query;
     }

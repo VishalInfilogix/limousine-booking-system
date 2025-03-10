@@ -39,6 +39,13 @@ Route::get('/clear-cache', function () {
 });
 
 
+Route::get('/link-storage', function () {
+    Artisan::call('storage:link');
+
+    return "Storage Linking Successful.";
+});
+
+
 Route::group(['middleware' => ['guest', 'web']], function () {
     Route::get('/', [LoginController::class, 'index'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('submit-login');

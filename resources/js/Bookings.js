@@ -1454,14 +1454,14 @@ export default class Bookings extends BaseClass {
     };
 
     handleInitilizeValidation = () => {
-        $(".multiple_event_id").each((i, e) => {
-            $(e).rules("add", {
-                required: true,
-                messages: {
-                    required: this.languageMessage.event_id.required,
-                },
-            });
-        });
+        // $(".multiple_event_id").each((i, e) => {
+        //     $(e).rules("add", {
+        //         required: true,
+        //         messages: {
+        //             required: this.languageMessage.event_id.required,
+        //         },
+        //     });
+        // });
 
         $(".multiple_departure_time").each((i, e) => {
             $(e).rules("add", {
@@ -2337,9 +2337,9 @@ export default class Bookings extends BaseClass {
                 client_id: {
                     required: true,
                 },
-                event_id: {
-                    required: true,
-                },
+                // event_id: {
+                //     required: true,
+                // },
                 child_seat_required: {
                     required: true
                 },
@@ -2356,9 +2356,9 @@ export default class Bookings extends BaseClass {
                 client_id: {
                     required: this.languageMessage.client_id.required,
                 },
-                event_id: {
-                    required: this.languageMessage.event_id.required,
-                },
+                // event_id: {
+                //     required: this.languageMessage.event_id.required,
+                // },
                 service_type_id: {
                     required: this.languageMessage.service_type_id.required,
                 },

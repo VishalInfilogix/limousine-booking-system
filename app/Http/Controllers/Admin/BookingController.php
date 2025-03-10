@@ -76,10 +76,10 @@ class BookingController extends Controller
     {
         try {
             $serviceTypes = $this->serviceTypeService->getServiceTypes();
+            $drivers = $this->driverService->getDrivers()->sortBy('name')->values();
             $locations = $this->locationService->getLocations();
             $hotels = $this->hotelService->getHotels();
             $vehicleTypes = $this->vehicleClassService->getVehicleClass();
-            $drivers = $this->driverService->getDrivers();
             $vehicles = $this->vehicleService->getvehicles();
             $driverOffDays = $this->driverOffDayService->getSavedDates();
             $hotelClients = $this->hotelService->getClientAdmins();
@@ -115,7 +115,7 @@ class BookingController extends Controller
                 $loggedUser->client->load(['hotel', 'multiCorporates.hotel']);
 
                 $loggedInUserHotelDetails = $loggedUser->client->hotel;
-                $hotel_id = $loggedUser->client->hotel_id;
+                $hotel_id = $loggedUser->client->id;
 
                 $multiCorporates = $loggedUser->client->multiCorporates;
 
@@ -215,6 +215,7 @@ class BookingController extends Controller
     {
         $bookedByHotelId = $booking->client->hotel_id ?? null;
         $loggedUserHotelId = Auth::user()->client->hotel_id ?? null;
+        $loggedUserClientId = Auth::user()->client->id ?? null;
         $user = Auth::user();
         $userTypeSlug = $user->userType->slug ?? null;
         // if ($loggedUserHotelId !== null && $bookedByHotelId !== $loggedUserHotelId) {
@@ -285,9 +286,10 @@ class BookingController extends Controller
         $peakPeriods = $this->peakPeriodService->getAllPeakPeriod();
         $driverOffDays = $this->driverOffDayService->getSavedDates();
         $events = $this->eventService->getEventDataByHotel($booking->client_id);
-        if(in_array($userTypeSlug, ['client-admin', 'client-staff']) && $loggedUserHotelId !== null)
+        
+        if(in_array($userTypeSlug, ['client-admin', 'client-staff']) && $loggedUserClientId !== null)
         {
-            $clients = $this->clientService->getClientsByHotel($loggedUserHotelId);
+            $clients = $this->clientService->getClientsByHotel($loggedUserClientId);
         }else{
             $clientsFromBookingCorporate = $this->clientService->getClientsByHotel($booking->client_id);        
             $clientsFromLinkedCorporates = $this->clientService->getClientsByLinkedHotel($booking->client_id)->map(function ($client) {

@@ -178,7 +178,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <div id="EventCreate" style="display: flex; align-items: center; justify-content: space-between;">
-                    <label for="eventId">Event <span class="text-danger">*</span></label>
+                    <label for="eventId">Event</label>
                     <button type="button" data-bs-toggle="modal" data-bs-target="#addEventModal">
                         <span class="fa fa-plus mt-3"></span>
                     </button>
@@ -499,7 +499,7 @@
                 <label for="attachment"><span
                         title="Acceptable Formats: jpg, jpeg, png, gif, doc, docx, txt, pdf, xls, xlsx"
                         class="fa fa-info-circle" aria-hidden="true"></span>
-                    Attachment</label>
+                        Attachment (Please zip multiple files, refer to client user manual)</label>
                 <input type="file" id="attachment" name="attachment" value="{{ old('attachment') }}"
                     class="form-control @error('attachment') is-invalid @enderror" placeholder="File">
                 @error('attachment')

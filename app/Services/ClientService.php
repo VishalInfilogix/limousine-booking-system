@@ -261,8 +261,6 @@ class ClientService
             {
                 foreach($requestData['multi_hotel_id'] as $client_hotel_data)
                 {
-                    foreach($requestData['multi_hotel_id'] as $client_hotel_data)
-                {
                     if(!empty($client_hotel_data) && !empty($clientId)){
                         $clientHotelData['client_id'] = $clientId;
                         $clientHotelData['hotel_id'] = $client_hotel_data;
@@ -270,7 +268,6 @@ class ClientService
                         $clientHotelData['created_by_id'] = $loggedUserId;
                         $clientHotel = $this->clientRepository->addClientHotel($clientHotelData);
                     }
-                }
                 }
             }
 

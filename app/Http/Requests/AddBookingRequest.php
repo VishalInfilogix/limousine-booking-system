@@ -22,7 +22,7 @@ class AddBookingRequest extends FormRequest
         $dropLocationId = $request->input('drop_off_location_id') ?? null;
         return [
             'client_id' => ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff'])) ? 'required' : 'nullable',
-            'event_id' => 'required',
+            // 'event_id' => 'required',
             'service_type_id' => 'required|integer',
             'pick_up_location_id' => 'nullable',
             'drop_off_location_id' => 'nullable',
@@ -45,7 +45,7 @@ class AddBookingRequest extends FormRequest
     {
         return [
             'client_id.required' => __("validation.custom.client_id.required"),
-            'event_id.required' => __("validation.custom.event_id.required"),
+            // 'event_id.required' => __("validation.custom.event_id.required"),
             'service_type_id.required' => __("validation.custom.service_type_id.required"),
             'service_type_id.integer' => __("validation.custom.integer"),
 

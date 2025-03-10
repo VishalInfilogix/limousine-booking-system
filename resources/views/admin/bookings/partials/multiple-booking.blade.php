@@ -215,10 +215,10 @@
                                                         @if ($client)
                                                             @if (old('multiple_client_id.' . $index) == $client->id)
                                                                 <option value="{{ $client->id }}" selected>
-                                                                    {{ !empty($client->name) ? $hotelClient->name : '' }}</option>
+                                                                    {{ !empty($hotelClient->name) ? $hotelClient->name : '' }}</option>
                                                             @else
                                                                 <option value="{{ $client->id }}">
-                                                                    {{ !empty($client->name) ? $hotelClient->name : '' }}
+                                                                    {{ !empty($hotelClient->name) ? $hotelClient->name : '' }}
                                                                 </option>
                                                             @endif
                                                         @endif

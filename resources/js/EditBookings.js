@@ -47,7 +47,7 @@ export default class EditBookings extends BaseClass {
         $(document).on("click", ".remove-guest", this.handleRemoveGuest);
         $(document).on(
             "change",
-            "#service-types, #is-peak-period-surcharge, #is-mid-night-surcharge, #is-arr-waiting-time-surcharge, #is-out-of-city-surcharge, #is-last-minute-booking-surcharge, #is-additional-stop-charge, #is-misc-surcharge",
+            "#service-types, #is-peak-period-surcharge, #trip-ended, #is-mid-night-surcharge, #is-arr-waiting-time-surcharge, #is-out-of-city-surcharge, #is-last-minute-booking-surcharge, #is-additional-stop-charge, #is-misc-surcharge",
             this.calculatedBilling
         );
         $(document).on(
@@ -263,8 +263,8 @@ export default class EditBookings extends BaseClass {
                                     $('#arrival-charge').val(0.00);
                                     $('#transfer-charge').val(0.00);
                                     $('#departure-charge').val(0.00);
-                                    $('#disposal-charge').val(response.data.data.amount.toString());
-                                    $('#disposal-charge').attr('value', response.data.data.amount.toString());                                         
+                                    $('#disposal-charge').val(($('#no-of-hours').val() * response.data.data.amount).toString());
+                                    $('#disposal-charge').attr('value', ($('#no-of-hours').val() * response.data.data.amount).toString());                                         
                                 }
                                 this.calculatedBilling();
                             } else {
@@ -741,16 +741,19 @@ export default class EditBookings extends BaseClass {
                     : 0;
                 break;
             case 4:
-                tripCharge = $("#disposal-charge").val()
-                    ? isNaN(parseFloat($("#disposal-charge").val()))
+                tripCharge = $("#original-disposal-charge").val()
+                    ? isNaN(parseFloat($("#original-disposal-charge").val()))
                         ? 0
-                        : parseFloat($("#disposal-charge").val())
+                        : parseFloat($("#original-disposal-charge").val())
                     : 0;
                 const hours = this.calculateHoursByDateTime();
                 const noOfHours = $("#no-of-hours").val();
-
+                
                 const totalHours = hours > noOfHours ? hours : noOfHours;
                 tripCharge = totalHours > 0 ? tripCharge * totalHours : tripCharge;
+
+                $("#disposal-charge").val(tripCharge)
+
                 break;
             case 5:
                 tripCharge = $("#delivery-charge").val()
@@ -1040,9 +1043,9 @@ export default class EditBookings extends BaseClass {
                 service_type_id: {
                     required: true,
                 },
-                event_id: {
-                    required: true,
-                },
+                // event_id: {
+                //     required: true,
+                // },
                 attachment: {
                     extension: "jpg|jpeg|png|gif|doc|docx|txt|pdf|xls|xlsx",
                     validFileSize: true,
@@ -1241,9 +1244,9 @@ export default class EditBookings extends BaseClass {
                 service_type_id: {
                     required: this.languageMessage.service_type_id.required,
                 },
-                event_id: {
-                    required: this.languageMessage.event_id.required,
-                },
+                // event_id: {
+                //     required: this.languageMessage.event_id.required,
+                // },
                 attachment: {
                     extension: this.languageMessage.attachment.extension,
                 },

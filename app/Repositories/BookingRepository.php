@@ -211,11 +211,15 @@ class BookingRepository implements BookingInterface
         if ($loggedUserType === UserType::CLIENT) {
             $query->where(function ($query) use ($loggedUserId, $loggedUserHotel) {
                 $query->where('created_by_id', $loggedUserId)
-                    ->orWhereHas('client', function ($query) use ($loggedUserHotel) {
-                        $query->where('hotel_id', $loggedUserHotel);
-                    });
+                      ->orWhereHas('client', function ($query) use ($loggedUserHotel) {
+                          $query->where('hotel_id', $loggedUserHotel);
+                      })
+                      ->orWhere(function ($query) use ($loggedUserId) {  // Fixed `->orWhere`
+                          $query->whereRaw("linked_clients REGEXP ?", ["(^|,)$loggedUserId(,|$)"]);
+                      });
             });
         }
+        
         if ($isDriverSchedule) {
             $query->whereNotIn('status', [Booking::COMPLETED, Booking::CANCELLED]);
         }
@@ -234,14 +238,10 @@ class BookingRepository implements BookingInterface
 
         if ($loggedUserType === UserType::CLIENT) {
             $query->where(function ($query) use ($loggedUserId) {
-                $query->whereRaw("
-                    FIND_IN_SET(?, REPLACE(REPLACE(REPLACE(linked_clients, '\"', ''), '[', ''), ']', ''))
-                ", [$loggedUserId])
-                ->orWhere('created_by_id', $loggedUserId);
+                $query->whereRaw("linked_clients REGEXP ?", ["(^|,)$loggedUserId(,|$)"])
+                      ->orWhere('created_by_id', $loggedUserId);
             });
-        }
-        
-        
+        }        
         
         // if (!empty($clientId)) {
         //     $query->where('created_by_id', $clientId);

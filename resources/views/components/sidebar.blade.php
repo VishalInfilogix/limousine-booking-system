@@ -33,6 +33,7 @@
                         <p>Bookings Archives</p>
                     </a>
                 </li>
+                @if ($loggedUsertypeSlug === null || in_array($loggedUsertypeSlug, ['admin', 'admin-staff']))
                 <li class="nav-item">
                     <a href="{{ route('reports') }}" class="nav-link {{ Request::is('reports*') ? 'active' : '' }}"
                         title="Reports">
@@ -40,6 +41,7 @@
                         <p>Reports</p>
                     </a>
                 </li>
+                @endif
                 @if ($loggedUsertypeSlug === null || in_array($loggedUsertypeSlug, ['admin', 'admin-staff']))
                     <li class="nav-item {{ Request::is('driver*') ? 'menu-open' : '' }}">
                         <a href="javascript:void(0);" class="nav-link" title="Drivers">

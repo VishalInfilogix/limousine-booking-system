@@ -62,7 +62,7 @@ class BookingService
      * @param array $requestData An associative array containing optional parameters:
      *                           - 'page': The page number for pagination.
      *                           - 'search': The search query to filter bookings.
-     *                           - 'sortField': The field to sort bookings by.
+     *                           - 'sortField': The field to sort bookwings by.
      *                           - 'sortDirection': The direction for sorting ('asc' or 'desc').
      * @return \Illuminate\Pagination\LengthAwarePaginator A paginated list of bookings.
      * @throws \Exception If an error occurs during the retrieval process.
