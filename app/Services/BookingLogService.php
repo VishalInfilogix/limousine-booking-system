@@ -330,9 +330,14 @@ class BookingLogService
                 $notifyUsers =  $this->userRepository->getAdmins();
             }
             $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
-            if ($userType === null || $userType === UserType::ADMIN) {
-                $this->sendEmailToClientAdmin($loggedUserFullName, $logMessages, $booking);
-            }
+            // if ($userType === null || $userType === UserType::ADMIN) {
+            //     $this->sendEmailToClientAdmin($loggedUserFullName, $logMessages, $booking);
+            // }
+
+            // if ($userType === null || $userType === UserType::ADMIN) {
+            // }
+            $this->sendEmailToCreator($loggedUserFullName, $logMessages, $booking);
+
             if ($userType === UserType::CLIENT) {
                 $this->sendTelegramNotificationToOpsTeam($loggedUserFullName, $logMessages, $booking);
             }
@@ -447,6 +452,45 @@ class BookingLogService
                     $this->helper->sendEmail($hotelAdmin->email, $mailData);
                     // }
                 }
+            }
+        } catch (\Exception $e) {
+            return;
+        }
+    }
+
+    private function sendEmailToCreator($loggedUserFullName, $logs, $booking)
+    {
+        try {
+            // first check if creator is not super admin
+            $createdBy = $booking->created_by_id;
+
+            $creatorDetails = $this->userRepository->getUserById($createdBy);
+
+            $filterStr = ['added driver acknowledge', 'changed driver acknowledge', 'changed driver notified', 'added driver notified'];
+            $filteredLogs = array_filter($logs, function($log) use ($filterStr) {
+                foreach ($filterStr as $filter) {
+                    if (strpos(strtolower($log), $filter) !== false) {
+                        return false; // Exclude log if any filter string is found
+                    }
+                }
+                return true; // Include log if none of the filter strings are found
+            });
+
+            if($creatorDetails->email !== 'admin@yopmail.com')
+            {
+                $bookingId = $booking->id;
+                $subject = "Updated Booking #" . $bookingId;
+
+                $mailData   = [
+                    'subject' =>  $subject,
+                    'template' =>  'send-email',
+                    'name'    => $this->helper->getFullName($creatorDetails->first_name, $creatorDetails->last_name),
+                    'logs' => $filteredLogs,
+                    'changedBy' => $loggedUserFullName,
+                    'bookingId' => $bookingId,
+                ];
+         
+                $this->helper->sendEmail($creatorDetails->email, $mailData);
             }
         } catch (\Exception $e) {
             return;
