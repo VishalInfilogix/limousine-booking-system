@@ -249,6 +249,16 @@ label:not(.form-check-label):not(.custom-file-label){
     @include cover-image("dashboard-icon.svg");
     background-repeat: no-repeat;
 }
+.bookings-archives-icon {
+    @include wh(16px, 16px);
+    @include cover-image("bookings-archives-icon.svg");
+    background-repeat: no-repeat;
+}
+.reports-icon {
+    @include wh(16px, 16px);
+    @include cover-image("reports-icon.svg");
+    background-repeat: no-repeat;
+}
 
 .book-icon {
     @include wh(18px, 18px);

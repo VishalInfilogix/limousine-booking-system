@@ -79,8 +79,8 @@ class BookingController extends Controller
             $drivers = $this->driverService->getDrivers()->sortBy('name')->values();
             $locations = $this->locationService->getLocations();
             $hotels = $this->hotelService->getHotels();
-            $vehicleTypes = $this->vehicleClassService->getVehicleClass();
-            $vehicles = $this->vehicleService->getvehicles();
+            $vehicleTypes = $this->vehicleClassService->getVehicleClass()->sortBy('name')->values();
+            $vehicles = $this->vehicleService->getvehicles()->sortBy('vehicle_number')->values();
             $driverOffDays = $this->driverOffDayService->getSavedDates();
             $hotelClients = $this->hotelService->getClientAdmins();
             $bookingData = $this->bookingService->getBookingData($request->query());

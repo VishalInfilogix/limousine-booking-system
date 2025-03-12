@@ -293,7 +293,7 @@
                                                 onclick="this.style.backgroundColor = this.checked ? '#0e161e' : '#fff'; 
                                                 this.style.borderColor = this.checked ? '#c3c3c3' : '#a6acaf'; 
                                                 this.style.boxShadow = this.checked ? '0px 0px 8px rgba(15,20,26,80%)' : '0px 0px 5px rgba(10,20,30,50%)';"
-                                                {{ $booking->to_be_advised_status === 'yes' ? 'checked="checked"' : '' }}>
+                                                {{ $booking->to_be_advised_status === 'yes' ? 'checked=checked' : '' }}>
 
                                         </div>
                                     </li>

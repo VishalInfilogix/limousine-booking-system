@@ -29,7 +29,7 @@
                 <li class="nav-item">
                     <a href="{{ route('bookings-archives') }}" class="nav-link {{ Request::is('bookings-archives*') ? 'active' : '' }}"
                         title="Bookings Archives">
-                        <span class="icon-nav icon bookings-icon"></span>
+                        <span class="icon-nav icon bookings-archives-icon"></span>
                         <p>Bookings Archives</p>
                     </a>
                 </li>
@@ -37,7 +37,7 @@
                 <li class="nav-item">
                     <a href="{{ route('reports') }}" class="nav-link {{ Request::is('reports*') ? 'active' : '' }}"
                         title="Reports">
-                        <span class="icon-nav icon bookings-icon"></span>
+                        <span class="icon-nav icon reports-icon"></span>
                         <p>Reports</p>
                     </a>
                 </li>

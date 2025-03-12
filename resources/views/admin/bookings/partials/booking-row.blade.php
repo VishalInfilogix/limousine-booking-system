@@ -37,8 +37,9 @@
         $vehicleNumber = $booking->vehicle->vehicle_number ?? null;
         $vehicleClassName = $booking->vehicleType->name ?? null;
         $vehicleValue = 'N/A';
-        if ($vehicleClassName && $vehicleNumber) {
-            $vehicleValue = $vehicleClassName . '</br>' . $vehicleNumber;
+        $VehicleClassName = $booking->vehicle->vehicleClass->name ?? null;
+        if ($VehicleClassName && $vehicleNumber) {
+            $vehicleValue = $VehicleClassName . '</br>' . $vehicleNumber;
         }
         $pickUpLocation = null;
 

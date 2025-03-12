@@ -133,7 +133,7 @@
                 </div>
                 <input type="hidden" id="sortOrder">
                 <div class="card-body p-0">
-                    <div class="table-responsive custom-table">
+                    <div class="table-responsive custom-table table-scroll-height">
                         <table id="reportsTable" class="table table-head-fixed text-nowrap table-hover m-0">
                             <thead>
                                 <tr>

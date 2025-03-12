@@ -38,6 +38,7 @@ export default class EditBookings extends BaseClass {
             this.calculatedBilling
         );
         $(document).on("change", "#pickup_time_to_be_advised", this.handlePickupTime);
+        $(document).on("blur", "#pick-up-time", this.handleToBeAdvised);
         $(document).on("change", "#driver-id", this.handleDriver);
         $(document).on("click", "#addStop", this.handleAddStop);
         $(document).on("click", "#addClient", this.handleAddClient);
@@ -356,6 +357,14 @@ export default class EditBookings extends BaseClass {
             $('#pick-up-time').prop('readonly', false);
             $('#pick-up-time').val("");
         }
+    }
+
+    handleToBeAdvised = () => {
+        $('#pickup_time_to_be_advised').prop('checked', false);
+        $('#pickup_time_to_be_advised').css('border', "2px solid #a6acaf");
+        $('#pickup_time_to_be_advised').css('box-shadow', "0px 0px 5px rgba(10,20,30,50%)");
+        $('#pickup_time_to_be_advised').css('background-color', "#fff");
+        $('#pick-up-time').prop('readonly', false);
     }
 
     handleAddStop = () => {

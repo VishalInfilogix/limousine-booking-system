@@ -224,14 +224,18 @@ export default class Bookings extends BaseClass {
 
         $("#pickupDateBooking").daterangepicker(
             {
-                startDate: moment().startOf("day"),
-                endDate: todayEndDate,
+                startDate: moment("2000-01-01").startOf("year"), // Start from Jan 1, 2000
+                endDate: moment().add(100, "years").endOf("year"), // End 100 years from now
                 parentEl: ".wrapper",
                 timePicker: true,
                 timePicker24Hour: true,
                 timePickerIncrement: 1,
                 ranges: {
-                    Today: [moment().startOf("day"), todayEndDate],
+                    "Max Range": [
+                        moment("2000-01-01").startOf("year"), 
+                        moment().add(100, "years").endOf("year")
+                    ],
+                    Today: [moment().startOf("day"), moment().endOf("day")],
                     Tomorrow: [
                         moment().add(1, "day").startOf("day"),
                         moment().add(1, "day").endOf("day"),
@@ -253,8 +257,8 @@ export default class Bookings extends BaseClass {
                         moment().endOf("month").endOf("day"),
                     ],
                     "Last Month": [
-                        moment().subtract(1, "month").startOf("month").startOf("day"),
-                        moment().subtract(1, "month").endOf("month").endOf("day"),
+                        moment().subtract(1, "month").startOf("month"),
+                        moment().subtract(1, "month").endOf("month"),
                     ],
                     "Next 7 Days": [
                         moment().startOf("day"),
@@ -282,7 +286,7 @@ export default class Bookings extends BaseClass {
                     ],
                 },
                 locale: {
-                    format: "DD/MM/YYYY HH:mm", // Format of the date displayed in the input
+                    format: "DD/MM/YYYY HH:mm",
                 },
             },
             (start, end) => {
@@ -292,6 +296,8 @@ export default class Bookings extends BaseClass {
                 );
             }
         );
+        
+        
 
         let calendarShown = 0;
 

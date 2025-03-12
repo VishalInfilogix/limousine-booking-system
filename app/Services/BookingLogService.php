@@ -38,7 +38,7 @@ class BookingLogService
     ) {
     }
 
-    public function addLogMessages(array $requestData, Booking $booking, User $loggedUser)
+    public function addLogMessages(array $requestData, Booking $booking, User $loggedUser, array $linkedClients = null)
     {
         try {
             $logMessages = [];
@@ -297,18 +297,18 @@ class BookingLogService
                             case "linked_clients":
                                 if ($oldValue === null || $oldValue === '') {
                                     $all_user_ids = explode(',', $newValue);
-
+    
                                     $names = User::whereIn('id', $all_user_ids)->get(['first_name', 'last_name'])->map(fn($user) => "{$user->first_name} {$user->last_name}")->implode(', ');
-
+    
                                     $logMessages[] = "Added linked clients: {$names}";
                                 } else {
-
+    
                                     $all_old_user_ids = explode(',', $oldValue);
                                     $old_names = User::whereIn('id', $all_old_user_ids)->get(['first_name', 'last_name'])->map(fn($user) => "{$user->first_name} {$user->last_name}")->implode(', ');
-
+    
                                     $all_new_user_ids = explode(',', $newValue);
                                     $new_names = User::whereIn('id', $all_new_user_ids)->get(['first_name', 'last_name'])->map(fn($user) => "{$user->first_name} {$user->last_name}")->implode(', ');
-
+    
                                     if($new_names == '')
                                     {
                                         $logMessages[] = "Removed linked clients : {$old_names}";
@@ -333,11 +333,13 @@ class BookingLogService
             // if ($userType === null || $userType === UserType::ADMIN) {
             //     $this->sendEmailToClientAdmin($loggedUserFullName, $logMessages, $booking);
             // }
-
+    
             // if ($userType === null || $userType === UserType::ADMIN) {
             // }
             $this->sendEmailToCreator($loggedUserFullName, $logMessages, $booking);
-
+    
+            $updateDelinkClients = $this->updateBookingNotification($loggedUser, $logMessages, $booking, $linkedClients);
+            
             if ($userType === UserType::CLIENT) {
                 $this->sendTelegramNotificationToOpsTeam($loggedUserFullName, $logMessages, $booking);
             }
@@ -345,7 +347,7 @@ class BookingLogService
             foreach ($logMessages as $message) {
                 $logData = ["message" => $message, "booking_id" => $booking->id, "user_id" => $loggedUser->id];
                 $this->bookingLogRepository->addLogs($logData);
-
+    
                 $notificationType = 'booking';
                 $subject = __("message.booking_notification_subject");
                 $template = 'emails.send_notification';
@@ -492,6 +494,61 @@ class BookingLogService
          
                 $this->helper->sendEmail($creatorDetails->email, $mailData);
             }
+        } catch (\Exception $e) {
+            return;
+        }
+    }
+
+    private function updateBookingNotification($loggedUser, $logs, $booking, $deLinkClients)
+    {
+        try {
+            $filterStr = ['added driver acknowledge', 'changed driver acknowledge', 'changed driver notified', 'added driver notified'];
+            $filteredLogs = array_filter($logs, function($log) use ($filterStr) {
+                foreach ($filterStr as $filter) {
+                    if (strpos(strtolower($log), $filter) !== false) {
+                        return false; // Exclude log if any filter string is found
+                    }
+                }
+                return true; // Include log if none of the filter strings are found
+            });
+    
+            $subject = "Updated Booking #" . $booking->id;
+            $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
+            if(!empty($deLinkClients))
+            {
+                foreach($deLinkClients as $deLinkClient)
+                {
+                    $userDetail = $this->userRepository->getUserById((int) $deLinkClient);
+                    if(!empty($userDetail) && !empty($userDetail->email) && !empty($userDetail->first_name))
+                    {
+                        $mailData   = [
+                            'subject' =>  $subject,
+                            'template' =>  'send-email',
+                            'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
+                            'logs' => $filteredLogs,
+                            'changedBy' => $loggedUserFullName,
+                            'bookingId' => $booking->id,
+                        ];
+                        $this->helper->sendEmail($userDetail->email, $mailData);
+                    }
+                }
+            }
+    
+            $userDetail = $this->userRepository->getUserById($booking->created_by_id);
+    
+            if($userDetail->email !== 'admin@yopmain.com')
+            {
+                $mailData   = [
+                    'subject' =>  $subject,
+                    'template' =>  'send-email',
+                    'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
+                    'logs' => $filteredLogs,
+                    'changedBy' => $loggedUserFullName,
+                    'bookingId' => $booking->id,
+                ];
+            }
+    
+            $this->helper->sendEmail($userDetail->email, $mailData);
         } catch (\Exception $e) {
             return;
         }

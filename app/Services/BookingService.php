@@ -139,8 +139,10 @@ class BookingService
                     $startDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[0]))->format('Y-m-d H:i:s');
                     $endDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[1]))->format('Y-m-d H:i:s');
                 } else {
-                    $startDate = $currentDate;
-                    $endDate = Carbon::now()->addDays(30)->startOfDay()->toDateTimeString();
+                    // $startDate = $currentDate;
+                    // $endDate = Carbon::now()->addDays(30)->startOfDay()->toDateTimeString();
+                    $startDate = Carbon::create(2000, 1, 1, 0, 0, 0)->startOfDay()->toDateTimeString();
+                    $endDate = Carbon::create(2000, 1, 1, 0, 0, 0)->addYears(100)->endOfDay()->toDateTimeString();
                 }
             }else{
                 if ($pickupDateRange) {
@@ -148,8 +150,10 @@ class BookingService
                     $startDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[0]))->format('Y-m-d H:i:s');
                     $endDate = Carbon::createFromFormat('d/m/Y H:i', trim($dates[1]))->format('Y-m-d H:i:s');
                 } else {
-                    $startDate = $currentDate;
-                    $endDate = Carbon::now()->addDay()->startOfDay()->addHours(4)->toDateTimeString(); // Set end date to tomorrow at 4 AM
+                    // $startDate = $currentDate;
+                    // $endDate = Carbon::now()->addDay()->startOfDay()->addHours(4)->toDateTimeString(); // Set end date to tomorrow at 4 AM
+                    $startDate = Carbon::create(2000, 1, 1, 0, 0, 0)->startOfDay()->toDateTimeString();
+                    $endDate = Carbon::create(2000, 1, 1, 0, 0, 0)->addYears(100)->endOfDay()->toDateTimeString();
                 }
             }
             return $this->bookingRepository->getBookingsArchive($loggedUser, $startDate, $endDate, $search, $page, $sortField, $sortDirection, $driverId);
@@ -278,9 +282,8 @@ class BookingService
             $userTypeSlug = $loggedUser->userType->slug ?? null;
             if ($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin') {
                 $this->sendMessageToOpsTeam($booking, $loggedUser);
-                $this->createBookingNotificationToAdmin($loggedUser, $booking);
+                $this->createBookingNotification($loggedUser, $booking, $userTypeSlug);
             }
-            $this->createBookingNotification($loggedUser, $booking);
             return $booking;
         } catch (\Exception $e) {
             DB::rollback();
@@ -411,9 +414,8 @@ class BookingService
                 $userTypeSlug = $loggedUser->userType->slug ?? null;
                 if ($userTypeSlug === 'client-staff' ||  $userTypeSlug === 'client-admin') {
                     $this->sendMessageToOpsTeam($booking, $loggedUser);
-                    $this->createBookingNotificationToAdmin($loggedUser, $booking);
+                    $this->createBookingNotification($loggedUser, $booking, $userTypeSlug);
                 }
-                $this->createBookingNotification($loggedUser, $booking);
             }
             DB::commit();
             return $booking;
@@ -462,7 +464,7 @@ class BookingService
             $guestname = join(',', $requestData['guest_name']);
             $countryCode = join(',', $requestData['country_code']);
             $phone = join(',', $requestData['phone']);
-
+    
             if (isset($requestData['event_id']))
                 $bookingData['event_id'] = $eventId;
             if (isset($requestData['service_type_id']))
@@ -556,12 +558,11 @@ class BookingService
                 // Upload the new profile image and update user data
                 $bookingData['attachment'] = $this->uploadService->upload($file, $fileName);
             }
-            $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user());
+    
+            $logMessage = $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user(), $requestData['access_given_clients']);
             $bookingData['updated_by_id'] = $loggedUserId;
             
             $this->bookingRepository->updateBooking($booking, $bookingData);
-            
-            $this->updateBookingNotification($loggedUserForNotification, $booking, $requestData['access_given_clients']);
     
             if ($loggedUserType === null || $loggedUserType === UserType::ADMIN) {
                 $bookingBillingData['booking_id'] = $booking->id;
@@ -666,8 +667,9 @@ class BookingService
             $bookingData['deleted_at'] = NULL;
             $bookingData['completely_deleted'] = 'no';
             
+            $linkedClients = !empty($booking->linked_clients) ? explode(',', $booking->linked_clients) : [];
             
-            $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user());
+            $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user(), $linkedClients);
 
             $bookingData['updated_by_id'] = $loggedUserId;
 
@@ -701,8 +703,10 @@ class BookingService
             
             $bookingData['client_asked_to_cancel'] = 'yes';
             
+            $linkedClients = !empty($booking->linked_clients) ? explode(',', $booking->linked_clients) : [];
             
-            $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user());
+            
+            $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user(), $linkedClients);
 
             $bookingData['updated_by_id'] = $loggedUserId;
 
@@ -740,7 +744,10 @@ class BookingService
                     $bookingData['is_driver_acknowledge'] = $requestData['is_driver_acknowledge'] === "true" ? 1 : 0;
                 if ($bookingData['is_driver_acknowledge'] && $bookingData['is_driver_notified'])
                     $bookingData['status'] = Booking::ACCEPTED;
-                $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user());
+            
+                $linkedClients = !empty($booking->linked_clients) ? explode(',', $booking->linked_clients) : [];
+
+                $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user(), $linkedClients);
                 $bookingData['updated_by_id'] = $loggedUserId;
                 $this->bookingRepository->updateBooking($booking, $bookingData);
             }
@@ -810,7 +817,9 @@ class BookingService
                     $bookingData['client_instructions'] = $requestData['client_instructions'];
                 if (isset($requestData['driver_remark']) && !empty($requestData['driver_remark']))
                     $bookingData['driver_remark'] = $requestData['driver_remark'];
-                $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user());
+            
+                $linkedClients = !empty($booking->linked_clients) ? explode(',', $booking->linked_clients) : [];
+                $this->bookingLogService->addLogMessages($bookingData, $booking, Auth::user(), $linkedClients);
                 $bookingData['updated_by_id'] = $loggedUserId;
                 $this->bookingRepository->updateBooking($booking, $bookingData);
             }
@@ -973,37 +982,14 @@ class BookingService
         }
     }
 
-    private function createBookingNotification($loggedUser, $booking)
+    private function createBookingNotification($loggedUser, $booking, $userTypeSlug)
     {
-        $userType =  $loggedUser->userType->type ?? null;
-        $userTypeSlug =  $loggedUser->userType->slug ?? null;
-        $message = "added a new booking";
-        $subject = "New Booking Created";
-        $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
-        if ($userType === null || $userType === UserType::ADMIN) {
-            $notifyUsers = $this->userRepository->getHotelAdminByHotelId($booking->client->hotel_id);
-            foreach ($notifyUsers as $hotelAdmin) {
-                $mailData   = [
-                    'subject' =>  $subject,
-                    'template' =>  'booking-created-email',
-                    'name'    => $this->helper->getFullName($hotelAdmin->first_name, $hotelAdmin->last_name),
-                    'logs' => $message,
-                    'changedBy' => $loggedUserFullName,
-                    'bookingId' => $booking->id,
-                ];
-                $this->helper->sendEmail($hotelAdmin->email, $mailData);
-            }
+        
+        try {
+            $message = "added a new booking";
+            $subject = "New Booking Created";
+            $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
 
-            $mailDataForAdmin = [
-                'subject' => $subject,
-                'template' => 'booking-created-email',
-                'name' => 'Limousine Team',
-                'logs' => $message,
-                'changedBy' => $loggedUserFullName,
-                'bookingId' => $booking->id,
-            ];
-            $this->helper->sendEmail('limousine@e1asia.com.sg', $mailDataForAdmin);
-        } else {
             $mailDataForAdmin = [
                 'subject' => $subject,
                 'template' => 'booking-created-email',
@@ -1012,84 +998,25 @@ class BookingService
                 'changedBy' => $loggedUserFullName . ' from ' . Auth::user()->client->hotel->name,
                 'bookingId' => $booking->id,
             ];
-
             $this->helper->sendEmail('limousine@e1asia.com.sg', $mailDataForAdmin);
+            
             $notifyUsers =  $this->userRepository->getAdmins();
+
+            $notificationType = 'booking';
+            $subject = __("message.booking_notification_subject");
+            $template = 'emails.send_notification';
+            $message = $loggedUserFullName . " " . $message;
+            $notificationData = [
+                'booking' => $booking,
+                'message' => $message,
+                'from_user_name' => $loggedUserFullName,
+            ];
+            $this->notificationService->sendNotification($notificationData, $loggedUser, $notificationType, $subject, $notifyUsers, $message, $template);
+        } catch (\Exception $e) {
+            // Rollback the transaction if an error occurs
+            DB::rollback();
+            throw new \Exception($e->getMessage());
         }
-        $notificationType = 'booking';
-        $subject = __("message.booking_notification_subject");
-        $template = 'emails.send_notification';
-        $message = $loggedUserFullName . " " . $message;
-        $notificationData = [
-            'booking' => $booking,
-            'message' => $message,
-            'from_user_name' => $loggedUserFullName,
-        ];
-        $this->notificationService->sendNotification($notificationData, $loggedUser, $notificationType, $subject, $notifyUsers, $message, $template);
-    }
-
-    private function createBookingNotificationToAdmin($loggedUser, $booking)
-    {
-        $userType =  $loggedUser->userType->type ?? null;
-        $message = "added a new booking";
-        $subject = "New Booking Created";
-        $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
-        if ($userType === null || $userType === UserType::ADMIN) {
-            $notifyUsers = $this->userRepository->getHotelAdminByHotelId($booking->client->hotel_id);
-            foreach ($notifyUsers as $hotelAdmin) {
-                $mailData   = [
-                    'subject' =>  $subject,
-                    'template' =>  'booking-created-email',
-                    'name'    => $this->helper->getFullName($hotelAdmin->first_name, $hotelAdmin->last_name),
-                    'logs' => $message,
-                    'changedBy' => $loggedUserFullName,
-                    'bookingId' => $booking->id,
-                ];
-                $this->helper->sendEmail('limousine@e1asia.com.sg', $mailData);
-            }
-        } else {
-            $notifyUsers =  $this->userRepository->getAdmins();
-        }
-    }
-
-    private function updateBookingNotification($loggedUser, $booking, $deLinkClients)
-    {
-        $userType =  $loggedUser->userType->type ?? null;
-        $message = "updated the booking details.";
-        $subject = "Booking Update";
-        $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
-        if(!empty($deLinkClients))
-        {
-            foreach($deLinkClients as $deLinkClient)
-            {
-                $userDetail = $this->userRepository->getUserById((int) $deLinkClient);
-                if(!empty($userDetail) && !empty($userDetail->email) && !empty($userDetail->first_name))
-                {
-                    $mailData   = [
-                        'subject' =>  $subject,
-                        'template' =>  'booking-updated-email',
-                        'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
-                        'logs' => $message,
-                        'changedBy' => $loggedUserFullName,
-                        'bookingId' => $booking->id,
-                    ];
-                    $this->helper->sendEmail($userDetail->email, $mailData);
-                }
-            }
-        }
-
-        $userDetail = $this->userRepository->getUserById($booking->created_by_id);
-
-        $mailData   = [
-            'subject' =>  $subject,
-            'template' =>  'booking-updated-email',
-            'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
-            'logs' => $message,
-            'changedBy' => $loggedUserFullName,
-            'bookingId' => $booking->id,
-        ];
-
-        $this->helper->sendEmail($userDetail->email, $mailData);
     }
 
     /**
