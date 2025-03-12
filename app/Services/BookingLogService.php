@@ -338,7 +338,10 @@ class BookingLogService
             // }
             $this->sendEmailToCreator($loggedUserFullName, $logMessages, $booking);
     
-            $updateDelinkClients = $this->updateBookingNotification($loggedUser, $logMessages, $booking, $linkedClients);
+            if(!empty($linkedClients))
+            {
+                $updateDelinkClients = $this->updateBookingNotification($loggedUser, $logMessages, $booking, $linkedClients);
+            }
             
             if ($userType === UserType::CLIENT) {
                 $this->sendTelegramNotificationToOpsTeam($loggedUserFullName, $logMessages, $booking);
@@ -533,22 +536,7 @@ class BookingLogService
                     }
                 }
             }
-    
-            $userDetail = $this->userRepository->getUserById($booking->created_by_id);
-    
-            if($userDetail->email !== 'admin@yopmain.com')
-            {
-                $mailData   = [
-                    'subject' =>  $subject,
-                    'template' =>  'send-email',
-                    'name'    => $this->helper->getFullName($userDetail->first_name, $userDetail->last_name),
-                    'logs' => $filteredLogs,
-                    'changedBy' => $loggedUserFullName,
-                    'bookingId' => $booking->id,
-                ];
-            }
-    
-            $this->helper->sendEmail($userDetail->email, $mailData);
+            return true;
         } catch (\Exception $e) {
             return;
         }
