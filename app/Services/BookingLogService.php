@@ -294,6 +294,14 @@ class BookingLogService
                                     $logMessages[] = "Changed no of child seats from {$oldValue} to {$newValue}";
                                 }
                                 break;
+                            case "client_asked_to_cancel":
+                                if($oldValue == 'no' && $newValue == 'yes')
+                                {
+                                    $logMessages[] = "Requested For Cancel.";
+
+                                    $this->sendEmailToAdminForCancel($booking, $loggedUser);
+                                }
+                                break;
                             case "linked_clients":
                                 if ($oldValue === null || $oldValue === '') {
                                     $all_user_ids = explode(',', $newValue);
@@ -497,6 +505,29 @@ class BookingLogService
          
                 $this->helper->sendEmail($creatorDetails->email, $mailData);
             }
+        } catch (\Exception $e) {
+            return;
+        }
+    }
+
+    private function sendEmailToAdminForCancel($booking, $loggedUser)
+    {
+        try {
+            $bookingId = $booking->id;
+            $subject = "Requested For Cancel #" . $bookingId;
+            $loggedUserFullName = $this->helper->getFullName($loggedUser->first_name, $loggedUser->last_name);
+            $message = "Requested For Cancel For Booking Number #" . $bookingId;
+    
+            $mailData   = [
+                'subject' =>  $subject,
+                'template' =>  'requested-for-cancel-booking',
+                'name'    => 'Limousine Team',
+                'logs' => $message,
+                'changedBy' => $loggedUserFullName . ' from ' . $loggedUser->client->hotel->name,
+                'bookingId' => $bookingId,
+            ];
+    
+            $this->helper->sendEmail('limousine@e1asia.com.sg', $mailData);
         } catch (\Exception $e) {
             return;
         }

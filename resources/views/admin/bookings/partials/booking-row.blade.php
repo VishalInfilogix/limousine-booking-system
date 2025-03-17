@@ -157,20 +157,27 @@
           @if (
             $userTypeSlug === null ||
                 in_array($userTypeSlug, ['admin', 'admin-staff']) ||
-                (in_array($userTypeSlug, ['client-admin', 'client-staff']) && 
-                    (($booking->status === 'PENDING') || ($booking->status === 'ACCEPTED'))
-                    && $hoursDifference > 24
-                ))
-              <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
-                  <i class="fas fa-pencil-alt mr-1"></i>
-              </a>
+                (in_array($userTypeSlug, ['client-admin', 'client-staff'])))
+                
+                @if($booking->status === 'PENDING' && $booking->client_asked_to_cancel != 'yes')
+                    <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
+                        <i class="fas fa-pencil-alt mr-1"></i>
+                    </a>
+                @endif
+                @if($booking->status === 'ACCEPTED' && $booking->client_asked_to_cancel != 'yes')
+                    @if($hoursDifference > 24)
+                        <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
+                            <i class="fas fa-pencil-alt mr-1"></i>
+                        </a>
+                    @endif
+                @endif
           @endif
           {{-- @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
               <button title="Delete"><i data-id="{{ $booking->id }}"
                       class="fas fa-solid fa-trash text-danger mr-2 mx-1"></i></button>
           @endif --}}
       </td>
-      <td class="sticky-column">
+      <td class="sticky-column {{$hoursDifference}}">
           @if ($attachment && Storage::disk('public')->exists($attachment))
               <a target="blank" href="{{ Storage::url($attachment) }}" class="attachment-link">
                   <i class="fa fa-paperclip text-dark"></i>
