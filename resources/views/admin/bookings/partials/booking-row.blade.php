@@ -154,24 +154,28 @@
           </td>
       @endif
       <td class="sticky-column">
-          @if (
-            $userTypeSlug === null ||
-                in_array($userTypeSlug, ['admin', 'admin-staff']) ||
-                (in_array($userTypeSlug, ['client-admin', 'client-staff'])))
-                
-                @if($booking->status === 'PENDING' && $booking->client_asked_to_cancel != 'yes')
+        @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
+
+            <a class="text-dark mx-1 {{$userTypeSlug}}" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
+                <i class="fas fa-pencil-alt mr-1"></i>
+            </a>
+            
+        @else
+            @if($booking->status === 'PENDING' && $booking->client_asked_to_cancel != 'yes')
+                @if($hoursDifference > 24)
+                <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
+                    <i class="fas fa-pencil-alt mr-1"></i>
+                </a>
+                @endif
+            @endif
+            @if($booking->status === 'ACCEPTED' && $booking->client_asked_to_cancel != 'yes')
+                @if($hoursDifference > 24)
                     <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
                         <i class="fas fa-pencil-alt mr-1"></i>
                     </a>
                 @endif
-                @if($booking->status === 'ACCEPTED' && $booking->client_asked_to_cancel != 'yes')
-                    @if($hoursDifference > 24)
-                        <a class="text-dark mx-1" href="{{ route('edit-booking', ['booking' => $booking->id]) }}" title="Edit">
-                            <i class="fas fa-pencil-alt mr-1"></i>
-                        </a>
-                    @endif
-                @endif
-          @endif
+            @endif
+        @endif
           {{-- @if ($userTypeSlug === null || in_array($userTypeSlug, ['admin', 'admin-staff']))
               <button title="Delete"><i data-id="{{ $booking->id }}"
                       class="fas fa-solid fa-trash text-danger mr-2 mx-1"></i></button>
