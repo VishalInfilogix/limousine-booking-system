@@ -25,10 +25,6 @@ use App\Http\Controllers\Admin\NotificationController;
 use \Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Artisan;
 
-Route::get('/test', function () {
-    return phpinfo();
-});
-
 Route::get('/clear-cache', function () {
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
